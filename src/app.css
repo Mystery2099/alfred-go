@@ -1,0 +1,326 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --app-bg: #F3F7FB;
+  --app-surface: #FFFFFF;
+  --app-surface-muted: #F1F5F9;
+  --app-border: #D5E0EA;
+  --app-text: #17212B;
+  --app-text-muted: #64748B;
+  --app-text-soft: #94A3B8;
+  --app-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
+  --app-shadow-color: rgba(0, 0, 0, 0.16);
+  --app-hover: #E8EEF5;
+  --app-chip: #F1F5F9;
+  --app-accent: #003C71;
+  --app-accent-hover: #002B51;
+  --app-accent-strong: #003C71;
+  --app-accent-contrast: #FFFFFF;
+  --app-link: #003C71;
+  --app-selected-bg: rgba(0, 60, 113, 0.10);
+  --app-selected-text: #003C71;
+  --app-badge-bg: #FFF3B3;
+  --app-badge-text: #00203C;
+  --brand-gold: #FFCD00;
+  --brand-blue: #003C71;
+  --brand-light-blue: #0085CA;
+  --brand-dark-blue: #00203C;
+  --profile-gradient-from: #003C71;
+  --profile-gradient-to: #0085CA;
+  --profile-warning: #FFCD00;
+  --profile-success: #0085CA;
+  --profile-help: #003C71;
+}
+
+.dark {
+  --app-bg: #0B1220;
+  --app-surface: #121A2A;
+  --app-surface-muted: #1A2436;
+  --app-border: #2A3850;
+  --app-text: #E8EEF7;
+  --app-text-muted: #A8B3C7;
+  --app-text-soft: #8494AD;
+  --app-shadow: 0 10px 28px rgba(0, 0, 0, 0.35);
+  --app-shadow-color: rgba(0, 0, 0, 0.42);
+  --app-hover: #223047;
+  --app-chip: #1F2B3F;
+  --app-accent: #005D99;
+  --app-accent-hover: #004F80;
+  --app-accent-strong: #005D99;
+  --app-accent-contrast: #FFFFFF;
+  --app-link: #FFD940;
+  --app-selected-bg: rgba(255, 205, 0, 0.16);
+  --app-selected-text: #FFD940;
+  --app-badge-bg: #3B3100;
+  --app-badge-text: #FFDF40;
+  --brand-gold: #FFCD00;
+  --brand-blue: #003C71;
+  --brand-light-blue: #0085CA;
+  --brand-dark-blue: #00203C;
+  --profile-gradient-from: #00203C;
+  --profile-gradient-to: #003C71;
+  --profile-warning: #FFCD00;
+  --profile-success: #005D99;
+  --profile-help: #003C71;
+}
+
+html {
+  background: var(--app-bg);
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  overflow-x: hidden;
+  background: var(--app-bg);
+  color: var(--app-text);
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+.shadow-sm,
+.shadow-md,
+.shadow-lg {
+  --tw-shadow-color: var(--app-shadow-color);
+}
+
+.dark .shadow-sm,
+.dark .shadow-md,
+.dark .shadow-lg {
+  box-shadow: var(--app-shadow);
+}
+
+.dark input,
+.dark select,
+.dark textarea {
+  color: var(--app-text);
+}
+
+.dark input::placeholder,
+.dark textarea::placeholder {
+  color: var(--app-text-soft);
+}
+
+.dark .primary-button,
+.dark .avatar,
+.dark .quick-icon.tone-0 {
+  background-color: var(--app-accent);
+}
+
+.dark .quick-icon.tone-1 {
+  background-color: var(--app-accent);
+}
+
+.dark .notice-icon.reminder {
+  background-color: var(--app-accent);
+}
+
+.dark .quick-icon.tone-2 {
+  background-color: var(--brand-gold);
+  color: var(--brand-dark-blue);
+}
+
+.dark .quick-icon.tone-3 {
+  background-color: var(--brand-dark-blue);
+  border: 1px solid var(--app-border);
+}
+
+.dark .profile-hero {
+  background-image: linear-gradient(90deg, var(--profile-gradient-from), var(--profile-gradient-to));
+}
+
+.avatar {
+  @apply grid h-10 w-10 shrink-0 place-items-center rounded-full bg-campus-blue text-sm font-bold text-white shadow-md;
+}
+
+.nav-item {
+  @apply flex w-full items-center gap-4 rounded-3xl px-4 py-3 text-sm font-bold text-text-muted transition-all duration-300 ease-out hover:bg-muted hover:text-link;
+}
+
+.nav-item.active {
+  @apply text-link transition-colors duration-300 ease-out;
+}
+
+.mobile-item {
+  @apply flex h-14 flex-col items-center justify-center gap-1 rounded-lg px-2 text-[11px] font-bold text-text-muted transition-colors duration-300 ease-out;
+}
+
+.mobile-item.active {
+  @apply text-link transition-colors duration-300 ease-out;
+}
+
+.control {
+  @apply rounded-2xl border border-border bg-surface px-3 py-3 text-sm outline-none ring-campus-gold transition focus:border-campus-blue focus:ring-2;
+}
+
+.primary-button {
+  @apply inline-flex items-center justify-center gap-2 rounded-2xl px-4 py-3 text-sm font-extrabold text-white shadow-sm transition;
+  background-color: var(--app-accent);
+}
+
+.primary-button:hover {
+  background-color: var(--app-accent-hover);
+}
+
+.secondary-button {
+  @apply inline-flex items-center justify-center gap-2 rounded-2xl border border-border bg-surface px-4 py-3 text-sm font-extrabold text-link transition hover:bg-muted;
+}
+
+.tag {
+  @apply rounded-full bg-muted px-3 py-1 text-xs font-bold text-text-muted;
+}
+
+.segmented {
+  @apply rounded-lg border border-border bg-surface px-3 py-2 text-sm font-bold capitalize text-text-muted transition hover:bg-muted;
+}
+
+.segmented.active {
+  @apply border-campus-blue bg-campus-blue text-white;
+}
+
+.admin-card {
+  @apply flex items-center gap-4 rounded-2xl border border-border bg-surface p-4 text-left shadow-sm transition hover:-translate-y-0.5 hover:shadow-md sm:p-5;
+}
+
+.admin-card svg {
+  @apply h-8 w-8 text-link;
+}
+
+.admin-card b {
+  @apply block text-lg;
+}
+
+.admin-card small {
+  @apply block text-sm text-text-muted;
+}
+
+.pill {
+  @apply rounded-full px-3 py-1.5 text-xs font-extrabold text-text-muted transition-colors duration-300 hover:text-link;
+}
+
+.pill.active {
+  @apply text-white;
+}
+
+.notice-icon {
+  @apply grid h-10 w-10 shrink-0 place-items-center rounded-xl text-white;
+}
+
+.notice-icon.urgent {
+  @apply bg-campus-red;
+}
+
+.notice-icon.deadline {
+  @apply bg-amber-500;
+}
+
+.notice-icon.reminder {
+  @apply bg-campus-blue;
+}
+
+.action-chip {
+  @apply hidden items-center gap-1 rounded-full bg-selected px-4 py-2 text-xs font-extrabold text-link transition hover:bg-campus-blue hover:text-white md:inline-flex;
+}
+
+.dark .action-chip {
+  background-color: var(--app-surface-muted);
+  color: var(--app-text-muted);
+}
+
+.dark .action-chip:hover {
+  background-color: var(--app-accent);
+  color: #fff;
+}
+
+.quick-card {
+  @apply flex min-h-32 w-full min-w-0 items-start gap-4 rounded-2xl bg-surface p-3 text-left shadow-sm ring-1 ring-border transition hover:-translate-y-0.5 hover:shadow-md hover:ring-2 hover:ring-campus-blue/20 sm:p-4;
+}
+
+.quick-icon {
+  @apply grid h-11 w-11 shrink-0 place-items-center rounded-xl text-white;
+}
+
+.quick-icon.tone-0 {
+  @apply bg-campus-blue;
+}
+
+.quick-icon.tone-1 {
+  @apply bg-campus-lightBlue;
+}
+
+.quick-icon.tone-2 {
+  @apply bg-campus-gold text-link;
+}
+
+.quick-icon.tone-3 {
+  @apply bg-campus-darkBlue;
+}
+
+.recent-card {
+  @apply flex w-full min-w-0 items-center gap-3 rounded-2xl bg-surface p-3 text-left shadow-sm ring-1 ring-border transition hover:bg-muted hover:shadow-sm;
+}
+
+.recent-card b {
+  @apply block text-sm font-extrabold;
+}
+
+.recent-card small {
+  @apply block truncate text-xs text-text-muted;
+}
+
+.search-chip {
+  @apply rounded-full bg-surface px-4 py-2 text-sm text-text-muted shadow-sm ring-1 ring-border transition hover:bg-selected hover:text-link;
+}
+
+.profile-hero {
+  @apply flex items-center gap-4 rounded-2xl p-5 shadow-lg shadow-campus-blue/20;
+  background-image: linear-gradient(90deg, var(--profile-gradient-from), var(--profile-gradient-to));
+}
+
+.profile-row {
+  @apply flex w-full items-center gap-3 px-4 py-4 text-left transition hover:bg-muted;
+}
+
+.profile-row b {
+  @apply block text-sm font-extrabold text-text;
+}
+
+.profile-row small {
+  @apply mt-0.5 block text-xs text-text-muted;
+}
+
+.profile-icon {
+  @apply grid h-9 w-9 shrink-0 place-items-center rounded-xl text-white;
+}
+
+.profile-icon.tone-0 {
+  @apply bg-campus-blue;
+}
+
+.profile-icon.tone-1 {
+  background-color: var(--profile-warning);
+  color: var(--brand-dark-blue);
+}
+
+.profile-icon.tone-2 {
+  background-color: var(--profile-success);
+}
+
+.profile-icon.tone-3 {
+  background-color: var(--profile-help);
+}
+
+.no-scrollbar {
+  scrollbar-width: none;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
