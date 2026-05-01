@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { enhance } from '$app/forms'
   import { Heart, ExternalLink, ChevronRight } from 'lucide-svelte'
   import { getAppState } from '$lib/app-state.svelte'
   import Badge from './Badge.svelte'
@@ -10,12 +11,6 @@
 
   let { tool }: Props = $props()
   const app = getAppState()
-
-  function handleFavorite(e: Event) {
-    e.preventDefault()
-    e.stopPropagation()
-    app.toggleFavorite(tool.id)
-  }
 
   function handleLaunch(e: Event) {
     e.preventDefault()
@@ -35,12 +30,12 @@
   <div class="min-w-0 flex-1">
     <div class="flex items-center gap-2">
       <b class="truncate text-sm font-extrabold text-text">{tool.name}</b>
-      <button
-        onclick={handleFavorite}
-        class="shrink-0 transition-colors {app.isFavorite(tool.id) ? 'text-campus-gold' : 'text-text-soft hover:text-campus-gold'}"
-      >
-        <Heart class="h-4 w-4 {app.isFavorite(tool.id) ? 'fill-current' : ''}" />
-      </button>
+      <form method="POST" action="?/toggleFavorite" use:enhance>
+        <input type="hidden" name="toolId" value={tool.id} />
+        <button class="shrink-0 transition-colors {app.isFavorite(tool.id) ? 'text-campus-gold' : 'text-text-soft hover:text-campus-gold'}">
+          <Heart class="h-4 w-4 {app.isFavorite(tool.id) ? 'fill-current' : ''}" />
+        </button>
+      </form>
     </div>
     <p class="mt-0.5 line-clamp-2 text-xs text-text-muted">{tool.description}</p>
     <div class="mt-1.5 flex flex-wrap gap-1">

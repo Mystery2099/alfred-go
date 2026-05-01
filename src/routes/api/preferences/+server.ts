@@ -1,33 +1,14 @@
 import { json } from '@sveltejs/kit'
-import { db } from '$lib/server/db'
-import { userPreferences } from '$lib/server/schema'
-import { eq } from 'drizzle-orm'
-import { logEvent } from '$lib/logger'
+import { jsonApiError } from '$lib/server/api-error'
+import { savePreference } from '$lib/server/app-data'
 import type { RequestHandler } from './$types'
 
-export const POST: RequestHandler = async ({ request }) => {
-  const { userId, ...prefs } = await request.json()
-
-  const existing = db.select().from(userPreferences)
-    .where(eq(userPreferences.userId, userId)).all()
-
-  const now = new Date().toISOString()
-
-  if (existing.length > 0) {
-    db.update(userPreferences)
-      .set({ ...prefs, updatedAt: now })
-      .where(eq(userPreferences.userId, userId))
-      .run()
-  } else {
-    db.insert(userPreferences).values({
-      id: `pref-${userId}`,
-      userId,
-      ...prefs,
-      createdAt: now,
-      updatedAt: now,
-    }).run()
+export const POST: RequestHandler = async ({ request, locals }) => {
+  try {
+    const { userId: _ignoredUserId, ...prefs } = await request.json()
+    savePreference(locals.user, prefs)
+    return json({ success: true })
+  } catch (error) {
+    return jsonApiError(error)
   }
-
-  logEvent('info', 'preference.saved', { userId })
-  return json({ success: true })
 }

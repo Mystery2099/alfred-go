@@ -1,9 +1,4 @@
-import { redirect } from '@sveltejs/kit'
-import type { PageServerLoad } from './$types'
+import { adminCategoryActions } from '$lib/server/form-actions'
 
-export const load: PageServerLoad = async ({ locals }) => {
-  if (locals.user?.role !== 'admin') {
-    throw redirect(302, '/')
-  }
-  return {}
-}
+export const load = async () => ({})
+export const actions = adminCategoryActions

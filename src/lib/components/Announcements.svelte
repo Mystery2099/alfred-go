@@ -22,7 +22,8 @@
     const _ = app.noticeFilter
     if (!filterContainerRef) return
     requestAnimationFrame(() => {
-      const activeEl = filterContainerRef!.querySelector('.pill.active') as HTMLElement | null
+      if (!filterContainerRef) return
+      const activeEl = filterContainerRef.querySelector('.pill.active') as HTMLElement | null
       if (activeEl) {
         pillStyle = {
           left: `${activeEl.offsetLeft}px`,

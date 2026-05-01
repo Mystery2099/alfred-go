@@ -1,81 +1,89 @@
 <script lang="ts">
-  import { getAppState } from '$lib/app-state.svelte'
-  import { goto } from '$app/navigation'
-  import { Settings, ShieldCheck, LogOut } from 'lucide-svelte'
-  import SectionTitle from '$lib/components/SectionTitle.svelte'
-  import Badge from '$lib/components/Badge.svelte'
-  import Button from '$lib/components/Button.svelte'
+  import { getAppState, roleLabels } from '$lib/app-state.svelte'
+  import { BookOpen, ChevronRight, Grid2X2, LogOut, Settings, Shield, Star } from 'lucide-svelte'
 
   const app = getAppState()
 
-  async function handleLogout() {
-    await app.logout()
-    goto('/login')
-  }
+  const user = $derived(app.currentUser)
+  const favoriteTools = $derived(app.visibleTools.filter((tool) => app.favoriteIds.has(tool.id)))
+  const accessNotes = $derived([
+    ['Signed in as', user?.email || 'No email on file'],
+    ['Account role', roleLabels[app.currentRole]],
+    ['Viewing resources as', roleLabels[app.effectiveRole]],
+    ['Visible resources', `${app.visibleTools.length} tools`],
+  ])
 
-  const accessNotes = [
-    { label: 'Role', value: app.currentUser?.role || 'Guest' },
-    { label: 'Effective Role', value: app.effectiveRole },
-    { label: 'Theme', value: app.currentPreference?.theme || 'System' },
-    { label: 'Role View', value: app.currentPreference?.preferredRoleView || 'Default' },
-  ]
-
-  const infoRows = [
-    { label: 'Name', value: app.displayName },
-    { label: 'Email', value: app.currentUser?.email || '—' },
-    { label: 'User ID', value: app.userId || '—' },
-  ]
 </script>
 
-<div class="p-4 md:p-8">
-  <SectionTitle>Profile</SectionTitle>
-  <p class="mb-6 text-sm text-text-muted">Manage your account and preferences.</p>
-
-  <!-- Hero -->
-  <div class="mb-6 flex items-center gap-4">
-    <div class="avatar h-16 w-16 text-2xl">{app.displayName.charAt(0)}</div>
-    <div>
-      <h2 class="text-lg font-extrabold text-text">{app.displayName}</h2>
-      <p class="text-sm text-text-muted">{app.currentUser?.email}</p>
-      <Badge variant="default" class="mt-1">{app.currentRole}</Badge>
+<section class="mx-auto max-w-5xl space-y-5">
+  <div class="profile-hero flex-wrap">
+    <span class="grid h-14 w-14 place-items-center rounded-full border-2 border-white/35 bg-surface/20 text-xl font-bold text-white">{app.displayName?.charAt(0) || 'A'}</span>
+    <div class="min-w-0 flex-1">
+      <h2 class="text-lg font-extrabold text-white">{app.displayName}</h2>
+      <p class="text-sm text-white/80">{user?.email} · {roleLabels[app.currentRole]}</p>
     </div>
-  </div>
-
-  <!-- Access Notes -->
-  <div class="mb-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
-    {#each accessNotes as note}
-      <div class="card p-3 text-center">
-        <p class="text-[10px] font-bold uppercase tracking-wider text-text-muted">{note.label}</p>
-        <p class="mt-1 text-sm font-extrabold text-text capitalize">{note.value}</p>
-      </div>
-    {/each}
-  </div>
-
-  <!-- Info -->
-  <div class="card mb-6 divide-y divide-border">
-    {#each infoRows as row}
-      <div class="flex items-center justify-between px-4 py-3">
-        <span class="text-sm text-text-muted">{row.label}</span>
-        <span class="text-sm font-bold text-text">{row.value}</span>
-      </div>
-    {/each}
-  </div>
-
-  <!-- Links -->
-  <div class="flex flex-col gap-2">
-    <Button href="/settings" variant="secondary">
-      <Settings class="h-4 w-4" />
-      Settings
-    </Button>
-    {#if app.isAdmin}
-      <Button href="/admin" variant="secondary">
-        <ShieldCheck class="h-4 w-4" />
-        Admin Dashboard
-      </Button>
-    {/if}
-    <Button variant="ghost" onclick={handleLogout}>
+    <form method="POST" action="?/logout">
+    <button class="inline-flex items-center gap-2 rounded-xl bg-white/15 px-3 py-2 text-sm font-extrabold text-white transition hover:bg-white/25">
       <LogOut class="h-4 w-4" />
-      Log Out
-    </Button>
+      Sign out
+    </button>
+    </form>
   </div>
-</div>
+
+  <div class="grid gap-4 lg:grid-cols-[1.2fr_0.8fr]">
+    <section class="rounded-xl border border-border bg-surface p-5 shadow-sm">
+      <div>
+        <p class="text-xs font-extrabold uppercase tracking-[0.18em] text-text-muted">Account</p>
+        <h2 class="mt-1 text-2xl font-extrabold text-link">Profile overview</h2>
+      </div>
+      <div class="mt-5 grid gap-3 sm:grid-cols-2">
+        {#each accessNotes as [label, value]}
+          <div class="rounded-xl bg-muted p-4">
+            <p class="text-xs font-extrabold uppercase tracking-wider text-text-soft">{label}</p>
+            <p class="mt-1 text-sm font-extrabold text-text">{value}</p>
+          </div>
+        {/each}
+      </div>
+    </section>
+
+    <section class="rounded-xl border border-border bg-surface p-5 shadow-sm">
+      <p class="text-xs font-extrabold uppercase tracking-wider text-text-soft">Quick context</p>
+      <div class="mt-4 space-y-3">
+        {@render InfoRow(BookOpen, 'Dashboard source', favoriteTools.length ? 'Pinned resources are powering your quick access.' : 'Featured resources are shown until you pin favorites.')}
+        {@render InfoRow(Star, 'Favorites', `${favoriteTools.length} saved for this account`)}
+        {@render InfoRow(Shield, 'Session', 'Server-authenticated prototype session active')}
+      </div>
+    </section>
+  </div>
+
+  <a class="flex items-center gap-4 rounded-xl border border-border bg-surface p-5 shadow-sm transition hover:bg-muted hover:shadow-md" href="/settings">
+    <span class="profile-icon tone-0"><Settings class="h-5 w-5" /></span>
+    <span class="min-w-0 flex-1">
+      <span class="block font-extrabold text-link">Settings</span>
+      <span class="mt-1 block text-sm text-text-muted">Manage theme, role view, notifications, security, and support preferences.</span>
+    </span>
+    <ChevronRight class="h-5 w-5 text-text-soft" />
+  </a>
+
+  {#if app.isAdmin}
+    <a class="flex items-center gap-4 rounded-xl border border-border bg-surface p-5 shadow-sm transition hover:bg-muted hover:shadow-md lg:hidden" href="/admin">
+      <span class="profile-icon tone-2"><Grid2X2 class="h-5 w-5" /></span>
+      <span class="min-w-0 flex-1">
+        <span class="block font-extrabold text-link">Admin</span>
+        <span class="mt-1 block text-sm text-text-muted">Manage tools and categories from the admin area.</span>
+      </span>
+      <ChevronRight class="h-5 w-5 text-text-soft" />
+    </a>
+  {/if}
+</section>
+
+{#snippet InfoRow(icon: any, title: string, body: string)}
+  {@const RowIcon = icon}
+  <div class="flex items-start gap-3">
+    <span class="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-selected text-link"><RowIcon class="h-5 w-5" /></span>
+    <span>
+      <span class="block text-sm font-extrabold">{title}</span>
+      <span class="mt-0.5 block text-sm text-text-muted">{body}</span>
+    </span>
+  </div>
+{/snippet}

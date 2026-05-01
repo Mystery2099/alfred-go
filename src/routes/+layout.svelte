@@ -16,14 +16,14 @@
     app.hydrate(data)
   })
 
-  const isAuthenticated = $derived(!!data?.authUserId)
-  const isAdmin = $derived(data?.users?.find((u) => u.id === data?.authUserId)?.role === 'admin')
+  const isAuthenticated = $derived(app.isAuthenticated)
+  const isAdmin = $derived(app.isAdmin)
 
   $effect(() => {
-    if (data && !data.authUserId && $page.url.pathname !== '/login') {
+    if (app.dataReady && !app.isAuthenticated && $page.url.pathname !== '/login') {
       goto('/login')
     }
-    if (data?.authUserId && $page.url.pathname === '/login') {
+    if (app.isAuthenticated && $page.url.pathname === '/login') {
       goto('/')
     }
   })
@@ -32,9 +32,15 @@
     app.applyTheme()
   })
 
+  $effect(() => {
+    const _ = app.currentPreference?.theme
+    if (app.dataReady) app.applyTheme()
+  })
+
   let collapsed = $state(false)
   let navContainerRef: HTMLDivElement | undefined = $state()
   let mobileNavRef: HTMLElement | undefined = $state()
+  let searchRef: HTMLInputElement | undefined = $state()
   let navPillStyle = $state({ top: '0px', height: '0px', opacity: 0 })
   let mobilePillStyle = $state({ left: '0px', width: '0px', opacity: 0 })
 
@@ -75,8 +81,24 @@
   onMount(() => {
     const systemTheme = window.matchMedia('(prefers-color-scheme: dark)')
     const updateSystemTheme = () => app.applyTheme()
+    const handleKeydown = (event: KeyboardEvent) => {
+      const target = event.target as HTMLElement | null
+      const isTyping = target && ['INPUT', 'TEXTAREA', 'SELECT'].includes(target.tagName)
+      if (event.key === '/' && !isTyping) {
+        event.preventDefault()
+        searchRef?.focus()
+      }
+      if (event.key === 'Escape') {
+        searchRef?.blur()
+        app.setQuery('')
+      }
+    }
     systemTheme.addEventListener('change', updateSystemTheme)
-    return () => systemTheme.removeEventListener('change', updateSystemTheme)
+    window.addEventListener('keydown', handleKeydown)
+    return () => {
+      systemTheme.removeEventListener('change', updateSystemTheme)
+      window.removeEventListener('keydown', handleKeydown)
+    }
   })
 
   const navItems = [
@@ -199,7 +221,7 @@
         </div>
         <label class="hidden min-w-0 flex-[1.1] items-center gap-3 rounded-3xl border border-border bg-muted px-4 py-3 shadow-sm transition focus-within:border-campus-blue focus-within:ring-2 focus-within:ring-campus-blue/20 md:flex">
           <Search class="h-5 w-5 text-text-muted" />
-          <input value={app.query} oninput={(e) => app.setQuery(e.currentTarget.value)} class="w-full bg-transparent text-sm outline-none" placeholder="Search resources..." />
+          <input bind:this={searchRef} value={app.query} oninput={(e) => app.setQuery(e.currentTarget.value)} class="w-full bg-transparent text-sm outline-none" placeholder="Search resources..." />
         </label>
         <button title="Notifications" class="relative hidden h-11 w-11 place-items-center rounded-full bg-muted text-link shadow-sm md:grid">
           <Bell class="h-5 w-5" />

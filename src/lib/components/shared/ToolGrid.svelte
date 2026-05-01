@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { enhance } from '$app/forms'
   import { Heart } from 'lucide-svelte'
   import { getAppState } from '$lib/app-state.svelte'
   import Icon from './Icon.svelte'
@@ -30,9 +31,12 @@
             <h3 class="text-base font-extrabold text-link">{tool.name}</h3>
             <p class="mt-1 line-clamp-2 text-sm text-text-muted opacity-80">{tool.description}</p>
           </div>
-          <button title="Favorite" onclick={() => app.toggleFavorite(tool.id)}>
-            <Heart class="h-5 w-5 {app.isFavorite(tool.id) ? 'fill-campus-gold text-campus-gold' : 'text-text-soft'}" />
-          </button>
+          <form method="POST" action="?/toggleFavorite" use:enhance>
+            <input type="hidden" name="toolId" value={tool.id} />
+            <button title="Favorite">
+              <Heart class="h-5 w-5 {app.isFavorite(tool.id) ? 'fill-campus-gold text-campus-gold' : 'text-text-soft'}" />
+            </button>
+          </form>
         </div>
         <div class="mt-4 flex items-center justify-between">
           <span class="text-xs font-bold text-text-muted">{app.categoryName(tool.categoryId)}</span>

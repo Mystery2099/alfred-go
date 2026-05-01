@@ -15,7 +15,7 @@ export const roleLabels: Record<Role, string> = {
   applicant: 'Applicant',
   accepted_student: 'Accepted Student',
   student: 'Student',
-  staff: 'Staff / Faculty',
+  staff: 'Staff',
   admin: 'Admin',
 }
 
@@ -40,9 +40,11 @@ interface AppState {
   tagFilter: string | 'all'
   noticeFilter: string | 'all'
   openCategoryIds: Set<string>
-  openProfilePanel: boolean
+  openProfilePanel: string | null
   authError: string | null
 }
+
+const defaultOpenCategoryIds = ['academics', 'financial', 'resources', 'student-life']
 
 const defaultState: AppState = {
   data: null,
@@ -51,12 +53,12 @@ const defaultState: AppState = {
   categoryFilter: 'all',
   tagFilter: 'all',
   noticeFilter: 'all',
-  openCategoryIds: new Set(),
-  openProfilePanel: false,
+  openCategoryIds: new Set(defaultOpenCategoryIds),
+  openProfilePanel: null,
   authError: null,
 }
 
-let state = $state<AppState>({ ...defaultState, openCategoryIds: new Set() })
+let state = $state<AppState>({ ...defaultState, openCategoryIds: new Set(defaultOpenCategoryIds) })
 
 // Derived values
 let currentUser = $derived(
@@ -121,16 +123,17 @@ let filteredTools = $derived(() => {
     if (catFilter !== 'all' && tool.categoryId !== catFilter) return false
     if (tagFilter !== 'all' && !tool.tags.includes(tagFilter)) return false
     if (query) {
-      const matchesName = tool.name.toLowerCase().includes(query)
-      const matchesDesc = tool.description.toLowerCase().includes(query)
-      const matchesTags = tool.tags.some((tag) => tag.toLowerCase().includes(query))
-      if (!matchesName && !matchesDesc && !matchesTags) return false
+      const category = categories().find((item) => item.id === tool.categoryId)
+      const searchable = [tool.name, tool.description, category?.name || '', ...tool.tags]
+        .join(' ')
+        .toLowerCase()
+      if (!searchable.includes(query)) return false
     }
     return true
   })
 })
 
-let isAuthenticated = $derived(!!state.userId && !!state.data)
+let isAuthenticated = $derived(!!currentUser)
 
 function categoryName(id: string): string {
   return categories().find((c) => c.id === id)?.name || id
@@ -150,12 +153,7 @@ function categoryGlyph(id: string): string {
 }
 
 function roleCanSeeTool(role: Role, tool: Tool): boolean {
-  const roleIndex = roles.indexOf(role)
-  const toolRoles = tool.audienceRoles
-    .map((r) => roles.indexOf(r as Role))
-    .filter((i) => i >= 0)
-  if (toolRoles.length === 0) return true
-  return toolRoles.some((r) => r <= roleIndex)
+  return tool.isActive && (role === 'admin' || tool.audienceRoles.includes(role))
 }
 
 export function getAppState() {
@@ -230,67 +228,12 @@ export function getAppState() {
       state.openCategoryIds = next
     },
 
-    setOpenProfilePanel(open: boolean) {
+    setOpenProfilePanel(open: string | null) {
       state.openProfilePanel = open
     },
 
     setAuthError(err: string | null) {
       state.authError = err
-    },
-
-    async login(email: string, password: string): Promise<boolean> {
-      try {
-        const res = await fetch('/api/login', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email, password }),
-        })
-        const result = await res.json()
-        if (result.error) {
-          state.authError = result.error || 'Login failed'
-          return false
-        } else if (result.id) {
-          state.userId = result.id
-          state.authError = null
-          // Refresh data
-          const dataRes = await fetch('/api/data')
-          const data = await dataRes.json()
-          state.data = data
-          return true
-        } else {
-          state.authError = 'Login failed'
-          return false
-        }
-      } catch (e) {
-        state.authError = 'Network error'
-        return false
-      }
-    },
-
-    async logout() {
-      await fetch('/api/logout', { method: 'POST' })
-      state = { ...defaultState, openCategoryIds: new Set() }
-    },
-
-    async toggleFavorite(toolId: string) {
-      if (!state.userId) return
-      const isFav = favoriteIds().has(toolId)
-      if (isFav) {
-        await fetch('/api/favorites', {
-          method: 'DELETE',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ userId: state.userId, toolId }),
-        })
-      } else {
-        await fetch('/api/favorites', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ userId: state.userId, toolId }),
-        })
-      }
-      const res = await fetch('/api/data')
-      const data = await res.json()
-      state.data = data
     },
 
     isFavorite(toolId: string) {
@@ -313,9 +256,13 @@ export function getAppState() {
     },
 
     launchTool(tool: Tool) {
-      if (tool.url) {
-        window.open(tool.url, '_blank', 'noopener,noreferrer')
+      if (!tool.url) return null
+      if (tool.url.startsWith('/')) {
+        window.location.href = tool.url
+        return tool.url
       }
+      window.open(tool.url, '_blank', 'noopener,noreferrer')
+      return null
     },
   }
 }

@@ -1,68 +1,47 @@
 <script lang="ts">
+  import { enhance } from '$app/forms'
   import { page } from '$app/stores'
-  import { getAppState } from '$lib/app-state.svelte'
-  import { Heart, ExternalLink, ArrowLeft } from 'lucide-svelte'
-  import Button from '$lib/components/Button.svelte'
-  import Badge from '$lib/components/Badge.svelte'
-  import EmptyState from '$lib/components/EmptyState.svelte'
+  import { getAppState, roleLabels } from '$lib/app-state.svelte'
+  import Icon from '$lib/components/shared/Icon.svelte'
 
   const app = getAppState()
   const toolId = $derived($page.params.toolId)
-  const tool = $derived(app.data?.tools.find((t) => t.id === toolId))
+  const tool = $derived(app.visibleTools.find((item) => item.id === toolId))
 </script>
 
-<div class="p-4 md:p-8">
-  <a href="/search" class="mb-4 inline-flex items-center gap-1 text-sm text-text-muted hover:text-link transition">
-    <ArrowLeft class="h-4 w-4" />
-    Back to Search
-  </a>
-
-  {#if tool}
-    <div class="card p-6">
-      <div class="mb-4 flex items-start justify-between">
-        <div class="flex items-center gap-4">
-          <div class="flex h-14 w-14 items-center justify-center rounded-2xl bg-link/10 text-link">
-            <ExternalLink class="h-7 w-7" />
-          </div>
-          <div>
-            <h1 class="text-xl font-extrabold text-text">{tool.name}</h1>
-            <p class="text-sm text-text-muted">{app.categoryName(tool.categoryId)}</p>
-          </div>
-        </div>
-        <button
-          onclick={() => app.toggleFavorite(tool.id)}
-          class="rounded-xl p-2 transition hover:bg-muted {app.isFavorite(tool.id) ? 'text-campus-gold' : 'text-text-soft hover:text-campus-gold'}"
-        >
-          <Heart class="h-6 w-6 {app.isFavorite(tool.id) ? 'fill-current' : ''}" />
-        </button>
-      </div>
-
-      <p class="mb-4 text-sm text-text">{tool.description}</p>
-
-      <div class="mb-4 flex flex-wrap gap-1">
+{#if tool}
+  <section class="grid gap-5 lg:grid-cols-[1fr_320px]">
+    <article class="rounded-xl border border-border bg-surface p-6 shadow-sm">
+      <span class="grid h-14 w-14 place-items-center rounded-2xl bg-campus-blue text-white">
+        <Icon name={tool.icon || 'Grid2X2'} class="h-7 w-7" />
+      </span>
+      <h2 class="mt-5 text-3xl font-extrabold">{tool.name}</h2>
+      <p class="mt-3 text-lg text-text-muted">{tool.description}</p>
+      <div class="mt-6 flex flex-wrap gap-2">
         {#each tool.tags as tag}
-          <Badge variant="secondary">{tag}</Badge>
+          <span class="tag">{tag}</span>
         {/each}
       </div>
-
-      <div class="mb-4 flex flex-wrap gap-2">
-        {#each tool.audienceRoles as role}
-          <Badge variant="outline" class="capitalize">{role.replace('_', ' ')}</Badge>
-        {/each}
+      <div class="mt-8 flex flex-wrap gap-3">
+        <button class="primary-button" onclick={() => app.launchTool(tool)}>Launch tool</button>
+        <form method="POST" action="?/toggleFavorite" use:enhance>
+          <input type="hidden" name="toolId" value={tool.id} />
+          <button class="secondary-button">{app.favoriteIds.has(tool.id) ? 'Remove favorite' : 'Add favorite'}</button>
+        </form>
       </div>
-
-      <div class="flex gap-2">
-        <Button href={tool.url}>
-          <ExternalLink class="h-4 w-4" />
-          Launch Tool
-        </Button>
-        <Button variant="secondary" onclick={() => app.toggleFavorite(tool.id)}>
-          <Heart class="h-4 w-4 {app.isFavorite(tool.id) ? 'fill-current' : ''}" />
-          {app.isFavorite(tool.id) ? 'Favorited' : 'Favorite'}
-        </Button>
-      </div>
-    </div>
-  {:else}
-    <EmptyState title="Tool not found" message="This tool doesn't exist or has been removed." />
-  {/if}
-</div>
+    </article>
+    <aside class="rounded-xl border border-border bg-surface p-5 shadow-sm">
+      <p class="text-sm font-bold uppercase tracking-wider text-text-muted">Details</p>
+      <dl class="mt-4 space-y-4 text-sm">
+        <div><dt class="font-bold">Category</dt><dd>{app.categoryName(tool.categoryId)}</dd></div>
+        <div><dt class="font-bold">Audience</dt><dd>{tool.audienceRoles.map((role) => roleLabels[role]).join(', ')}</dd></div>
+        <div><dt class="font-bold">Status</dt><dd>{tool.isActive ? 'Active' : 'Inactive'}</dd></div>
+      </dl>
+    </aside>
+  </section>
+{:else}
+  <div class="rounded-xl border border-dashed border-border bg-surface p-8 text-center">
+    <h3 class="text-xl font-extrabold">Tool not found</h3>
+    <p class="mt-2 text-text-muted">This resource may not exist, may be inactive, or may not be visible for your current role view.</p>
+  </div>
+{/if}

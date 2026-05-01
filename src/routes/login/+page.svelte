@@ -1,14 +1,16 @@
 <script lang="ts">
   import { getAppState, roleLabels } from '$lib/app-state.svelte'
-  import { goto } from '$app/navigation'
   import { LockKeyhole, LogIn, Mail } from 'lucide-svelte'
 
-  let { data } = $props()
+  let { data, form } = $props()
   const app = getAppState()
 
   let email = $state('student@alfredgo.local')
   let password = $state('StudentGo2026!')
-  let submitting = $state(false)
+
+  $effect(() => {
+    if (form?.email) email = form.email
+  })
 
   function defaultPasswordForRole(role: string) {
     const passwords: Record<string, string> = {
@@ -21,13 +23,6 @@
     return passwords[role] || ''
   }
 
-  async function submit(event: Event) {
-    event.preventDefault()
-    submitting = true
-    const ok = await app.login(email, password)
-    submitting = false
-    if (ok) goto('/')
-  }
 </script>
 
 <section class="mx-auto grid max-w-5xl gap-6 py-4 lg:grid-cols-[1fr_360px] lg:items-start">
@@ -56,28 +51,28 @@
     </div>
   </div>
 
-  <form class="rounded-xl border border-border bg-surface p-5 shadow-sm" onsubmit={submit}>
+  <form class="rounded-xl border border-border bg-surface p-5 shadow-sm" method="POST">
     <h2 class="text-lg font-extrabold text-link">Account login</h2>
     <label class="mt-5 block">
       <span class="text-sm font-bold text-text-muted">Email</span>
       <span class="mt-2 flex items-center gap-3 rounded-2xl border border-border bg-muted px-3 py-3 focus-within:border-campus-blue focus-within:ring-2 focus-within:ring-campus-blue/20">
         <Mail class="h-5 w-5 text-text-muted" />
-        <input class="w-full bg-transparent text-sm outline-none" type="email" autocomplete="username" bind:value={email} required />
+        <input class="w-full bg-transparent text-sm outline-none" name="email" type="email" autocomplete="username" bind:value={email} required />
       </span>
     </label>
     <label class="mt-4 block">
       <span class="text-sm font-bold text-text-muted">Password</span>
       <span class="mt-2 flex items-center gap-3 rounded-2xl border border-border bg-muted px-3 py-3 focus-within:border-campus-blue focus-within:ring-2 focus-within:ring-campus-blue/20">
         <LockKeyhole class="h-5 w-5 text-text-muted" />
-        <input class="w-full bg-transparent text-sm outline-none" type="password" autocomplete="current-password" bind:value={password} required />
+        <input class="w-full bg-transparent text-sm outline-none" name="password" type="password" autocomplete="current-password" bind:value={password} required />
       </span>
     </label>
-    {#if app.authError}
-      <p class="mt-4 rounded-lg bg-rose-50 px-3 py-2 text-sm font-bold text-rose-700">{app.authError}</p>
+    {#if form?.authError || app.authError}
+      <p class="mt-4 rounded-lg bg-rose-50 px-3 py-2 text-sm font-bold text-rose-700">{form?.authError || app.authError}</p>
     {/if}
-    <button class="primary-button mt-5 w-full" type="submit" disabled={submitting}>
+    <button class="primary-button mt-5 w-full" type="submit">
       <LogIn class="h-4 w-4" />
-      {submitting ? 'Signing in...' : 'Sign in'}
+      Sign in
     </button>
   </form>
 </section>

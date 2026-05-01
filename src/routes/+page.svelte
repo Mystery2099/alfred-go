@@ -7,10 +7,10 @@
 
   const app = getAppState()
 
-  const favoriteTools = $derived(() => app.visibleTools.filter((tool) => app.isFavorite(tool.id)))
-  const featured = $derived(() => app.visibleTools.filter((tool) => tool.isFeatured))
-  const quickTools = $derived(() => (favoriteTools().length ? favoriteTools() : featured()).slice(0, 6))
-  const quickLabel = $derived(() => favoriteTools().length ? 'Pinned' : 'Quick Access')
+  const favoriteTools = $derived(app.visibleTools.filter((tool) => app.isFavorite(tool.id)))
+  const featured = $derived(app.visibleTools.filter((tool) => tool.isFeatured))
+  const quickTools = $derived((favoriteTools.length ? favoriteTools : featured).slice(0, 6))
+  const quickLabel = $derived(favoriteTools.length ? 'Pinned' : 'Quick Access')
 </script>
 
 <section class="mx-auto max-w-6xl space-y-8">
@@ -18,7 +18,7 @@
   <section class="border-b border-border pb-8">
     <p class="mb-3 text-xs font-extrabold uppercase tracking-[0.18em] text-link">{quickLabel}</p>
     <div class="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
-      {#each quickTools() as tool, index}
+      {#each quickTools as tool, index}
         <QuickCard {tool} tone={index % 4} />
       {/each}
     </div>
