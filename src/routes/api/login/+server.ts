@@ -1,6 +1,6 @@
 import { json } from '@sveltejs/kit'
 import { jsonApiError } from '$lib/server/api-error'
-import { authenticateUser } from '$lib/server/app-data'
+import { authenticateUser, logActivity } from '$lib/server/app-data'
 import type { RequestHandler } from './$types'
 
 export const POST: RequestHandler = async ({ request, cookies }) => {
@@ -16,6 +16,7 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
       maxAge: 60 * 60 * 8,
     })
 
+    logActivity(user.id, 'login')
     return json(user)
   } catch (error) {
     return jsonApiError(error, 'Invalid email or password')

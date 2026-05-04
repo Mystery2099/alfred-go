@@ -1,12 +1,17 @@
 import type { Actions } from '@sveltejs/kit'
-import type { Category, Role, Tool, UserPreference } from '$lib/types'
-import { saveCategory, savePreference, saveTool, toggleFavorite } from './app-data'
+import type { Announcement, Category, Role, Tool, UserPreference } from '$lib/types'
+import { deleteAnnouncement, deleteCategory, deleteTool, saveAnnouncement, saveCategory, savePreference, saveTool, toggleFavorite } from './app-data'
 
 export const favoriteActions = {
   toggleFavorite: async ({ request, locals }) => {
     const formData = await request.formData()
     const toolId = String(formData.get('toolId') || '')
-    if (toolId) toggleFavorite(locals.user, toolId)
+    if (toolId) {
+      toggleFavorite(locals.user, toolId)
+      if (locals.user) {
+        logActivity(locals.user.id, 'favorite', toolId)
+      }
+    }
     return { ok: true }
   },
 } satisfies Actions
@@ -17,8 +22,16 @@ export const preferenceActions = {
     const prefs: Partial<UserPreference> = {}
     const theme = formData.get('theme')
     const preferredRoleView = formData.get('preferredRoleView')
+    const notificationSettings = formData.get('notificationSettings')
     if (theme) prefs.theme = String(theme) as UserPreference['theme']
     if (preferredRoleView) prefs.preferredRoleView = String(preferredRoleView) as Role
+    if (notificationSettings) {
+      try {
+        prefs.notificationSettings = JSON.parse(String(notificationSettings))
+      } catch {
+        // ignore invalid JSON
+      }
+    }
     savePreference(locals.user, prefs)
     return { ok: true }
   },
@@ -27,12 +40,23 @@ export const preferenceActions = {
 export const adminToolActions = {
   saveTool: async ({ request, locals }) => {
     const formData = await request.formData()
+    const name = String(formData.get('name') || '').trim()
+    const url = String(formData.get('url') || '').trim()
+
+    if (!name) return { ok: false, error: 'Name is required.' }
+    if (!url) return { ok: false, error: 'URL is required.' }
+    try {
+      new URL(url)
+    } catch {
+      return { ok: false, error: 'URL must be a valid web address.' }
+    }
+
     const now = new Date().toISOString()
     const tool: Tool = {
       id: String(formData.get('id') || `tool-${Date.now()}`),
-      name: String(formData.get('name') || ''),
-      description: String(formData.get('description') || ''),
-      url: String(formData.get('url') || ''),
+      name,
+      description: String(formData.get('description') || '').trim(),
+      url,
       categoryId: String(formData.get('categoryId') || 'academics'),
       icon: String(formData.get('icon') || 'Grid2X2'),
       tags: String(formData.get('tags') || '').split(',').map((tag) => tag.trim()).filter(Boolean),
@@ -45,22 +69,79 @@ export const adminToolActions = {
     saveTool(locals.user, tool)
     return { ok: true }
   },
+  deleteTool: async ({ request, locals }) => {
+    const formData = await request.formData()
+    const toolId = String(formData.get('toolId') || '')
+    if (!toolId) return { ok: false, error: 'Tool ID is required.' }
+    deleteTool(locals.user, toolId)
+    return { ok: true }
+  },
 } satisfies Actions
 
 export const adminCategoryActions = {
   saveCategory: async ({ request, locals }) => {
     const formData = await request.formData()
-    const name = String(formData.get('name') || '')
+    const name = String(formData.get('name') || '').trim()
+
+    if (!name) return { ok: false, error: 'Category name is required.' }
+
     const now = new Date().toISOString()
     const category: Category = {
       id: String(formData.get('id') || name.toLowerCase().replace(/[^a-z0-9]+/g, '-')),
       name,
-      description: String(formData.get('description') || ''),
+      description: String(formData.get('description') || '').trim(),
       sortOrder: Number(formData.get('sortOrder') || 0),
       createdAt: now,
       updatedAt: now,
     }
     saveCategory(locals.user, category)
+    return { ok: true }
+  },
+  deleteCategory: async ({ request, locals }) => {
+    const formData = await request.formData()
+    const categoryId = String(formData.get('categoryId') || '')
+    if (!categoryId) return { ok: false, error: 'Category ID is required.' }
+    deleteCategory(locals.user, categoryId)
+    return { ok: true }
+  },
+} satisfies Actions
+
+export const adminAnnouncementActions = {
+  saveAnnouncement: async ({ request, locals }) => {
+    const formData = await request.formData()
+    const title = String(formData.get('title') || '').trim()
+    const body = String(formData.get('body') || '').trim()
+
+    if (!title) return { ok: false, error: 'Title is required.' }
+    if (!body) return { ok: false, error: 'Body is required.' }
+
+    const now = new Date().toISOString()
+    const id = String(formData.get('id') || `announcement-${Date.now()}`)
+    const toolId = String(formData.get('toolId') || '').trim() || undefined
+    const url = String(formData.get('url') || '').trim() || undefined
+
+    const announcement: Announcement = {
+      id,
+      title,
+      body,
+      tone: String(formData.get('tone') || 'reminder') as Announcement['tone'],
+      filter: String(formData.get('filter') || 'updates') as Announcement['filter'],
+      actionLabel: String(formData.get('actionLabel') || '').trim() || undefined,
+      toolId,
+      url,
+      sortOrder: Number(formData.get('sortOrder') || 0),
+      isActive: formData.get('isActive') !== 'off',
+      createdAt: now,
+      updatedAt: now,
+    }
+    saveAnnouncement(locals.user, announcement)
+    return { ok: true }
+  },
+  deleteAnnouncement: async ({ request, locals }) => {
+    const formData = await request.formData()
+    const announcementId = String(formData.get('announcementId') || '')
+    if (!announcementId) return { ok: false, error: 'Announcement ID is required.' }
+    deleteAnnouncement(locals.user, announcementId)
     return { ok: true }
   },
 } satisfies Actions
