@@ -40,19 +40,48 @@
     ['Feedback for AlfredGO', 'For the prototype, collect comments about missing links, confusing categories, and role visibility.'],
   ] as const
 
-  let notificationEnabled = $state<Record<string, boolean>>(
-    Object.fromEntries(notificationOptions.map(([title]) => [title, true]))
-  )
-
-  function toggleNotification(title: string) {
-    notificationEnabled = { ...notificationEnabled, [title]: !notificationEnabled[title] }
+  function notificationEnabled(title: string): boolean {
+    const settings = app.currentPreference?.notificationSettings
+    if (!settings || !(title in settings)) return true
+    return settings[title]
   }
 
   function resourcePreview(): Tool[] {
     const favorites = favoriteTools()
     return (favorites.length ? favorites : featuredTools()).slice(0, 4)
   }
+
+  let triggerRefs = $state<Record<string, HTMLButtonElement | null>>({})
+  let panelRefs = $state<Record<string, HTMLDivElement | null>>({})
+
+  function openPanel(panel: string) {
+    app.setOpenProfilePanel(panel)
+    requestAnimationFrame(() => {
+      const el = panelRefs[panel]
+      if (el) {
+        const focusable = el.querySelector<HTMLElement>('button, input, select, textarea, a[href]')
+        focusable?.focus()
+      }
+    })
+  }
+
+  function closePanel() {
+    const current = app.openProfilePanel
+    app.setOpenProfilePanel(null)
+    if (current && triggerRefs[current]) {
+      triggerRefs[current]?.focus()
+    }
+  }
+
+  function handleKeydown(event: KeyboardEvent) {
+    if (event.key === 'Escape' && app.openProfilePanel) {
+      event.preventDefault()
+      closePanel()
+    }
+  }
 </script>
+
+<svelte:window onkeydown={handleKeydown} />
 
 <section class="mx-auto max-w-6xl space-y-5">
   <div>
@@ -64,7 +93,8 @@
     <div>
       <button
         class="profile-row"
-        onclick={() => app.setOpenProfilePanel(app.openProfilePanel === 'dashboard' ? null : 'dashboard')}
+        bind:this={triggerRefs['dashboard']}
+        onclick={() => app.openProfilePanel === 'dashboard' ? closePanel() : openPanel('dashboard')}
         aria-expanded={app.openProfilePanel === 'dashboard'}
       >
         <span class="profile-icon tone-0"><Settings class="h-5 w-5" /></span>
@@ -75,7 +105,7 @@
         <ChevronRight class="h-5 w-5 text-text-soft transition {app.openProfilePanel === 'dashboard' ? 'rotate-90' : ''}" />
       </button>
       {#if app.openProfilePanel === 'dashboard'}
-        <div class="px-4 pb-4 sm:px-16">
+        <div class="px-4 pb-4 sm:px-16" bind:this={panelRefs['dashboard']}>
           <div class="grid gap-4 lg:grid-cols-2">
             <div class="card p-5">
               <p class="text-sm font-extrabold text-link">Theme</p>
@@ -126,7 +156,8 @@
     <div class="border-t border-border">
       <button
         class="profile-row"
-        onclick={() => app.setOpenProfilePanel(app.openProfilePanel === 'notifications' ? null : 'notifications')}
+        bind:this={triggerRefs['notifications']}
+        onclick={() => app.openProfilePanel === 'notifications' ? closePanel() : openPanel('notifications')}
         aria-expanded={app.openProfilePanel === 'notifications'}
       >
         <span class="profile-icon tone-1"><Bell class="h-5 w-5" /></span>
@@ -137,25 +168,31 @@
         <ChevronRight class="h-5 w-5 text-text-soft transition {app.openProfilePanel === 'notifications' ? 'rotate-90' : ''}" />
       </button>
       {#if app.openProfilePanel === 'notifications'}
-        <div class="px-4 pb-4 sm:px-16">
+        <div class="px-4 pb-4 sm:px-16" bind:this={panelRefs['notifications']}>
           <div class="grid gap-3 md:grid-cols-2">
             {#each notificationOptions as [title, body, ItemIcon]}
-              <button
-                class="flex items-start gap-3 rounded-xl border border-border bg-surface p-4 text-left transition hover:bg-muted"
-                onclick={() => toggleNotification(title)}
-              >
-                <span class="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-selected text-link"><ItemIcon class="h-5 w-5" /></span>
-                <span class="min-w-0 flex-1">
-                  <span class="block font-extrabold text-link">{title}</span>
-                  <span class="mt-1 block text-sm leading-6 text-text-muted">{body}</span>
-                </span>
-                <span class="mt-1 h-6 w-10 rounded-full p-0.5 transition {notificationEnabled[title] ? 'bg-campus-blue' : 'bg-border'}">
-                  <span class="block h-5 w-5 rounded-full bg-white transition {notificationEnabled[title] ? 'translate-x-4' : ''}"></span>
-                </span>
-              </button>
+              <form method="POST" action="?/savePreference" use:enhance>
+                <input type="hidden" name="notificationSettings" value={JSON.stringify({
+                  ...(app.currentPreference?.notificationSettings || {}),
+                  [title]: !notificationEnabled(title)
+                })} />
+                <button
+                  type="submit"
+                  class="flex w-full items-start gap-3 rounded-xl border border-border bg-surface p-4 text-left transition hover:bg-muted"
+                >
+                  <span class="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-selected text-link"><ItemIcon class="h-5 w-5" /></span>
+                  <span class="min-w-0 flex-1">
+                    <span class="block font-extrabold text-link">{title}</span>
+                    <span class="mt-1 block text-sm leading-6 text-text-muted">{body}</span>
+                  </span>
+                  <span class="mt-1 h-6 w-10 rounded-full p-0.5 transition {notificationEnabled(title) ? 'bg-campus-blue' : 'bg-border'}">
+                    <span class="block h-5 w-5 rounded-full bg-white transition {notificationEnabled(title) ? 'translate-x-4' : ''}"></span>
+                  </span>
+                </button>
+              </form>
             {/each}
           </div>
-          <p class="mt-4 text-sm text-text-muted">Notification controls are prototype preferences for now. They show the alert categories AlfredGO should support when real integrations are added.</p>
+          <p class="mt-4 text-sm text-text-muted">Notification preferences are saved to your account.</p>
         </div>
       {/if}
     </div>
@@ -163,7 +200,8 @@
     <div class="border-t border-border">
       <button
         class="profile-row"
-        onclick={() => app.setOpenProfilePanel(app.openProfilePanel === 'privacy' ? null : 'privacy')}
+        bind:this={triggerRefs['privacy']}
+        onclick={() => app.openProfilePanel === 'privacy' ? closePanel() : openPanel('privacy')}
         aria-expanded={app.openProfilePanel === 'privacy'}
       >
         <span class="profile-icon tone-2"><Shield class="h-5 w-5" /></span>
@@ -174,7 +212,7 @@
         <ChevronRight class="h-5 w-5 text-text-soft transition {app.openProfilePanel === 'privacy' ? 'rotate-90' : ''}" />
       </button>
       {#if app.openProfilePanel === 'privacy'}
-        <div class="px-4 pb-4 sm:px-16">
+        <div class="px-4 pb-4 sm:px-16" bind:this={panelRefs['privacy']}>
           <div class="grid gap-3 md:grid-cols-3">
             {#each securityItems as [title, body, ItemIcon]}
               <div class="rounded-xl border border-border bg-surface p-4">
@@ -191,7 +229,8 @@
     <div class="border-t border-border">
       <button
         class="profile-row"
-        onclick={() => app.setOpenProfilePanel(app.openProfilePanel === 'help' ? null : 'help')}
+        bind:this={triggerRefs['help']}
+        onclick={() => app.openProfilePanel === 'help' ? closePanel() : openPanel('help')}
         aria-expanded={app.openProfilePanel === 'help'}
       >
         <span class="profile-icon tone-3"><CircleHelp class="h-5 w-5" /></span>
@@ -202,7 +241,7 @@
         <ChevronRight class="h-5 w-5 text-text-soft transition {app.openProfilePanel === 'help' ? 'rotate-90' : ''}" />
       </button>
       {#if app.openProfilePanel === 'help'}
-        <div class="px-4 pb-4 sm:px-16">
+        <div class="px-4 pb-4 sm:px-16" bind:this={panelRefs['help']}>
           <div class="grid gap-3 md:grid-cols-3">
             {#each helpItems as [title, body]}
               <div class="rounded-xl border border-border bg-surface p-4">
