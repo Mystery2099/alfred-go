@@ -5,8 +5,8 @@
   import { getAppState } from '$lib/app-state.svelte'
   import { onMount } from 'svelte'
   import {
-    Bell, ChevronLeft, ChevronRight, Grid2X2,
-    Home, Search, Settings, Star, User
+    Bell, ChevronLeft, ChevronRight, Clock3, Grid2X2,
+    Home, Search, Settings, Star, User, X
   } from 'lucide-svelte'
 
   let { children, data } = $props()
@@ -41,8 +41,12 @@
   let navContainerRef: HTMLDivElement | undefined = $state()
   let mobileNavRef: HTMLElement | undefined = $state()
   let searchRef: HTMLInputElement | undefined = $state()
+  let notifRef: HTMLDivElement | undefined = $state()
+  let notifOpen = $state(false)
   let navPillStyle = $state({ top: '0px', height: '0px', opacity: 0 })
   let mobilePillStyle = $state({ left: '0px', width: '0px', opacity: 0 })
+
+  const recentAnnouncements = $derived(() => app.announcements.slice(0, 5))
 
   $effect(() => {
     const _ = $page.url.pathname
@@ -91,13 +95,21 @@
       if (event.key === 'Escape') {
         searchRef?.blur()
         app.setQuery('')
+        notifOpen = false
+      }
+    }
+    const handleClickOutside = (event: MouseEvent) => {
+      if (notifOpen && notifRef && !notifRef.contains(event.target as Node)) {
+        notifOpen = false
       }
     }
     systemTheme.addEventListener('change', updateSystemTheme)
     window.addEventListener('keydown', handleKeydown)
+    window.addEventListener('mousedown', handleClickOutside)
     return () => {
       systemTheme.removeEventListener('change', updateSystemTheme)
       window.removeEventListener('keydown', handleKeydown)
+      window.removeEventListener('mousedown', handleClickOutside)
     }
   })
 
@@ -122,6 +134,9 @@
 </svelte:head>
 
 {#if isAuthenticated}
+  <a href="#main" class="sr-only absolute left-0 top-0 z-50 bg-campus-blue px-4 py-2 text-sm font-bold text-white focus:not-sr-only focus:outline-none focus:ring-2 focus:ring-white">
+    Skip to main content
+  </a>
   <aside class="fixed left-0 top-0 z-30 hidden h-screen flex-col overflow-y-auto border-r border-border bg-surface py-5 transition-all duration-300 lg:flex {collapsed ? 'w-16 px-3' : 'w-60 px-5'}">
     <!-- Logo -->
     <a href="/" class="mb-6 flex items-center gap-3 {collapsed ? 'justify-center px-0' : 'px-3'}">
@@ -169,7 +184,7 @@
 
     <!-- Collapse toggle -->
     <button
-      title={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+      aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
       onclick={() => collapsed = !collapsed}
       class="mt-3 flex h-8 w-8 items-center justify-center self-end rounded-lg text-text-muted transition-colors hover:bg-muted hover:text-link {collapsed ? 'self-center' : ''}"
     >
@@ -198,7 +213,7 @@
     </div>
   </aside>
 
-  <main class="pb-24 transition-all duration-300 lg:pb-8 {collapsed ? 'lg:ml-16' : 'lg:ml-60'}">
+  <main id="main" class="pb-24 transition-all duration-300 lg:pb-8 {collapsed ? 'lg:ml-16' : 'lg:ml-60'}">
     <!-- Header -->
     <header class="sticky top-0 z-20 border-b border-border bg-surface px-4 py-5 lg:px-8">
       <div class="mx-auto flex max-w-6xl items-center gap-4">
@@ -212,6 +227,7 @@
               '/favorites': 'Favorites',
               '/profile': 'Profile',
               '/settings': 'Settings',
+              '/announcements': 'Announcements',
               '/admin': 'Manage AlfredGO',
               '/admin/tools': 'Manage tools',
               '/admin/categories': 'Manage categories',
@@ -223,10 +239,69 @@
           <Search class="h-5 w-5 text-text-muted" />
           <input bind:this={searchRef} value={app.query} oninput={(e) => app.setQuery(e.currentTarget.value)} class="w-full bg-transparent text-sm outline-none" placeholder="Search resources..." />
         </label>
-        <button title="Notifications" class="relative hidden h-11 w-11 place-items-center rounded-full bg-muted text-link shadow-sm md:grid">
-          <Bell class="h-5 w-5" />
-          <span class="absolute right-2 top-2 h-2 w-2 rounded-full bg-rose-500"></span>
-        </button>
+        <div class="relative" bind:this={notifRef}>
+          <button
+            aria-label="Notifications"
+            aria-expanded={notifOpen}
+            onclick={() => notifOpen = !notifOpen}
+            class="relative grid h-11 w-11 place-items-center rounded-full bg-muted text-link shadow-sm transition-colors hover:bg-border"
+          >
+            <Bell class="h-5 w-5" />
+            {#if app.announcements.length > 0}
+              <span class="absolute right-2 top-2 h-2 w-2 rounded-full bg-rose-500"></span>
+            {/if}
+          </button>
+
+          {#if notifOpen}
+            <div class="fixed inset-x-4 top-16 z-50 rounded-2xl border border-border bg-surface shadow-xl ring-1 ring-black/5 sm:absolute sm:inset-x-auto sm:right-0 sm:top-full sm:mt-2 sm:w-80">
+              <div class="flex items-center justify-between px-4 py-3 border-b border-border">
+                <h3 class="text-sm font-extrabold text-link">Notifications</h3>
+                <button onclick={() => notifOpen = false} class="rounded-lg p-1 text-text-muted hover:bg-muted hover:text-link" aria-label="Close notifications">
+                  <X class="h-4 w-4" />
+                </button>
+              </div>
+              <div class="visible-scrollbar max-h-[60vh] overflow-y-auto py-1 sm:max-h-80">
+                {#if recentAnnouncements().length === 0}
+                  <p class="px-4 py-6 text-center text-sm text-text-muted">No new notifications</p>
+                {:else}
+                  {#each recentAnnouncements() as notice}
+                    <a
+                      href={notice.url || (notice.toolId ? `/tools/${notice.toolId}` : '#')}
+                      target={notice.url ? '_blank' : undefined}
+                      rel={notice.url ? 'noopener noreferrer' : undefined}
+                      class="flex items-start gap-3 px-4 py-3 transition-colors hover:bg-muted"
+                      onclick={() => notifOpen = false}
+                    >
+                      <span class="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg
+                        {notice.tone === 'urgent' ? 'bg-rose-100 text-rose-600' : notice.tone === 'deadline' ? 'bg-amber-100 text-amber-600' : 'bg-campus-blue/10 text-campus-blue'}">
+                        {#if notice.tone === 'urgent'}
+                          <Bell class="h-4 w-4" />
+                        {:else if notice.tone === 'deadline'}
+                          <Clock3 class="h-4 w-4" />
+                        {:else}
+                          <Bell class="h-4 w-4" />
+                        {/if}
+                      </span>
+                      <div class="min-w-0 flex-1">
+                        <p class="text-sm font-semibold text-link">{notice.title}</p>
+                        <p class="mt-0.5 text-xs text-text-muted line-clamp-2">{notice.body}</p>
+                      </div>
+                    </a>
+                  {/each}
+                {/if}
+              </div>
+              <div class="flex border-t border-border">
+                <a href="/announcements" class="flex-1 px-4 py-2.5 text-center text-xs font-semibold text-campus-blue transition-colors hover:bg-muted" onclick={() => notifOpen = false}>
+                  View all
+                </a>
+                <div class="w-px bg-border"></div>
+                <a href="/settings" class="flex-1 px-4 py-2.5 text-center text-xs font-semibold text-text-muted transition-colors hover:bg-muted" onclick={() => notifOpen = false}>
+                  Settings
+                </a>
+              </div>
+            </div>
+          {/if}
+        </div>
       </div>
     </header>
 
@@ -244,6 +319,7 @@
     {#each mobileItems as [label, href, ItemIcon]}
       <a
         href={href}
+        aria-label={label}
         class="mobile-item relative z-10 {$page.url.pathname === href ? 'active' : ''}"
       >
         <ItemIcon class="h-5 w-5" />
