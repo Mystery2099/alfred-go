@@ -5,6 +5,7 @@ import type { Activity, Announcement, AppData, Category, Tool, User, UserPrefere
 import { verifyPassword } from './auth'
 import { db } from './db'
 import { activities, announcements, categories, favorites, tools, userCredentials, userPreferences, users } from './schema'
+import { sendPushToAll } from './push'
 
 export function getAppData(authUserId: string | null): AppData & { authUserId: string | null } {
   const allAnnouncements = db.select().from(announcements).all() as AppData['announcements']
@@ -149,6 +150,15 @@ export function saveAnnouncement(user: User | null, announcement: Announcement) 
   }
   db.insert(announcements).values(payload).onConflictDoUpdate({ target: announcements.id, set: payload }).run()
   logEvent('info', existing.length ? 'announcement.updated' : 'announcement.created', { announcementId: announcement.id })
+
+  // Send push notification to all subscribers for new active announcements
+  if (!existing.length && announcement.isActive) {
+    sendPushToAll(
+      announcement.title,
+      announcement.body,
+      announcement.toolId ? `/tools/${announcement.toolId}` : (announcement.url || '/announcements')
+    ).catch(() => {})
+  }
 }
 
 export function deleteAnnouncement(user: User | null, announcementId: string) {
