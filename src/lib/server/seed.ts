@@ -1,10 +1,12 @@
 import { count } from 'drizzle-orm'
 import { db } from './db'
-import { categories, favorites, tools, userCredentials, userPreferences, users } from './schema'
+import { activities, announcements, categories, favorites, tools, userCredentials, userPreferences, users } from './schema'
 import { hashPassword, testAccounts } from './auth'
 import { seedData } from '../data/seed'
 
 export async function reseed() {
+  db.delete(activities).run()
+  db.delete(announcements).run()
   db.delete(favorites).run()
   db.delete(userCredentials).run()
   db.delete(userPreferences).run()
@@ -17,6 +19,7 @@ export async function reseed() {
   db.insert(tools).values(seedData.tools).run()
   db.insert(favorites).values(seedData.favorites).run()
   db.insert(userPreferences).values(seedData.preferences).run()
+  db.insert(announcements).values(seedData.announcements).run()
   seedCredentials()
 }
 

@@ -1,4 +1,4 @@
-import type { AppData, Category, Role, Tool, User, UserPreference } from '../types'
+import type { Announcement, AppData, Category, Role, Tool, User, UserPreference } from '../types'
 
 const now = new Date().toISOString()
 
@@ -29,6 +29,113 @@ export const categories: Category[] = [
   { id: 'resources', name: 'Resources', description: 'Technology, printing, emergency alerts, and self-service tools.', sortOrder: 50, createdAt: now, updatedAt: now },
   { id: 'student-life', name: 'Student Life', description: 'Housing, dining, safety, wellness, travel, and campus involvement.', sortOrder: 60, createdAt: now, updatedAt: now },
   { id: 'staff', name: 'Staff Resources', description: 'Employee tools and administrative systems.', sortOrder: 70, createdAt: now, updatedAt: now }
+]
+
+export const announcements: Announcement[] = [
+  {
+    id: 'announcement-1',
+    title: 'Finals Week Is Here — Good Luck!',
+    body: 'Final exams run through Friday. Remember to check your exam schedule, get plenty of rest, and use the Success Center and library for last-minute study support.',
+    tone: 'reminder',
+    filter: 'reminders',
+    actionLabel: 'Academic Calendar',
+    toolId: 'academic-calendar',
+    sortOrder: 10,
+    isActive: true,
+    createdAt: now,
+    updatedAt: now
+  },
+  {
+    id: 'announcement-2',
+    title: 'Hinkle Library Extended Hours',
+    body: 'The library is open until midnight this week with extra study rooms and quiet zones reserved for finals. Snacks and coffee provided after 8 PM.',
+    tone: 'reminder',
+    filter: 'updates',
+    actionLabel: 'Visit Library',
+    toolId: 'hinkle-library',
+    sortOrder: 20,
+    isActive: true,
+    createdAt: now,
+    updatedAt: now
+  },
+  {
+    id: 'announcement-3',
+    title: 'Banner and DegreeWorks Maintenance',
+    body: 'Banner and DegreeWorks will be unavailable tonight from 2:00 AM to 6:00 AM for scheduled system maintenance. Plan your work accordingly.',
+    tone: 'urgent',
+    filter: 'updates',
+    actionLabel: 'View DegreeWorks',
+    toolId: 'degreeworks',
+    sortOrder: 30,
+    isActive: true,
+    createdAt: now,
+    updatedAt: now
+  },
+  {
+    id: 'announcement-4',
+    title: 'Grade Submission Deadline for Faculty',
+    body: 'All final grades must be submitted in Banner by Tuesday at 5:00 PM. Contact the Registrar with questions or extensions.',
+    tone: 'deadline',
+    filter: 'deadlines',
+    actionLabel: 'Bannerweb',
+    url: 'https://banner.alfredstate.edu/StudentSelfService/ssb/studentProfile',
+    sortOrder: 40,
+    isActive: true,
+    createdAt: now,
+    updatedAt: now
+  },
+  {
+    id: 'announcement-5',
+    title: 'Summer & Fall Registration Opens Soon',
+    body: 'Registration for summer and fall terms opens next Monday. Meet with your advisor and review your DegreeWorks audit before your time slot.',
+    tone: 'deadline',
+    filter: 'deadlines',
+    actionLabel: 'Schedule Planner',
+    toolId: 'schedule-planner',
+    sortOrder: 50,
+    isActive: true,
+    createdAt: now,
+    updatedAt: now
+  },
+  {
+    id: 'announcement-6',
+    title: 'Dining Hours Adjusted for Finals',
+    body: 'Pioneer Café and other dining locations have extended hours this week. Check the Dining Services page for the full finals-week schedule.',
+    tone: 'reminder',
+    filter: 'updates',
+    actionLabel: 'Dining Services',
+    toolId: 'dining',
+    sortOrder: 60,
+    isActive: true,
+    createdAt: now,
+    updatedAt: now
+  },
+  {
+    id: 'announcement-7',
+    title: 'Check In With Yourself This Week',
+    body: 'Finals can be stressful. The 988 Lifeline and Health Portal are available 24/7 if you need support. You have got this!',
+    tone: 'reminder',
+    filter: 'reminders',
+    actionLabel: 'Health & Wellness',
+    toolId: 'health-wellness',
+    sortOrder: 70,
+    isActive: true,
+    createdAt: now,
+    updatedAt: now
+  },
+  {
+    id: 'announcement-8',
+    title: 'Financial Aid Documents Due',
+    body: 'Several outstanding financial aid documents are due by the end of the month. Log in to view your requirements and submit any missing paperwork.',
+    tone: 'deadline',
+    filter: 'deadlines',
+    actionLabel: 'Financial Aid',
+    toolId: 'financial-aid-offers',
+    sortOrder: 80,
+    isActive: true,
+    createdAt: now,
+    updatedAt: now
+  }
 ]
 
 export const tools: Tool[] = [
@@ -113,6 +220,12 @@ export const preferences: UserPreference[] = users.map((user) => ({
   dashboardLayout: 'standard',
   theme: 'system',
   preferredRoleView: user.role,
+  notificationSettings: {
+    'Academic deadlines': true,
+    'Campus service updates': true,
+    'Financial aid tasks': true,
+    'Favorite resource changes': true,
+  },
   createdAt: now,
   updatedAt: now
 }))
@@ -126,7 +239,9 @@ export const seedData: AppData = {
     { id: 'fav-student-email', userId: 'user-student', toolId: 'email', createdAt: now },
     { id: 'fav-accepted-financial-aid', userId: 'user-accepted_student', toolId: 'financial-aid', createdAt: now }
   ],
-  preferences
+  preferences,
+  announcements,
+  activities: []
 }
 
 function tool(
