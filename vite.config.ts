@@ -7,6 +7,9 @@ export default defineConfig({
 		sveltekit(),
 		VitePWA({
 			registerType: 'autoUpdate',
+			strategies: 'injectManifest',
+			srcDir: 'src',
+			filename: 'service-worker.ts',
 			includeAssets: ['icons/alfred-state-logo-A.svg', 'icons/icon-192x192.png', 'icons/icon-512x512.png'],
 			manifest: {
 				name: 'AlfredGO',
@@ -35,34 +38,8 @@ export default defineConfig({
 					}
 				]
 			},
-			workbox: {
-				navigateFallback: '/offline',
-				runtimeCaching: [
-					{
-						urlPattern: /^\/.*$/,
-						handler: 'NetworkFirst',
-						options: {
-							cacheName: 'pages-cache',
-							expiration: { maxEntries: 50, maxAgeSeconds: 60 * 60 * 24 * 7 }
-						}
-					},
-					{
-						urlPattern: /\.(?:js|css)$/,
-						handler: 'StaleWhileRevalidate',
-						options: {
-							cacheName: 'assets-cache',
-							expiration: { maxEntries: 100, maxAgeSeconds: 60 * 60 * 24 * 30 }
-						}
-					},
-					{
-						urlPattern: /\.(?:png|jpg|jpeg|svg|gif|webp|ico)$/,
-						handler: 'CacheFirst',
-						options: {
-							cacheName: 'images-cache',
-							expiration: { maxEntries: 100, maxAgeSeconds: 60 * 60 * 24 * 30 }
-						}
-					}
-				]
+			injectManifest: {
+				globPatterns: ['**/*.{js,css,html,json,png,svg,ico,woff2}'],
 			}
 		})
 	]
