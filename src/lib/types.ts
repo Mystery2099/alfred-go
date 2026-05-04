@@ -47,8 +47,33 @@ export type UserPreference = {
   dashboardLayout?: string
   theme: 'system' | 'light' | 'dark'
   preferredRoleView?: Role
+  notificationSettings?: Record<string, boolean>
   createdAt: string
   updatedAt: string
+}
+
+export type Announcement = {
+  id: string
+  title: string
+  body: string
+  tone: 'urgent' | 'deadline' | 'reminder'
+  filter: 'updates' | 'deadlines' | 'reminders'
+  actionLabel?: string
+  toolId?: string
+  url?: string
+  sortOrder: number
+  isActive: boolean
+  createdAt: string
+  updatedAt: string
+}
+
+export type Activity = {
+  id: string
+  userId: string
+  type: 'tool_launch' | 'favorite' | 'login'
+  toolId?: string
+  toolName?: string
+  createdAt: string
 }
 
 export type AppData = {
@@ -57,5 +82,7 @@ export type AppData = {
   tools: Tool[]
   favorites: Favorite[]
   preferences: UserPreference[]
+  announcements: Announcement[]
+  activities: Activity[]
   authUserId?: string | null
 }

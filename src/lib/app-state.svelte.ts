@@ -110,6 +110,16 @@ let currentPreference = $derived(() => {
   return state.data.preferences.find((p) => p.userId === state.userId) || null
 })
 
+let announcements = $derived(() => {
+  if (!state.data) return []
+  return state.data.announcements.filter((a) => a.isActive).sort((a, b) => a.sortOrder - b.sortOrder)
+})
+
+let recentActivities = $derived(() => {
+  if (!state.data || !state.userId) return []
+  return state.data.activities.filter((a) => a.userId === state.userId).slice(0, 5)
+})
+
 let filteredTools = $derived(() => {
   if (!state.data) return []
   const role = effectiveRole()
@@ -184,6 +194,8 @@ export function getAppState() {
     get isAuthenticated() { return isAuthenticated },
     get isAdmin() { return currentUser?.role === 'admin' },
     get dataReady() { return !!state.data },
+    get announcements() { return announcements() },
+    get recentActivities() { return recentActivities() },
 
     // Functions
     categoryName,
@@ -261,6 +273,11 @@ export function getAppState() {
         window.location.href = tool.url
         return tool.url
       }
+      fetch('/api/activity', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ type: 'tool_launch', toolId: tool.id, toolName: tool.name })
+      }).catch(() => {})
       window.open(tool.url, '_blank', 'noopener,noreferrer')
       return null
     },
