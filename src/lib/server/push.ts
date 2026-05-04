@@ -2,8 +2,8 @@ import webpush from 'web-push'
 import { db } from './db'
 import { pushSubscriptions } from './schema'
 import { eq } from 'drizzle-orm'
+import { VAPID_PUBLIC_KEY } from '$lib/push-client'
 
-const VAPID_PUBLIC_KEY = 'BPSXqR83Ocgm9BshL1V_A50sK6N4px7XNH6tBwafwwIq6EIGVKCumPD1YyimaD4QhNtVa70BZO5A2gopqmDnAgQ'
 const VAPID_PRIVATE_KEY = '477JtNqosMrZmq0eRW8aDZQWiR92ibDVyUOtS0_pu8k'
 const VAPID_SUBJECT = 'mailto:admin@alfredgo.local'
 
