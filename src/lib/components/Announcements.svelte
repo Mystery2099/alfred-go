@@ -1,90 +1,114 @@
 <script lang="ts">
-  import { AlertTriangle, Clock3, ClipboardList, ChevronRight } from 'lucide-svelte'
-  import { getAppState } from '$lib/app-state.svelte'
-  import Icon from './shared/Icon.svelte'
-  import { page } from '$app/stores'
+  import { Bell, Calendar, Clock, Megaphone, TriangleAlert } from 'lucide-svelte'
+  import type { Announcement, AppState } from '../types'
 
-  const app = getAppState()
+  let { app, limit = 0 }: { app: AppState; limit?: number } = $props()
 
-  const notices = [
-    { title: 'Banner and DegreeWorks Maintenance', body: 'Banner and DegreeWorks may be unavailable during scheduled overnight maintenance windows.', time: 'Campus update', tone: 'urgent' as const, filter: 'updates' as const, action: 'View DegreeWorks', tool: 'degreeworks' },
-    { title: 'Academic Calendar Deadlines', body: 'Review withdrawal dates, final exam schedules, and registration deadlines for the current term.', time: 'Academic reminder', tone: 'deadline' as const, filter: 'deadlines' as const, action: 'Academic Calendar', tool: 'academic-calendar' },
-    { title: 'Registration Tasks Available', body: 'Review DegreeWorks, schedule planning, advisor verification, and SSB registration.', time: 'Registration reminder', tone: 'reminder' as const, filter: 'reminders' as const, action: 'Register for Classes', tool: 'register-for-classes' }
-  ]
+  const isPreview = $derived(limit > 0)
 
-  type FilterType = 'all' | 'deadlines' | 'reminders' | 'updates'
-  const filters: [FilterType, string][] = [['all', 'All'], ['deadlines', 'Deadlines'], ['reminders', 'Reminders'], ['updates', 'Updates']]
+  const filters = ['All', 'Reminders', 'Deadlines', 'Updates'] as const
+  let activeFilter = $state('All')
 
-  let filterContainerRef: HTMLDivElement | undefined = $state()
-  let pillStyle = $state({ left: '0px', width: '0px', opacity: 0 })
+  function filteredAnnouncements() {
+    let list = app?.announcements ?? []
+    if (activeFilter !== 'All') {
+      list = list.filter(
+        (a) => a.filter?.toLowerCase() === activeFilter.toLowerCase()
+      )
+    }
+    if (isPreview) {
+      list = list.slice(0, limit)
+    }
+    return list
+  }
 
-  $effect(() => {
-    const _ = app.noticeFilter
-    if (!filterContainerRef) return
-    requestAnimationFrame(() => {
-      if (!filterContainerRef) return
-      const activeEl = filterContainerRef.querySelector('.pill.active') as HTMLElement | null
-      if (activeEl) {
-        pillStyle = {
-          left: `${activeEl.offsetLeft}px`,
-          width: `${activeEl.offsetWidth}px`,
-          opacity: 1,
-        }
-      } else {
-        pillStyle = { ...pillStyle, opacity: 0 }
-      }
-    })
-  })
+  const toneIcons: Record<string, any> = {
+    urgent: TriangleAlert,
+    deadline: Clock,
+    reminder: Bell,
+    default: Megaphone,
+  }
 
-  const filtered = $derived(() => notices.filter((notice) => app.noticeFilter === 'all' || notice.filter === app.noticeFilter))
+  const toneColors: Record<string, string> = {
+    urgent: 'text-amber-600 dark:text-amber-400',
+    deadline: 'text-rose-600 dark:text-rose-400',
+    reminder: 'text-sky-600 dark:text-sky-400',
+    default: 'text-cyan-600 dark:text-cyan-400',
+  }
+
+  const borderColors: Record<string, string> = {
+    urgent: 'border-l-amber-500',
+    deadline: 'border-l-rose-500',
+    reminder: 'border-l-sky-500',
+    default: 'border-l-cyan-500',
+  }
 </script>
 
-<section>
-  <div class="mb-2 flex items-center justify-between gap-3">
-    <p class="mb-3 text-xs font-extrabold uppercase tracking-[0.18em] text-link">What's Happening</p>
-    <div class="no-scrollbar -mr-4 relative flex max-w-full gap-2 overflow-x-auto pb-1 pr-4" bind:this={filterContainerRef}>
-      <div
-        class="pointer-events-none absolute bottom-1 top-0 z-0 rounded-full bg-campus-blue transition-all duration-300 ease-out"
-        style="left: {pillStyle.left}; width: {pillStyle.width}; opacity: {pillStyle.opacity};"
-      ></div>
-      {#each filters as [value, label]}
-        <button
-          class="pill relative z-10 {app.noticeFilter === value ? 'active' : ''}"
-          onclick={() => app.setNoticeFilter(value)}
-        >
-          {label}
-        </button>
-      {/each}
+<section class="space-y-3" aria-label="Announcements">
+  <!-- Header and filters -->
+  <div>
+    <div class="flex items-center justify-between mb-3">
+      <h2 class="text-lg font-semibold text-slate-800 dark:text-slate-100">What&apos;s Happening</h2>
+      {#if !isPreview}
+        <a href="/announcements" class="text-xs font-medium text-campus-blue-700 dark:text-campus-blue-400 hover:underline hidden sm:inline-flex items-center gap-1">
+          View all
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+        </a>
+      {/if}
     </div>
+    {#if !isPreview}
+      <div class="flex flex-wrap gap-1.5 sm:gap-2">
+        {#each filters as f}
+          <button
+            onclick={() => { activeFilter = f }}
+            class="px-2.5 py-1 rounded-full text-xs font-medium transition-colors border {activeFilter === f ? 'bg-campus-blue-600 text-white border-campus-blue-600 dark:bg-campus-blue-500 dark:border-campus-blue-500' : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-750'}"
+            aria-pressed={activeFilter === f}
+          >
+            {f}
+          </button>
+        {/each}
+      </div>
+    {/if}
   </div>
-  <div class="space-y-3">
-    {#each filtered() as notice}
-      <article class="flex items-center gap-4 rounded-2xl bg-surface p-3 shadow-sm ring-1 ring-border transition hover:bg-muted hover:shadow-md hover:ring-campus-blue/20 sm:p-4">
-        <span class="notice-icon {notice.tone}">
-          {#if notice.tone === 'urgent'}
-            <AlertTriangle class="h-5 w-5" />
-          {:else if notice.tone === 'deadline'}
-            <Clock3 class="h-5 w-5" />
-          {:else}
-            <ClipboardList class="h-5 w-5" />
+
+  <!-- Compact list (no scroll on dashboard) -->
+  <div class="space-y-2 {isPreview ? '' : 'max-h-[280px] overflow-y-auto visible-scrollbar scroll-fade pr-1'}">
+    {#each filteredAnnouncements() as a (a.id)}
+      <a
+        href={a.toolId ? `/tools/${a.toolId}` : (a.url || '#')}
+        class="group block bg-white dark:bg-slate-800 rounded-xl border border-slate-200/60 dark:border-slate-700/40 border-l-4 {borderColors[a.tone ?? 'default']} hover:bg-slate-50 dark:hover:bg-slate-750 transition-colors p-2.5 sm:p-3"
+        aria-label="{a.title} — {a.body}"
+      >
+        <div class="flex items-start gap-2.5">
+          {#if a.tone}
+            {@const Icon = toneIcons[a.tone] || Megaphone}
+            <div class="mt-0.5 shrink-0 {toneColors[a.tone ?? 'default']}">
+              <Icon size={16} />
+            </div>
           {/if}
-        </span>
-        <div class="min-w-0 flex-1">
-          <h3 class="text-base font-extrabold text-link">
-            {notice.title}
-            {#if notice.tone === 'urgent'}
-              <span class="ml-2 inline-flex items-center gap-1 rounded-md bg-rose-500 px-2 py-0.5 text-[10px] font-extrabold uppercase text-white">Urgent</span>
-            {/if}
-          </h3>
-          <p class="mt-1 text-sm text-text-muted opacity-90">{notice.body}</p>
-          <p class="mt-3 flex items-center gap-1 text-xs font-medium text-text-muted"><Clock3 class="h-3 w-3" /> {notice.time}</p>
+          <div class="min-w-0 flex-1">
+            <div class="flex items-start justify-between gap-2">
+              <p class="text-sm font-semibold text-slate-800 dark:text-slate-100 line-clamp-1">{a.title}</p>
+              {#if a.actionLabel}
+                <span class="shrink-0 hidden sm:inline-flex items-center gap-1 text-[11px] font-medium text-campus-blue-700 dark:text-campus-blue-400 group-hover:underline">
+                  {a.actionLabel}
+                  <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                </span>
+              {/if}
+            </div>
+            <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5 line-clamp-2">{a.body}</p>
+          </div>
         </div>
-        {#if notice.action && notice.tool}
-          <a href="/tools/{notice.tool}" class="action-chip">
-            {notice.action} <ChevronRight class="h-4 w-4" />
-          </a>
-        {/if}
-      </article>
+      </a>
     {/each}
+    {#if filteredAnnouncements().length === 0}
+      <div class="text-center py-6 text-sm text-slate-500 dark:text-slate-400">No announcements for this filter.</div>
+    {/if}
   </div>
+
+  {#if isPreview && (app?.announcements?.length ?? 0) > limit}
+    <a href="/announcements" class="block w-full text-center py-2.5 rounded-xl border border-dashed border-slate-300 dark:border-slate-600 text-sm font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-750 hover:border-campus-blue-300 dark:hover:border-campus-blue-700 transition-colors">
+      View all {app?.announcements?.length ?? 0} announcements
+    </a>
+  {/if}
 </section>
