@@ -2,7 +2,7 @@
   import { enhance } from '$app/forms'
   import { getAppState, roleLabels, roles } from '$lib/app-state.svelte'
   import type { Tool } from '$lib/types'
-  import { Plus } from 'lucide-svelte'
+  import { Plus, X } from 'lucide-svelte'
   import ToolGrid from '$lib/components/shared/ToolGrid.svelte'
 
   const app = getAppState()
@@ -23,9 +23,20 @@
   })
 
   let draft = $state<Tool>(emptyTool())
+  let isEditing = $state(false)
+  let formError = $state<string | null>(null)
+  let submitting = $state(false)
 
   function resetDraft() {
     draft = emptyTool()
+    isEditing = false
+    formError = null
+  }
+
+  function startEdit(tool: Tool) {
+    draft = { ...tool, tags: [...tool.tags] }
+    isEditing = true
+    formError = null
   }
 </script>
 
@@ -40,8 +51,36 @@
       <p class="text-xs font-extrabold uppercase tracking-[0.18em] text-text-muted">Admin</p>
       <h2 class="mt-1 text-2xl font-extrabold text-link">Manage tools</h2>
     </div>
-    <form method="POST" action="?/saveTool" use:enhance={() => async ({ update }) => { await update(); resetDraft() }} class="rounded-xl border border-border bg-surface p-5 shadow-sm">
-      <h3 class="mb-4 font-extrabold">Tool editor</h3>
+    <form method="POST" action="?/saveTool" use:enhance={() => {
+      submitting = true
+      return async ({ result, update }) => {
+        submitting = false
+        if (result.type === 'failure' && result.data?.error) {
+          formError = String(result.data.error)
+          return
+        }
+        if (result.type === 'success' && result.data?.ok === false && result.data?.error) {
+          formError = String(result.data.error)
+          return
+        }
+        formError = null
+        await update()
+        resetDraft()
+      }
+    }} class="rounded-xl border border-border bg-surface p-5 shadow-sm">
+      <div class="mb-4 flex items-center justify-between">
+        <h3 class="font-extrabold">{isEditing ? 'Edit tool' : 'Tool editor'}</h3>
+        {#if isEditing}
+          <button type="button" onclick={resetDraft} class="grid h-8 w-8 place-items-center rounded-lg text-text-muted transition hover:bg-muted hover:text-link" aria-label="Cancel editing">
+            <X class="h-4 w-4" />
+          </button>
+        {/if}
+      </div>
+      {#if formError}
+        <div class="mb-4 rounded-lg bg-rose-50 px-4 py-3 text-sm font-semibold text-rose-600">
+          {formError}
+        </div>
+      {/if}
       <input type="hidden" name="id" value={draft.id} />
       <input type="hidden" name="icon" value={draft.icon || 'Grid2X2'} />
       <input type="hidden" name="isActive" value="on" />
@@ -78,9 +117,16 @@
         {/each}
       </div>
       <div class="mt-4 flex gap-3">
-        <button class="primary-button"><Plus class="h-4 w-4" /> Save tool</button>
+        <button class="primary-button" disabled={submitting}>
+          {#if submitting}
+            <span class="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"></span>
+          {:else}
+            <Plus class="h-4 w-4" />
+          {/if}
+          {isEditing ? 'Update tool' : 'Save tool'}
+        </button>
       </div>
     </form>
-    <ToolGrid tools={app.data?.tools || []} admin />
+    <ToolGrid tools={app.data?.tools || []} admin onEdit={startEdit} />
   </section>
 {/if}

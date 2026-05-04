@@ -1,6 +1,6 @@
 <script lang="ts">
   import { getAppState } from '$lib/app-state.svelte'
-  import { ClipboardList, Grid2X2 } from 'lucide-svelte'
+  import { Bell, ClipboardList, Grid2X2 } from 'lucide-svelte'
 
   const app = getAppState()
 </script>
@@ -16,7 +16,7 @@
       <p class="text-xs font-extrabold uppercase tracking-[0.18em] text-text-muted">Administration</p>
       <h2 class="mt-1 text-2xl font-extrabold text-link">Manage AlfredGO</h2>
     </div>
-    <div class="grid gap-4 md:grid-cols-2">
+    <div class="grid gap-4 md:grid-cols-3">
       <a class="admin-card" href="/admin/tools">
         <Grid2X2 />
         <span><b>Tools</b><small>{app.data?.tools.length || 0} resources</small></span>
@@ -24,6 +24,10 @@
       <a class="admin-card" href="/admin/categories">
         <ClipboardList />
         <span><b>Categories</b><small>{app.categories.length} groups</small></span>
+      </a>
+      <a class="admin-card" href="/admin/announcements">
+        <Bell />
+        <span><b>Announcements</b><small>{app.data?.announcements.length || 0} notices</small></span>
       </a>
     </div>
   </section>
