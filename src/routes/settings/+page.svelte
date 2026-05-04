@@ -9,12 +9,14 @@
     CircleHelp,
     KeyRound,
     MonitorSmartphone,
+    Radio,
     Settings,
     Shield,
     SlidersHorizontal,
     Star,
   } from 'lucide-svelte'
   import SectionTitle from '$lib/components/SectionTitle.svelte'
+  import { isPushSupported, subscribeToPush, unsubscribeFromPush, getPushStatus } from '$lib/push-client'
 
   const app = getAppState()
 
@@ -53,6 +55,40 @@
 
   let triggerRefs = $state<Record<string, HTMLButtonElement | null>>({})
   let panelRefs = $state<Record<string, HTMLDivElement | null>>({})
+
+  let pushSupported = $state(false)
+  let pushSubscribed = $state(false)
+  let pushLoading = $state(false)
+  let pushError = $state('')
+
+  $effect(() => {
+    if (typeof window !== 'undefined') {
+      pushSupported = isPushSupported()
+      if (pushSupported) {
+        getPushStatus().then((status) => {
+          pushSubscribed = status.subscribed
+        })
+      }
+    }
+  })
+
+  async function togglePush() {
+    pushLoading = true
+    pushError = ''
+    try {
+      if (pushSubscribed) {
+        await unsubscribeFromPush()
+        pushSubscribed = false
+      } else {
+        await subscribeToPush()
+        pushSubscribed = true
+      }
+    } catch (err: any) {
+      pushError = err.message || 'Failed to update push subscription'
+    } finally {
+      pushLoading = false
+    }
+  }
 
   function openPanel(panel: string) {
     app.setOpenProfilePanel(panel)
@@ -169,6 +205,34 @@
       </button>
       {#if app.openProfilePanel === 'notifications'}
         <div class="px-4 pb-4 sm:px-16" bind:this={panelRefs['notifications']}>
+          {#if pushSupported}
+            <div class="mb-4 rounded-xl border border-border bg-surface p-4">
+              <div class="flex items-start gap-3">
+                <span class="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-selected text-link"><Radio class="h-5 w-5" /></span>
+                <span class="min-w-0 flex-1">
+                  <span class="block font-extrabold text-link">Browser push notifications</span>
+                  <span class="mt-1 block text-sm leading-6 text-text-muted">Get real-time alerts on your phone or computer even when AlfredGO is closed.</span>
+                </span>
+                <button
+                  onclick={togglePush}
+                  disabled={pushLoading}
+                  class="mt-1 h-6 w-10 rounded-full p-0.5 transition {pushSubscribed ? 'bg-campus-blue' : 'bg-border'} disabled:opacity-50"
+                  aria-pressed={pushSubscribed}
+                  aria-label={pushSubscribed ? 'Disable push notifications' : 'Enable push notifications'}
+                >
+                  <span class="block h-5 w-5 rounded-full bg-white transition {pushSubscribed ? 'translate-x-4' : ''}"></span>
+                </button>
+              </div>
+              {#if pushError}
+                <p class="mt-2 text-sm text-red-600 dark:text-red-400">{pushError}</p>
+              {/if}
+            </div>
+          {:else}
+            <div class="mb-4 rounded-xl border border-border bg-surface p-4">
+              <p class="text-sm text-text-muted">Push notifications are not supported in this browser. Install AlfredGO as a PWA for the best notification experience.</p>
+            </div>
+          {/if}
+
           <div class="grid gap-3 md:grid-cols-2">
             {#each notificationOptions as [title, body, ItemIcon]}
               <form method="POST" action="?/savePreference" use:enhance>
