@@ -56,8 +56,48 @@ sqlite.exec(`
     dashboard_layout text,
     theme text not null,
     preferred_role_view text,
+    notification_settings text,
     created_at text not null,
     updated_at text not null
+  );
+  create table if not exists announcements (
+    id text primary key,
+    title text not null,
+    body text not null,
+    tone text not null,
+    filter text not null,
+    action_label text,
+    tool_id text,
+    url text,
+    sort_order integer not null,
+    is_active integer not null,
+    created_at text not null,
+    updated_at text not null
+  );
+  create table if not exists activities (
+    id text primary key,
+    user_id text not null,
+    type text not null,
+    tool_id text,
+    tool_name text,
+    created_at text not null
+  );
+`)
+
+try {
+  sqlite.exec(`ALTER TABLE user_preferences ADD COLUMN notification_settings TEXT;`)
+} catch {
+  // column may already exist
+}
+
+sqlite.exec(`
+  create table if not exists push_subscriptions (
+    id text primary key,
+    user_id text,
+    endpoint text not null,
+    p256dh text not null,
+    auth text not null,
+    created_at text not null
   );
 `)
 
