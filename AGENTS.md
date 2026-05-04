@@ -104,3 +104,6 @@ This is a SvelteKit app using the Node adapter. There is no separate Express API
 - Prototype, not production
 - Keep things simple
 - Avoid overengineering
+
+Feel free to use Tanstack libraries.
+Use Sveltekit mcp to check stuff
