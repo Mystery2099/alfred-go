@@ -107,3 +107,4 @@ This is a SvelteKit app using the Node adapter. There is no separate Express API
 
 Feel free to use Tanstack libraries.
 Use Sveltekit mcp to check stuff
+Use Context7 to check documentation
