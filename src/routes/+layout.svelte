@@ -329,8 +329,12 @@
   </nav>
 {:else}
   <main class="min-h-screen bg-app text-text">
-    <div class="mx-auto max-w-5xl px-4 py-8 sm:px-6 lg:px-8">
+    {#if $page.url.pathname === '/login'}
       {@render children()}
-    </div>
+    {:else}
+      <div class="mx-auto max-w-5xl px-4 py-8 sm:px-6 lg:px-8">
+        {@render children()}
+      </div>
+    {/if}
   </main>
 {/if}
