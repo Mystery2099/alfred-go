@@ -24,9 +24,9 @@
   }
 </script>
 
-<div class="flex min-h-[100dvh] flex-col lg:flex-row">
+<div class="grid min-h-[100dvh] grid-rows-[1fr_auto] lg:grid-cols-3">
   <!-- Left: Hero image -->
-  <div class="relative flex-1 overflow-hidden">
+  <div class="relative overflow-hidden lg:col-span-2">
     <img
       src="/suny-alfred-state-college-technology_708_gallery1.webp"
       alt="Alfred State College"
@@ -56,7 +56,7 @@
   </div>
 
   <!-- Right: Login form -->
-  <div class="flex w-full flex-col justify-center bg-[var(--app-bg)] p-6 lg:flex-1 lg:p-16 xl:p-20">
+  <div class="flex w-full flex-col justify-center bg-[var(--app-bg)] p-6 lg:col-span-1 lg:p-16 xl:p-20">
     <div class="mx-auto w-full max-w-lg">
       <!-- Mobile-only header -->
       <div class="mb-6 lg:hidden">

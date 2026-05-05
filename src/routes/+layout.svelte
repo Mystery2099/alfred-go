@@ -30,11 +30,17 @@
 
   onMount(() => {
     app.applyTheme()
+    app.applyAccessibility()
   })
 
   $effect(() => {
     const _ = app.currentPreference?.theme
     if (app.dataReady) app.applyTheme()
+  })
+
+  $effect(() => {
+    const _ = app.currentPreference?.accessibilitySettings
+    if (app.dataReady) app.applyAccessibility()
   })
 
   let collapsed = $state(false)

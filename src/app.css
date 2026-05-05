@@ -336,3 +336,75 @@ textarea {
   border-bottom-left-radius: 0.75rem;
   border-bottom-right-radius: 0.75rem;
 }
+
+/* Reduced motion */
+.reduce-motion *,
+.reduce-motion *::before,
+.reduce-motion *::after {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+  scroll-behavior: auto !important;
+}
+
+/* High contrast */
+.high-contrast {
+  --app-border: #000000;
+  --app-text-muted: #333333;
+  --app-text-soft: #555555;
+}
+
+.high-contrast.dark {
+  --app-border: #FFFFFF;
+  --app-text-muted: #CCCCCC;
+  --app-text-soft: #AAAAAA;
+}
+
+.high-contrast .control,
+.high-contrast .card,
+.high-contrast .profile-row,
+.high-contrast .nav-item,
+.high-contrast button,
+.high-contrast input,
+.high-contrast select,
+.high-contrast textarea {
+  border-width: 2px !important;
+}
+
+/* Compact density */
+.compact-density .nav-item {
+  @apply py-2;
+}
+
+.compact-density .profile-row {
+  @apply py-2.5;
+}
+
+.compact-density .control {
+  @apply py-2;
+}
+
+.compact-density .primary-button,
+.compact-density .secondary-button {
+  @apply py-2;
+}
+
+.compact-density .avatar {
+  @apply h-8 w-8;
+}
+
+.compact-density header {
+  @apply py-3;
+}
+
+.compact-density .quick-icon {
+  @apply h-9 w-9;
+}
+
+.compact-density .notice-icon {
+  @apply h-8 w-8;
+}
+
+.card {
+  @apply rounded-xl border border-border bg-surface shadow-sm;
+}

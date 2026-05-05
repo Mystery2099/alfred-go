@@ -104,7 +104,9 @@ This is a SvelteKit app using the Node adapter. There is no separate Express API
 - Prototype, not production
 - Keep things simple
 - Avoid overengineering
-
-Feel free to use Tanstack libraries.
-Use Sveltekit mcp to check stuff
-Use Context7 to check documentation
+- Feel free to use Tanstack libraries.
+- Use Sveltekit mcp to check stuff
+- Use Context7 to check documentation
+- Avoid Card Grids
+- Take inspiration from material 3 design
+- Take inspiration from the android settings app
