@@ -276,9 +276,11 @@
         <button
           aria-label="Open command palette"
           onclick={() => commandBarOpen = true}
-          class="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-muted text-link shadow-sm transition-colors hover:bg-border md:h-11 md:w-11"
+          class="flex h-10 items-center gap-2 rounded-full border border-border bg-muted px-3 text-link shadow-sm transition-colors hover:bg-border md:h-11 md:px-4"
         >
-          <Search class="h-5 w-5" />
+          <Search class="h-4 w-4 shrink-0 text-text-muted" />
+          <span class="hidden text-sm font-medium text-text-muted sm:inline">Search...</span>
+          <kbd class="ml-1 hidden rounded-md border border-border bg-surface px-1.5 py-0.5 text-[10px] font-bold text-text-muted md:inline-block">⌘K</kbd>
         </button>
         <div class="relative" bind:this={notifRef}>
           <button
