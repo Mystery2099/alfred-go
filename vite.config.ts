@@ -2,10 +2,10 @@ import { sveltekit } from '@sveltejs/kit/vite';
 import { defineConfig } from 'vite';
 import { VitePWA } from 'vite-plugin-pwa';
 
-export default defineConfig({
+export default defineConfig(({ command }) => ({
 	plugins: [
 		sveltekit(),
-		VitePWA({
+		command === 'build' && VitePWA({
 			registerType: 'autoUpdate',
 			strategies: 'injectManifest',
 			srcDir: 'src',
@@ -41,10 +41,6 @@ export default defineConfig({
 			injectManifest: {
 				globPatterns: ['**/*.{js,css,html,json,png,svg,ico,woff2}'],
 			},
-			devOptions: {
-				enabled: true,
-				type: 'module',
-			}
 		})
-	]
-});
+	].filter(Boolean)
+}));

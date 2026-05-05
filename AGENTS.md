@@ -112,9 +112,4 @@ This is a SvelteKit app using the Node adapter. There is no separate Express API
 - Take inspiration from the android settings app
 - feel free to use bits-ui
 
-
----
-
-## TODO
-
-- add hotkeys with tanstack hotkeys
+DO NOT RUN THE DEV SERVER
