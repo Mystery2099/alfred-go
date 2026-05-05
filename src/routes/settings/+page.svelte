@@ -233,7 +233,7 @@
             </div>
           {/if}
 
-          <div class="grid gap-3 md:grid-cols-2">
+          <div class="divide-y divide-border rounded-2xl bg-surface shadow-sm ring-1 ring-border overflow-hidden">
             {#each notificationOptions as [title, body, ItemIcon]}
               <form method="POST" action="?/savePreference" use:enhance>
                 <input type="hidden" name="notificationSettings" value={JSON.stringify({
@@ -242,7 +242,7 @@
                 })} />
                 <button
                   type="submit"
-                  class="flex w-full items-start gap-3 rounded-xl border border-border bg-surface p-4 text-left transition hover:bg-muted"
+                  class="flex w-full items-start gap-4 px-5 py-4 text-left transition hover:bg-muted"
                 >
                   <span class="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-selected text-link"><ItemIcon class="h-5 w-5" /></span>
                   <span class="min-w-0 flex-1">
@@ -277,12 +277,14 @@
       </button>
       {#if app.openProfilePanel === 'privacy'}
         <div class="px-4 pb-4 sm:px-16" bind:this={panelRefs['privacy']}>
-          <div class="grid gap-3 md:grid-cols-3">
+          <div class="divide-y divide-border rounded-2xl bg-surface shadow-sm ring-1 ring-border overflow-hidden">
             {#each securityItems as [title, body, ItemIcon]}
-              <div class="rounded-xl border border-border bg-surface p-4">
-                <span class="profile-icon tone-0"><ItemIcon class="h-5 w-5" /></span>
-                <p class="mt-3 font-extrabold text-link">{title}</p>
-                <p class="mt-2 text-sm leading-6 text-text-muted">{body}</p>
+              <div class="flex items-start gap-4 px-5 py-4">
+                <span class="profile-icon tone-0 shrink-0"><ItemIcon class="h-5 w-5" /></span>
+                <div class="min-w-0 flex-1">
+                  <p class="font-extrabold text-link">{title}</p>
+                  <p class="mt-1 text-sm leading-6 text-text-muted">{body}</p>
+                </div>
               </div>
             {/each}
           </div>
@@ -306,11 +308,11 @@
       </button>
       {#if app.openProfilePanel === 'help'}
         <div class="px-4 pb-4 sm:px-16" bind:this={panelRefs['help']}>
-          <div class="grid gap-3 md:grid-cols-3">
+          <div class="divide-y divide-border rounded-2xl bg-surface shadow-sm ring-1 ring-border overflow-hidden">
             {#each helpItems as [title, body]}
-              <div class="rounded-xl border border-border bg-surface p-4">
+              <div class="px-5 py-4">
                 <p class="font-extrabold text-link">{title}</p>
-                <p class="mt-2 text-sm leading-6 text-text-muted">{body}</p>
+                <p class="mt-1 text-sm leading-6 text-text-muted">{body}</p>
               </div>
             {/each}
           </div>

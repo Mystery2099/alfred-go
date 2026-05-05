@@ -36,9 +36,9 @@
         <p class="text-xs font-extrabold uppercase tracking-[0.18em] text-text-muted">Account</p>
         <h2 class="mt-1 text-2xl font-extrabold text-link">Profile overview</h2>
       </div>
-      <div class="mt-5 grid gap-3 sm:grid-cols-2">
+      <div class="mt-5 divide-y divide-border rounded-2xl bg-surface shadow-sm ring-1 ring-border overflow-hidden">
         {#each accessNotes as [label, value]}
-          <div class="rounded-xl bg-muted p-4">
+          <div class="px-5 py-4">
             <p class="text-xs font-extrabold uppercase tracking-wider text-text-soft">{label}</p>
             <p class="mt-1 text-sm font-extrabold text-text">{value}</p>
           </div>
