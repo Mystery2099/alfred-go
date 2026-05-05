@@ -1,8 +1,8 @@
 <script lang="ts">
-  import { Bell, Calendar, Clock, Megaphone, TriangleAlert } from 'lucide-svelte'
-  import type { Announcement, AppState } from '../types'
+  import { Bell, Clock, Megaphone, TriangleAlert } from 'lucide-svelte'
+  import type { AppStore } from '$lib/app-state.svelte'
 
-  let { app, limit = 0 }: { app: AppState; limit?: number } = $props()
+  let { app, limit = 0 }: { app: AppStore; limit?: number } = $props()
 
   const isPreview = $derived(limit > 0)
 
@@ -13,7 +13,7 @@
     let list = app?.announcements ?? []
     if (activeFilter !== 'All') {
       list = list.filter(
-        (a) => a.filter?.toLowerCase() === activeFilter.toLowerCase()
+        (announcement) => announcement.filter?.toLowerCase() === activeFilter.toLowerCase()
       )
     }
     if (isPreview) {
@@ -58,7 +58,7 @@
     </div>
     {#if !isPreview}
       <div class="flex flex-wrap gap-1.5 sm:gap-2">
-        {#each filters as f}
+        {#each filters as f (f)}
           <button
             onclick={() => { activeFilter = f }}
             class="px-2.5 py-1 rounded-full text-xs font-medium transition-colors border {activeFilter === f ? 'bg-campus-blue-600 text-white border-campus-blue-600 dark:bg-campus-blue-500 dark:border-campus-blue-500' : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-750'}"

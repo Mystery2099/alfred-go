@@ -3,6 +3,10 @@ import { saveSubscription } from '$lib/server/push'
 
 export const POST: RequestHandler = async ({ request, locals }) => {
   try {
+    if (!locals.user) {
+      return json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
     const body = await request.json()
     const { subscription } = body
 
@@ -10,8 +14,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
       return json({ error: 'Invalid subscription payload' }, { status: 400 })
     }
 
-    const userId = locals.user?.id ?? null
-    saveSubscription(userId, subscription)
+    saveSubscription(locals.user.id, subscription)
 
     return json({ success: true })
   } catch (err: any) {

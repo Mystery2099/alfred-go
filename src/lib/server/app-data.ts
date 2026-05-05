@@ -7,17 +7,69 @@ import { db } from './db'
 import { activities, announcements, categories, favorites, tools, userCredentials, userPreferences, users } from './schema'
 import { sendPushToAll } from './push'
 
+const roles = new Set(['applicant', 'accepted_student', 'student', 'staff', 'admin'])
+const themes = new Set(['system', 'light', 'dark'])
+const announcementTones = new Set(['urgent', 'deadline', 'reminder'])
+const announcementFilters = new Set(['updates', 'deadlines', 'reminders'])
+
+function assertRole(value: unknown): asserts value is User['role'] {
+  if (!roles.has(String(value))) error(400, 'Invalid role')
+}
+
+export function normalizePublicUrl(value: string) {
+  if (value.startsWith('/')) {
+    if (value.startsWith('//')) error(400, 'URL must be a same-origin path or an HTTP(S) URL')
+    return value
+  }
+
+  let parsed: URL
+  try {
+    parsed = new URL(value)
+  } catch {
+    error(400, 'URL must be a valid web address.')
+  }
+
+  if (!['http:', 'https:'].includes(parsed.protocol)) {
+    error(400, 'URL must use http or https.')
+  }
+
+  return parsed.toString()
+}
+
+export function getLoginData(user: User | null) {
+  return {
+    users: db.select({
+      id: users.id,
+      name: users.name,
+      email: users.email,
+      role: users.role,
+      createdAt: users.createdAt,
+      updatedAt: users.updatedAt,
+    }).from(users).all() as AppData['users'],
+    authUserId: user?.id ?? null,
+  }
+}
+
 export function getAppData(authUserId: string | null): AppData & { authUserId: string | null } {
   const allAnnouncements = db.select().from(announcements).all() as AppData['announcements']
+  const currentUsers = authUserId
+    ? db.select().from(users).where(eq(users.id, authUserId)).all() as AppData['users']
+    : []
+  const userFavorites = authUserId
+    ? db.select().from(favorites).where(eq(favorites.userId, authUserId)).all() as AppData['favorites']
+    : []
+  const userPrefs = authUserId
+    ? db.select().from(userPreferences).where(eq(userPreferences.userId, authUserId)).all() as AppData['preferences']
+    : []
   const userActivities = authUserId
     ? db.select().from(activities).where(eq(activities.userId, authUserId)).orderBy(desc(activities.createdAt)).limit(5).all() as AppData['activities']
     : []
   return {
-    users: db.select().from(users).all() as AppData['users'],
+    users: currentUsers,
     categories: db.select().from(categories).all() as AppData['categories'],
     tools: db.select().from(tools).all() as AppData['tools'],
-    favorites: db.select().from(favorites).all() as AppData['favorites'],
-    preferences: db.select().from(userPreferences).all() as AppData['preferences'],
+    favorites: userFavorites,
+    preferences: userPrefs,
     announcements: allAnnouncements.filter((a) => a.isActive).sort((a, b) => a.sortOrder - b.sortOrder),
     activities: userActivities,
     authUserId,
@@ -80,6 +132,8 @@ export function toggleFavorite(user: User | null, toolId: string) {
 
 export function savePreference(user: User | null, prefs: Partial<UserPreference>) {
   const authUser = requireUser(user)
+  if (prefs.theme && !themes.has(prefs.theme)) error(400, 'Invalid theme')
+  if (prefs.preferredRoleView) assertRole(prefs.preferredRoleView)
   const now = new Date().toISOString()
   const current = db.select().from(userPreferences).where(eq(userPreferences.userId, authUser.id)).all()[0]
   const payload = {
@@ -98,6 +152,8 @@ export function savePreference(user: User | null, prefs: Partial<UserPreference>
 
 export function saveTool(user: User | null, tool: Tool) {
   requireAdmin(user)
+  tool.url = normalizePublicUrl(String(tool.url || ''))
+  tool.audienceRoles.forEach(assertRole)
   const now = new Date().toISOString()
   const existing = db.select().from(tools).where(eq(tools.id, tool.id)).all()
   const payload = {
@@ -141,6 +197,9 @@ export function deleteCategory(user: User | null, categoryId: string) {
 
 export function saveAnnouncement(user: User | null, announcement: Announcement) {
   requireAdmin(user)
+  if (!announcementTones.has(announcement.tone)) error(400, 'Invalid announcement tone')
+  if (!announcementFilters.has(announcement.filter)) error(400, 'Invalid announcement filter')
+  if (announcement.url) announcement.url = normalizePublicUrl(announcement.url)
   const now = new Date().toISOString()
   const existing = db.select().from(announcements).where(eq(announcements.id, announcement.id)).all()
   const payload = {

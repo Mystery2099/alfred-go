@@ -8,11 +8,11 @@ export interface PushSubscriptionJSON {
   }
 }
 
-function urlBase64ToUint8Array(base64String: string): Uint8Array {
+function urlBase64ToUint8Array(base64String: string): Uint8Array<ArrayBuffer> {
   const padding = '='.repeat((4 - (base64String.length % 4)) % 4)
   const base64 = (base64String + padding).replace(/\-/g, '+').replace(/_/g, '/')
   const rawData = atob(base64)
-  const outputArray = new Uint8Array(rawData.length)
+  const outputArray = new Uint8Array<ArrayBuffer>(new ArrayBuffer(rawData.length))
   for (let i = 0; i < rawData.length; ++i) {
     outputArray[i] = rawData.charCodeAt(i)
   }
@@ -40,7 +40,7 @@ export async function subscribeToPush(): Promise<PushSubscriptionJSON | null> {
   }
 
   const json = subscription.toJSON()
-  if (!json.keys) {
+  if (!json.endpoint || !json.keys?.p256dh || !json.keys.auth) {
     throw new Error('Invalid subscription keys')
   }
 

@@ -1,8 +1,12 @@
 import { json, type RequestHandler } from '@sveltejs/kit'
 import { deleteSubscription } from '$lib/server/push'
 
-export const POST: RequestHandler = async ({ request }) => {
+export const POST: RequestHandler = async ({ request, locals }) => {
   try {
+    if (!locals.user) {
+      return json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
     const body = await request.json()
     const { endpoint } = body
 

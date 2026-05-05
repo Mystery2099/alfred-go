@@ -3,11 +3,14 @@ import { db } from './db'
 import { pushSubscriptions } from './schema'
 import { eq } from 'drizzle-orm'
 import { VAPID_PUBLIC_KEY } from '$lib/push-client'
+import { env } from '$env/dynamic/private'
 
-const VAPID_PRIVATE_KEY = '477JtNqosMrZmq0eRW8aDZQWiR92ibDVyUOtS0_pu8k'
+const VAPID_PRIVATE_KEY = env.VAPID_PRIVATE_KEY
 const VAPID_SUBJECT = 'mailto:admin@alfredgo.local'
 
-webpush.setVapidDetails(VAPID_SUBJECT, VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY)
+if (VAPID_PRIVATE_KEY) {
+  webpush.setVapidDetails(VAPID_SUBJECT, VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY)
+}
 
 export { VAPID_PUBLIC_KEY }
 
@@ -20,6 +23,9 @@ export interface PushSubscription {
 }
 
 export function saveSubscription(userId: string | null, sub: PushSubscription) {
+  if (!VAPID_PRIVATE_KEY) {
+    throw new Error('Push notifications are not configured')
+  }
   const id = `sub-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`
   db.insert(pushSubscriptions)
     .values({
@@ -52,6 +58,7 @@ export function getAllSubscriptions() {
 }
 
 export async function sendPushToAll(title: string, body: string, url = '/') {
+  if (!VAPID_PRIVATE_KEY) return { sent: 0, successful: 0, failed: 0 }
   const subs = getAllSubscriptions()
   const payload = JSON.stringify({ title, body, url, timestamp: Date.now() })
 
@@ -85,6 +92,7 @@ export async function sendPushToAll(title: string, body: string, url = '/') {
 }
 
 export async function sendPushToUser(userId: string, title: string, body: string, url = '/') {
+  if (!VAPID_PRIVATE_KEY) return { sent: 0, successful: 0, failed: 0 }
   const subs = db.select().from(pushSubscriptions).where(eq(pushSubscriptions.userId, userId)).all()
   if (!subs.length) return { sent: 0, successful: 0, failed: 0 }
 

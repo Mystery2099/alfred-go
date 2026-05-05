@@ -1,7 +1,8 @@
 import { json } from '@sveltejs/kit'
-import { getAppData } from '$lib/server/app-data'
+import { getAppData, requireUser } from '$lib/server/app-data'
 import type { RequestHandler } from './$types'
 
 export const GET: RequestHandler = async ({ locals }) => {
-  return json(getAppData(locals.user?.id || null))
+  const user = requireUser(locals.user)
+  return json(getAppData(user.id))
 }

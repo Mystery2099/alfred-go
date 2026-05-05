@@ -1,6 +1,6 @@
 import type { Actions } from '@sveltejs/kit'
 import type { Announcement, Category, Role, Tool, UserPreference } from '$lib/types'
-import { deleteAnnouncement, deleteCategory, deleteTool, saveAnnouncement, saveCategory, savePreference, saveTool, toggleFavorite } from './app-data'
+import { deleteAnnouncement, deleteCategory, deleteTool, logActivity, normalizePublicUrl, saveAnnouncement, saveCategory, savePreference, saveTool, toggleFavorite } from './app-data'
 
 export const favoriteActions = {
   toggleFavorite: async ({ request, locals }) => {
@@ -46,9 +46,9 @@ export const adminToolActions = {
     if (!name) return { ok: false, error: 'Name is required.' }
     if (!url) return { ok: false, error: 'URL is required.' }
     try {
-      new URL(url)
+      normalizePublicUrl(url)
     } catch {
-      return { ok: false, error: 'URL must be a valid web address.' }
+      return { ok: false, error: 'URL must be a same-origin path or an HTTP(S) web address.' }
     }
 
     const now = new Date().toISOString()
