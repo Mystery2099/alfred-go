@@ -80,7 +80,12 @@
           </div>
         {:else}
           <div class="flex items-center gap-1 shrink-0">
-            <form method="POST" action="?/toggleFavorite" use:enhance>
+            <form method="POST" action="?/toggleFavorite" use:enhance={() => {
+              app.optimisticToggleFavorite(tool.id)
+              return async ({ result }) => {
+                if (result.type === 'failure') app.optimisticToggleFavorite(tool.id)
+              }
+            }}>
               <input type="hidden" name="toolId" value={tool.id} />
               <button
                 aria-label={app.isFavorite(tool.id) ? `Remove ${tool.name} from favorites` : `Add ${tool.name} to favorites`}

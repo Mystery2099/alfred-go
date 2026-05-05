@@ -30,7 +30,12 @@
   <div class="min-w-0 flex-1">
     <div class="flex items-center gap-2">
       <b class="truncate text-sm font-extrabold text-text">{tool.name}</b>
-      <form method="POST" action="?/toggleFavorite" use:enhance>
+      <form method="POST" action="?/toggleFavorite" use:enhance={() => {
+        app.optimisticToggleFavorite(tool.id)
+        return async ({ result }) => {
+          if (result.type === 'failure') app.optimisticToggleFavorite(tool.id)
+        }
+      }}>
         <input type="hidden" name="toolId" value={tool.id} />
         <button class="shrink-0 transition-colors {app.isFavorite(tool.id) ? 'text-campus-gold' : 'text-text-soft hover:text-campus-gold'}">
           <Heart class="h-4 w-4 {app.isFavorite(tool.id) ? 'fill-current' : ''}" />

@@ -93,6 +93,12 @@
             {/if}
           </div>
           <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5 line-clamp-2">{a.body}</p>
+          {#if a.actionLabel && (a.toolId || a.url)}
+            <span class="mt-2 inline-flex items-center gap-1.5 rounded-lg bg-campus-blue-50 dark:bg-campus-blue-900/20 px-3 py-1.5 text-xs font-semibold text-campus-blue-700 dark:text-campus-blue-400">
+              {a.actionLabel}
+              <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+            </span>
+          {/if}
         </div>
       </div>
     </a>
