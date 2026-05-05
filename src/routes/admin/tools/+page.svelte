@@ -83,7 +83,6 @@
       {/if}
       <input type="hidden" name="id" value={draft.id} />
       <input type="hidden" name="icon" value={draft.icon || 'Grid2X2'} />
-      <input type="hidden" name="isActive" value="on" />
       <div class="grid gap-3 md:grid-cols-2">
         <input class="control" name="name" placeholder="Name" bind:value={draft.name} />
         <input class="control" name="url" placeholder="URL" bind:value={draft.url} />
@@ -116,6 +115,10 @@
           </label>
         {/each}
       </div>
+      <label class="mt-3 flex items-center gap-2">
+        <input type="checkbox" name="isActive" checked={draft.isActive} class="h-4 w-4" onchange={(event) => draft.isActive = event.currentTarget.checked} />
+        <span class="text-sm font-medium">Active</span>
+      </label>
       <div class="mt-4 flex gap-3">
         <button class="primary-button" disabled={submitting}>
           {#if submitting}

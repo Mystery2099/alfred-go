@@ -1,6 +1,6 @@
 <script lang="ts">
   import { enhance } from '$app/forms'
-  import { getAppState } from '$lib/app-state.svelte'
+  import { getAppState, roleLabels, roles } from '$lib/app-state.svelte'
   import type { Announcement } from '$lib/types'
   import { Plus, X, Trash2, Pencil } from 'lucide-svelte'
 
@@ -13,6 +13,7 @@
     tone: 'reminder',
     filter: 'updates',
     actionLabel: '',
+    audienceRoles: ['applicant', 'accepted_student', 'student', 'staff', 'admin'],
     sortOrder: (app.data?.announcements.length || 0) * 10 + 10,
     isActive: true,
     createdAt: new Date().toISOString(),
@@ -91,6 +92,21 @@
           <option value="deadlines">Deadlines</option>
           <option value="reminders">Reminders</option>
         </select>
+        <div class="md:col-span-2 flex flex-wrap gap-2">
+          {#each roles as role}
+            <label class="segmented {draft.audienceRoles.includes(role) ? 'active' : ''}">
+              <input
+                class="sr-only"
+                type="checkbox"
+                name="audienceRoles"
+                value={role}
+                checked={draft.audienceRoles.includes(role)}
+                onchange={(event) => draft.audienceRoles = event.currentTarget.checked ? [...draft.audienceRoles, role] : draft.audienceRoles.filter((item) => item !== role)}
+              />
+              {roleLabels[role]}
+            </label>
+          {/each}
+        </div>
         <div class="md:col-span-2 flex gap-2">
           <button type="button" onclick={() => linkType = 'tool'} class="segmented {linkType === 'tool' ? 'active' : ''}">Link to tool</button>
           <button type="button" onclick={() => linkType = 'url'} class="segmented {linkType === 'url' ? 'active' : ''}">Custom URL</button>
@@ -142,6 +158,7 @@
               {#if announcement.actionLabel}
                 <span class="tag">{announcement.actionLabel}</span>
               {/if}
+              <span class="tag">{announcement.audienceRoles.map((role) => roleLabels[role]).join(', ')}</span>
             </div>
           </div>
           <div class="flex items-center gap-1 shrink-0">
