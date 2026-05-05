@@ -21,43 +21,40 @@
     <p class="mt-2 text-text-muted">Try a different search, category, or role view.</p>
   </div>
 {:else}
-  <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+  <div class="divide-y divide-border rounded-2xl bg-surface shadow-sm ring-1 ring-border overflow-hidden">
     {#each tools as tool}
-      <article class="rounded-xl border border-border bg-surface p-3 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md hover:ring-2 hover:ring-campus-blue/20 sm:p-4">
-        <div class="flex items-start gap-3">
-          <span class="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-campus-blue text-white">
+      <div class="group flex items-center gap-4 px-5 py-4 transition hover:bg-muted">
+        <a href="/tools/{tool.id}" class="flex flex-1 items-center gap-4 min-w-0">
+          <span class="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-campus-blue text-white">
             <Icon name={tool.icon} />
           </span>
-          <div class="min-w-0 flex-1">
-            <h3 class="text-base font-extrabold text-link">{tool.name}</h3>
-            <p class="mt-1 line-clamp-2 text-sm text-text-muted opacity-80">{tool.description}</p>
-          </div>
-          {#if admin}
-            <div class="flex items-center gap-1">
-              <button aria-label="Edit {tool.name}" onclick={() => onEdit?.(tool)} class="grid h-8 w-8 place-items-center rounded-lg text-text-muted transition hover:bg-muted hover:text-link">
-                <Pencil class="h-4 w-4" />
-              </button>
-              <form method="POST" action="?/deleteTool" use:enhance>
-                <input type="hidden" name="toolId" value={tool.id} />
-                <button aria-label="Delete {tool.name}" type="submit" class="grid h-8 w-8 place-items-center rounded-lg text-text-muted transition hover:bg-rose-100 hover:text-rose-600">
-                  <Trash2 class="h-4 w-4" />
-                </button>
-              </form>
-            </div>
-          {:else}
-            <form method="POST" action="?/toggleFavorite" use:enhance>
+          <span class="min-w-0 flex-1">
+            <span class="block font-bold text-text">{tool.name}</span>
+            <span class="block truncate text-sm text-text-muted">{tool.description}</span>
+          </span>
+          <span class="text-xs font-bold text-text-muted shrink-0">{app.categoryName(tool.categoryId)}</span>
+        </a>
+        {#if admin}
+          <div class="flex items-center gap-1 shrink-0">
+            <button aria-label="Edit {tool.name}" onclick={() => onEdit?.(tool)} class="grid h-8 w-8 place-items-center rounded-lg text-text-muted transition hover:bg-muted hover:text-link">
+              <Pencil class="h-4 w-4" />
+            </button>
+            <form method="POST" action="?/deleteTool" use:enhance>
               <input type="hidden" name="toolId" value={tool.id} />
-              <button aria-label={app.isFavorite(tool.id) ? `Remove ${tool.name} from favorites` : `Add ${tool.name} to favorites`}>
-                <Heart class="h-5 w-5 {app.isFavorite(tool.id) ? 'fill-campus-gold text-campus-gold' : 'text-text-soft'}" />
+              <button aria-label="Delete {tool.name}" type="submit" class="grid h-8 w-8 place-items-center rounded-lg text-text-muted transition hover:bg-rose-100 hover:text-rose-600">
+                <Trash2 class="h-4 w-4" />
               </button>
             </form>
-          {/if}
-        </div>
-        <div class="mt-4 flex items-center justify-between">
-          <span class="text-xs font-bold text-text-muted">{app.categoryName(tool.categoryId)}</span>
-          <a href="/tools/{tool.id}" class="text-sm font-bold text-link">Open</a>
-        </div>
-      </article>
+          </div>
+        {:else}
+          <form method="POST" action="?/toggleFavorite" use:enhance class="shrink-0">
+            <input type="hidden" name="toolId" value={tool.id} />
+            <button aria-label={app.isFavorite(tool.id) ? `Remove ${tool.name} from favorites` : `Add ${tool.name} to favorites`}>
+              <Heart class="h-5 w-5 {app.isFavorite(tool.id) ? 'fill-campus-gold text-campus-gold' : 'text-text-soft'}" />
+            </button>
+          </form>
+        {/if}
+      </div>
     {/each}
   </div>
 {/if}

@@ -1,7 +1,7 @@
 <script lang="ts">
   import { getAppState } from '$lib/app-state.svelte'
   import Announcements from '$lib/components/Announcements.svelte'
-  import QuickCard from '$lib/components/shared/QuickCard.svelte'
+  import Icon from '$lib/components/shared/Icon.svelte'
   import RecentActivity from '$lib/components/RecentActivity.svelte'
   import SkeletonSection from '$lib/components/shared/SkeletonSection.svelte'
   import ToolSections from '$lib/components/ToolSections.svelte'
@@ -24,17 +24,39 @@
 {:else}
   <section class="mx-auto max-w-6xl space-y-8">
     <Announcements {app} limit={3} />
-    <section class="border-b border-border pb-8">
+
+    <!-- Quick Access / Pinned -->
+    <section>
       <p class="mb-3 text-xs font-extrabold uppercase tracking-[0.18em] text-link">{quickLabel}</p>
-      <div class="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
-        {#each quickTools as tool, index}
-          <QuickCard {tool} tone={index % 4} />
-        {/each}
-      </div>
+      {#if quickTools.length > 0}
+        <div class="divide-y divide-border rounded-2xl bg-surface shadow-sm ring-1 ring-border overflow-hidden">
+          {#each quickTools as tool}
+            <a
+              href="/tools/{tool.id}"
+              class="group flex items-center gap-4 px-5 py-4 transition hover:bg-muted"
+            >
+              <span class="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-campus-blue text-white">
+                <Icon name={tool.icon} />
+              </span>
+              <span class="min-w-0 flex-1">
+                <span class="block font-bold text-text">{tool.name}</span>
+                <span class="block truncate text-sm text-text-muted">{tool.description}</span>
+              </span>
+              <span class="text-xs font-bold text-text-muted">{app.categoryName(tool.categoryId)}</span>
+            </a>
+          {/each}
+        </div>
+      {:else}
+        <p class="text-sm text-text-muted">No tools available.</p>
+      {/if}
     </section>
-    <section class="border-b border-border pb-8">
+
+    <!-- Recent Activity -->
+    <section>
       <RecentActivity />
     </section>
+
+    <!-- All Resources -->
     <section>
       <p class="mb-3 text-xs font-extrabold uppercase tracking-[0.18em] text-link">All Resources</p>
       <ToolSections tools={app.visibleTools} />

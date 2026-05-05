@@ -1,6 +1,6 @@
 <script lang="ts">
   import { getAppState } from '$lib/app-state.svelte'
-  import QuickCard from './shared/QuickCard.svelte'
+  import Icon from './shared/Icon.svelte'
 
   const app = getAppState()
 
@@ -18,9 +18,21 @@
 </script>
 
 {#if quickTools().length > 0}
-  <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-    {#each quickTools() as tool, i}
-      <QuickCard {tool} tone={i % 4} />
+  <div class="divide-y divide-border rounded-2xl bg-surface shadow-sm ring-1 ring-border overflow-hidden">
+    {#each quickTools() as tool}
+      <a
+        href="/tools/{tool.id}"
+        class="group flex items-center gap-4 px-5 py-4 transition hover:bg-muted"
+      >
+        <span class="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-campus-blue text-white">
+          <Icon name={tool.icon} />
+        </span>
+        <span class="min-w-0 flex-1">
+          <span class="block font-bold text-text">{tool.name}</span>
+          <span class="block truncate text-sm text-text-muted">{tool.description}</span>
+        </span>
+        <span class="text-xs font-bold text-text-muted">{app.categoryName(tool.categoryId)}</span>
+      </a>
     {/each}
   </div>
 {:else}

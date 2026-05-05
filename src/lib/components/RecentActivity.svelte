@@ -1,15 +1,14 @@
 <script lang="ts">
   import { getAppState } from '$lib/app-state.svelte'
-  import Icon from './shared/Icon.svelte'
   import { BookOpen, Heart, LogIn } from 'lucide-svelte'
 
   const app = getAppState()
 
-  function activityIcon(type: string): string {
-    if (type === 'tool_launch') return 'BookOpen'
-    if (type === 'favorite') return 'Heart'
-    if (type === 'login') return 'LogIn'
-    return 'Clock'
+  function activityIcon(type: string) {
+    if (type === 'tool_launch') return BookOpen
+    if (type === 'favorite') return Heart
+    if (type === 'login') return LogIn
+    return null
   }
 
   function activityLabel(type: string, toolName?: string): string {
@@ -40,23 +39,18 @@
   {#if app.recentActivities.length === 0}
     <p class="text-sm text-text-muted">No recent activity yet. Launch some tools to see them here.</p>
   {:else}
-    <div class="grid gap-3 md:grid-cols-3">
+    <div class="divide-y divide-border rounded-2xl bg-surface shadow-sm ring-1 ring-border overflow-hidden">
       {#each app.recentActivities as activity}
-        <div class="recent-card">
-          <span class="quick-icon tone-0">
-            {#if activity.type === 'tool_launch'}
-              <BookOpen class="h-5 w-5" />
-            {:else if activity.type === 'favorite'}
-              <Heart class="h-5 w-5" />
-            {:else if activity.type === 'login'}
-              <LogIn class="h-5 w-5" />
-            {:else}
-              <Icon name="Clock" />
+        {@const Icon = activityIcon(activity.type)}
+        <div class="flex items-center gap-4 px-5 py-4">
+          <span class="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-muted text-text-muted">
+            {#if Icon}
+              <Icon class="h-5 w-5" />
             {/if}
           </span>
-          <span class="min-w-0 flex-1 text-left">
-            <b>{activityLabel(activity.type, activity.toolName)}</b>
-            <small>{relativeTime(activity.createdAt)}</small>
+          <span class="min-w-0 flex-1">
+            <span class="block text-sm font-bold text-text">{activityLabel(activity.type, activity.toolName)}</span>
+            <span class="block text-xs text-text-muted">{relativeTime(activity.createdAt)}</span>
           </span>
         </div>
       {/each}
