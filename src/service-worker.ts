@@ -3,7 +3,7 @@
 
 import { cleanupOutdatedCaches, precacheAndRoute } from 'workbox-precaching'
 import { NavigationRoute, registerRoute } from 'workbox-routing'
-import { StaleWhileRevalidate, CacheFirst } from 'workbox-strategies'
+import { CacheFirst, NetworkFirst } from 'workbox-strategies'
 
 declare let self: ServiceWorkerGlobalScope
 
@@ -28,8 +28,9 @@ registerRoute(
     return url.origin === self.location.origin &&
       (request.destination === 'script' || request.destination === 'style')
   },
-  new StaleWhileRevalidate({
+  new NetworkFirst({
     cacheName: 'assets-cache',
+    networkTimeoutSeconds: 3,
     plugins: [
       {
         cacheWillUpdate: async ({ response }) => {
