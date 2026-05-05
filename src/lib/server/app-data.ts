@@ -1,7 +1,7 @@
 import { error } from '@sveltejs/kit'
 import { and, desc, eq } from 'drizzle-orm'
 import { logEvent } from '$lib/logger'
-import type { Activity, Announcement, AppData, Category, Tool, User, UserPreference } from '$lib/types'
+import type { Activity, Announcement, AppData, Category, Role, Tool, User, UserPreference } from '$lib/types'
 import { verifyPassword } from './auth'
 import { db } from './db'
 import { activities, announcements, categories, favorites, tools, userCredentials, userPreferences, users } from './schema'
@@ -56,6 +56,18 @@ export function getLoginData(user: User | null) {
   }
 }
 
+function userCanSeeTool(userRole: Role, tool: Tool): boolean {
+  return tool.isActive && (userRole === 'admin' || tool.audienceRoles.includes(userRole))
+}
+
+function userCanSeeAnnouncement(userRole: Role, announcement: Announcement): boolean {
+  // Empty audienceRoles means visible to all roles (backward compatibility)
+  if (!announcement.isActive) return false
+  if (userRole === 'admin') return true
+  if (announcement.audienceRoles.length === 0) return true
+  return announcement.audienceRoles.includes(userRole)
+}
+
 export function getAppData(authUserId: string | null): AppData & { authUserId: string | null } {
   const allAnnouncements = db.select().from(announcements).all() as AppData['announcements']
   const currentUsers = authUserId
@@ -70,13 +82,25 @@ export function getAppData(authUserId: string | null): AppData & { authUserId: s
   const userActivities = authUserId
     ? db.select().from(activities).where(eq(activities.userId, authUserId)).orderBy(desc(activities.createdAt)).limit(5).all() as AppData['activities']
     : []
+
+  const userRole = currentUsers[0]?.role as Role | undefined
+  const allTools = db.select().from(tools).all() as AppData['tools']
+
+  // Filter tools and announcements by role. Admins see everything (including inactive).
+  const visibleTools = userRole === 'admin'
+    ? allTools
+    : allTools.filter((t) => userCanSeeTool(userRole || 'student', t))
+  const visibleAnnouncements = userRole === 'admin'
+    ? allAnnouncements
+    : allAnnouncements.filter((a) => userCanSeeAnnouncement(userRole || 'student', a))
+
   return {
     users: currentUsers,
     categories: db.select().from(categories).all() as AppData['categories'],
-    tools: db.select().from(tools).all() as AppData['tools'],
+    tools: visibleTools,
     favorites: userFavorites,
     preferences: userPrefs,
-    announcements: allAnnouncements.filter((a) => a.isActive).sort((a, b) => a.sortOrder - b.sortOrder),
+    announcements: visibleAnnouncements.sort((a, b) => a.sortOrder - b.sortOrder),
     activities: userActivities,
     authUserId,
   }
@@ -141,7 +165,13 @@ export function toggleFavorite(user: User | null, toolId: string) {
 export function savePreference(user: User | null, prefs: Partial<UserPreference>) {
   const authUser = requireUser(user)
   if (prefs.theme && !themes.has(prefs.theme)) error(400, 'Invalid theme')
-  if (prefs.preferredRoleView) assertRole(prefs.preferredRoleView)
+  if (prefs.preferredRoleView) {
+    assertRole(prefs.preferredRoleView)
+    // Only admin and staff can change role view; staff cannot select admin
+    if (authUser.role !== 'admin' && (authUser.role !== 'staff' || prefs.preferredRoleView === 'admin')) {
+      error(403, 'Not allowed to change role view')
+    }
+  }
   const now = new Date().toISOString()
   const current = db.select().from(userPreferences).where(eq(userPreferences.userId, authUser.id)).all()[0]
   const payload = {
@@ -216,6 +246,7 @@ export function saveAnnouncement(user: User | null, announcement: Announcement) 
   if (!announcementTones.has(announcement.tone)) error(400, 'Invalid announcement tone')
   if (!announcementFilters.has(announcement.filter)) error(400, 'Invalid announcement filter')
   if (announcement.url) announcement.url = normalizePublicUrl(announcement.url)
+  announcement.audienceRoles.forEach(assertRole)
   const now = new Date().toISOString()
   const existing = db.select().from(announcements).where(eq(announcements.id, announcement.id)).all()
   const payload = {

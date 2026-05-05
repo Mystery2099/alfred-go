@@ -76,6 +76,7 @@ sqlite.exec(`
     action_label text,
     tool_id text,
     url text,
+    audience_roles text not null,
     sort_order integer not null,
     is_active integer not null,
     created_at text not null,
@@ -135,6 +136,12 @@ try {
 
 try {
   sqlite.exec(`ALTER TABLE tools ADD COLUMN live_data TEXT;`)
+} catch {
+  // column may already exist
+}
+
+try {
+  sqlite.exec(`ALTER TABLE announcements ADD COLUMN audience_roles TEXT NOT NULL DEFAULT '[]';`)
 } catch {
   // column may already exist
 }

@@ -93,10 +93,20 @@ let currentRole = $derived((currentUser?.role || 'student') as Role)
 
 let effectiveRole = $derived(() => {
   const pref = currentPreference()
-  if (pref?.preferredRoleView && pref.preferredRoleView !== currentRole) {
-    return pref.preferredRoleView as Role
+  const requested = pref?.preferredRoleView
+  const actual = currentRole
+
+  // Only admin and staff can change role view
+  // Staff cannot select admin
+  if (actual === 'admin' && requested && roles.includes(requested as Role)) {
+    return requested as Role
   }
-  return currentRole
+  if (actual === 'staff' && requested && roles.includes(requested as Role) && requested !== 'admin') {
+    return requested as Role
+  }
+
+  // Everyone else must view resources as their actual role
+  return actual
 })
 
 let categories = $derived(() => {
@@ -136,7 +146,10 @@ let accessibilitySettings = $derived(() => {
 
 let announcements = $derived(() => {
   if (!state.data) return []
-  return state.data.announcements.filter((a) => a.isActive).sort((a, b) => a.sortOrder - b.sortOrder)
+  const role = effectiveRole()
+  return state.data.announcements
+    .filter((a) => a.isActive && (role === 'admin' || a.audienceRoles.length === 0 || a.audienceRoles.includes(role)))
+    .sort((a, b) => a.sortOrder - b.sortOrder)
 })
 
 let recentActivities = $derived(() => {

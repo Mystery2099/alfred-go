@@ -84,6 +84,7 @@ export const announcements = sqliteTable('announcements', {
   actionLabel: text('action_label'),
   toolId: text('tool_id'),
   url: text('url'),
+  audienceRoles: text('audience_roles', { mode: 'json' }).$type<string[]>().notNull(),
   sortOrder: integer('sort_order').notNull(),
   isActive: integer('is_active', { mode: 'boolean' }).notNull(),
   createdAt: text('created_at').notNull(),

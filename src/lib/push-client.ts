@@ -1,3 +1,5 @@
+import { dev } from '$app/environment'
+
 export const VAPID_PUBLIC_KEY = 'BPSXqR83Ocgm9BshL1V_A50sK6N4px7XNH6tBwafwwIq6EIGVKCumPD1YyimaD4QhNtVa70BZO5A2gopqmDnAgQ'
 
 export interface PushSubscriptionJSON {
@@ -20,7 +22,7 @@ function urlBase64ToUint8Array(base64String: string): Uint8Array<ArrayBuffer> {
 }
 
 export async function subscribeToPush(): Promise<PushSubscriptionJSON | null> {
-  if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
+  if (!isPushSupported()) {
     throw new Error('Push notifications are not supported in this browser')
   }
 
@@ -67,7 +69,7 @@ export async function subscribeToPush(): Promise<PushSubscriptionJSON | null> {
 }
 
 export async function unsubscribeFromPush(): Promise<void> {
-  if (!('serviceWorker' in navigator)) return
+  if (!isPushSupported()) return
 
   const registration = await navigator.serviceWorker.ready
   const subscription = await registration.pushManager.getSubscription()
@@ -93,5 +95,5 @@ export async function getPushStatus(): Promise<{ subscribed: boolean }> {
 }
 
 export function isPushSupported(): boolean {
-  return typeof window !== 'undefined' && 'serviceWorker' in navigator && 'PushManager' in window
+  return !dev && typeof window !== 'undefined' && 'serviceWorker' in navigator && 'PushManager' in window
 }

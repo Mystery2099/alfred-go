@@ -31,6 +31,10 @@ export const categories: Category[] = [
   { id: 'staff', name: 'Staff Resources', description: 'Employee tools and administrative systems.', sortOrder: 70, createdAt: now, updatedAt: now }
 ]
 
+const allRoles: Role[] = ['applicant', 'accepted_student', 'student', 'staff', 'admin']
+const studentRoles: Role[] = ['accepted_student', 'student', 'staff', 'admin']
+const staffRoles: Role[] = ['staff', 'admin']
+
 export const announcements: Announcement[] = [
   {
     id: 'announcement-1',
@@ -40,6 +44,7 @@ export const announcements: Announcement[] = [
     filter: 'reminders',
     actionLabel: 'Academic Calendar',
     toolId: 'academic-calendar',
+    audienceRoles: studentRoles,
     sortOrder: 10,
     isActive: true,
     createdAt: now,
@@ -53,6 +58,7 @@ export const announcements: Announcement[] = [
     filter: 'updates',
     actionLabel: 'Visit Library',
     toolId: 'hinkle-library',
+    audienceRoles: studentRoles,
     sortOrder: 20,
     isActive: true,
     createdAt: now,
@@ -66,6 +72,7 @@ export const announcements: Announcement[] = [
     filter: 'updates',
     actionLabel: 'View DegreeWorks',
     toolId: 'degreeworks',
+    audienceRoles: allRoles,
     sortOrder: 30,
     isActive: true,
     createdAt: now,
@@ -79,6 +86,7 @@ export const announcements: Announcement[] = [
     filter: 'deadlines',
     actionLabel: 'Bannerweb',
     url: 'https://banner.alfredstate.edu/StudentSelfService/ssb/studentProfile',
+    audienceRoles: staffRoles,
     sortOrder: 40,
     isActive: true,
     createdAt: now,
@@ -92,6 +100,7 @@ export const announcements: Announcement[] = [
     filter: 'deadlines',
     actionLabel: 'Schedule Planner',
     toolId: 'schedule-planner',
+    audienceRoles: studentRoles,
     sortOrder: 50,
     isActive: true,
     createdAt: now,
@@ -105,6 +114,7 @@ export const announcements: Announcement[] = [
     filter: 'updates',
     actionLabel: 'Dining Services',
     toolId: 'dining',
+    audienceRoles: studentRoles,
     sortOrder: 60,
     isActive: true,
     createdAt: now,
@@ -118,6 +128,7 @@ export const announcements: Announcement[] = [
     filter: 'reminders',
     actionLabel: 'Health & Wellness',
     toolId: 'health-wellness',
+    audienceRoles: allRoles,
     sortOrder: 70,
     isActive: true,
     createdAt: now,
@@ -131,6 +142,7 @@ export const announcements: Announcement[] = [
     filter: 'deadlines',
     actionLabel: 'Financial Aid',
     toolId: 'financial-aid-offers',
+    audienceRoles: studentRoles,
     sortOrder: 80,
     isActive: true,
     createdAt: now,
@@ -148,12 +160,19 @@ export const tools: Tool[] = [
     liveData: {
       currentTerm: 'Spring 2026',
       enrolledCourses: 5,
-      upcomingAssignments: 3,
       currentGPA: '3.42',
       nextDeadline: 'May 8 — CISY 7203 Final Project',
+      upcomingAssignments: [
+        { course: 'CISY 7203', name: 'Final Project Deliverable', due: 'May 8, 11:59 PM', type: 'Project' },
+        { course: 'MATH 2043', name: 'Problem Set 10', due: 'May 6, 11:59 PM', type: 'Homework' },
+        { course: 'ENGL 2083', name: 'Technical Report Draft', due: 'May 7, 5:00 PM', type: 'Paper' },
+        { course: 'PHYS 1023', name: 'Lab 12 Write-Up', due: 'May 5, 11:59 PM', type: 'Lab' },
+      ],
       recentGrades: [
         { course: 'CISY 7203', assignment: 'Midterm Exam', grade: '88%' },
         { course: 'MATH 2043', assignment: 'Problem Set 7', grade: '92%' },
+        { course: 'ENGL 2083', assignment: 'Memo Assignment', grade: '95%' },
+        { course: 'BUSN 3013', assignment: 'Case Study Analysis', grade: '87%' },
       ]
     }
   }),
@@ -197,12 +216,15 @@ export const tools: Tool[] = [
     status: 'online',
     requirements: 'Alfred State Microsoft login',
     liveData: {
+      currentTerm: 'Spring 2026',
+      gpa: '3.42',
+      creditsEnrolled: 15,
       courses: [
-        { code: 'CISY 7203', name: 'Web Development', instructor: 'Prof. James Chen', grade: 'A-' },
-        { code: 'MATH 2043', name: 'Calculus II', instructor: 'Dr. Lisa Park', grade: 'B+' },
-        { code: 'ENGL 2083', name: 'Technical Writing', instructor: 'Prof. Mark Torres', grade: 'A' },
-        { code: 'PHYS 1023', name: 'Physics I', instructor: 'Dr. Anna Reed', grade: 'B' },
-        { code: 'BUSN 3013', name: 'Project Management', instructor: 'Prof. David Kim', grade: 'A-' },
+        { code: 'CISY 7203', name: 'Web Development', instructor: 'Prof. James Chen', grade: 'A-', credits: 3 },
+        { code: 'MATH 2043', name: 'Calculus II', instructor: 'Dr. Lisa Park', grade: 'B+', credits: 4 },
+        { code: 'ENGL 2083', name: 'Technical Writing', instructor: 'Prof. Mark Torres', grade: 'A', credits: 3 },
+        { code: 'PHYS 1023', name: 'Physics I', instructor: 'Dr. Anna Reed', grade: 'B', credits: 3 },
+        { code: 'BUSN 3013', name: 'Project Management', instructor: 'Prof. David Kim', grade: 'A-', credits: 2 },
       ]
     }
   }),
@@ -271,7 +293,13 @@ export const tools: Tool[] = [
       dueDate: 'May 15, 2026',
       lastPayment: '$3,500.00 on April 12, 2026',
       paymentPlan: 'Active — 4 installments remaining',
-      nextInstallment: '$310.00 on May 15, 2026'
+      nextInstallment: '$310.00 on May 15, 2026',
+      paymentHistory: [
+        { date: 'April 12, 2026', amount: '$3,500.00', method: 'Credit Card' },
+        { date: 'March 15, 2026', amount: '$3,500.00', method: 'Bank Transfer' },
+        { date: 'February 14, 2026', amount: '$3,500.00', method: 'Credit Card' },
+        { date: 'January 12, 2026', amount: '$3,500.00', method: 'Bank Transfer' },
+      ]
     }
   }),
   tool('scholarships', 'Scholarships', 'Alfred State scholarship opportunities, ScholarshipUniverse, and NYS scholarships.', 'https://my.alfredstate.edu', 'financial', ['scholarships', 'aid'], ['applicant', 'accepted_student', 'student'], false, 'BadgeDollarSign', {
@@ -301,7 +329,13 @@ export const tools: Tool[] = [
       lastSync: '2 minutes ago',
       storageUsed: '4.2 GB',
       storageTotal: '50 GB',
-      quickLinks: ['Inbox', 'Calendar', 'Sent Items', 'Drafts']
+      quickLinks: ['Inbox', 'Calendar', 'Sent Items', 'Drafts'],
+      recentEmails: [
+        { sender: 'Financial Aid Office', subject: 'Your aid offer for Fall 2026', preview: 'Your financial aid package has been updated...', time: '10:32 AM', unread: true },
+        { sender: 'Prof. James Chen', subject: 'CISY 7203 — Final Project Reminder', preview: 'Just a reminder that your final project is due this Friday...', time: 'Yesterday', unread: true },
+        { sender: 'Residential Life', subject: 'Housing selection opens March 15', preview: 'Fall 2026 housing selection will begin on March 15 at 8:00 AM...', time: 'Yesterday', unread: true },
+        { sender: 'Campus Dining', subject: 'New menu items at Pioneer Café', preview: 'Check out the new smoothie bar and expanded breakfast options...', time: '2 days ago', unread: false },
+      ]
     }
   }),
   tool('microsoft-products', 'Microsoft Products', 'Word, Excel, PowerPoint, OneNote, Outlook, Teams, SharePoint, OneDrive, and Microsoft 365.', 'https://www.microsoft365.com', 'resources', ['microsoft', 'office', 'onedrive', 'teams'], ['accepted_student', 'student', 'staff', 'admin'], true, 'Grid2X2', {
@@ -327,7 +361,12 @@ export const tools: Tool[] = [
       openTickets: 1,
       lastTicket: 'Wi-Fi connection issue in Library — In Progress',
       avgResponseTime: 'Under 2 hours',
-      walkInHours: 'Mon–Fri 8:00 AM – 5:00 PM'
+      walkInHours: 'Mon–Fri 8:00 AM – 5:00 PM',
+      tickets: [
+        { title: 'Wi-Fi connection issue in Library', status: 'In Progress', date: 'May 3, 2026', category: 'Network' },
+        { title: 'Password reset request', status: 'Resolved', date: 'April 28, 2026', category: 'Account' },
+        { title: 'Printer driver installation', status: 'Resolved', date: 'April 15, 2026', category: 'Printing' },
+      ]
     }
   }),
   tool('pharos-printing', 'Pharos Printing', 'My Print Center, Pharos packages, and Pharos help.', 'https://my.alfredstate.edu', 'resources', ['printing', 'pharos'], ['student', 'staff'], false, 'FileCheck', {
@@ -356,9 +395,11 @@ export const tools: Tool[] = [
     status: 'online',
     requirements: 'Alfred State Microsoft login',
     liveData: {
-      holds: 0,
+      holds: [],
       gpa: '3.42',
+      semesterGPA: '3.58',
       academicStanding: 'Good Standing',
+      expectedGraduation: 'May 2027',
       lastLogin: 'Today at 9:15 AM'
     }
   }),
@@ -373,6 +414,8 @@ export const tools: Tool[] = [
       roomType: 'Double',
       mealPlan: 'Unlimited + $200 Dining Dollars',
       diningDollarsRemaining: '$87.30',
+      diningDollarsSpentThisMonth: '$112.70',
+      roommates: ['Alex Rivera', 'Jordan Kim'],
       housingContract: 'Active through Spring 2026'
     }
   }),
@@ -383,10 +426,15 @@ export const tools: Tool[] = [
     status: 'online',
     liveData: {
       currentMealPeriod: 'Dinner',
-      pioneerCafeStatus: 'Open until 10:00 PM',
       todaysSpecial: 'Grilled Chicken Alfredo',
       mealSwipesUsedToday: 2,
-      diningDollarsBalance: '$87.30'
+      diningDollarsBalance: '$87.30',
+      locations: [
+        { name: 'Pioneer Café', status: 'Open', hours: '7:00 AM — 10:00 PM', untilClose: '3 hours' },
+        { name: 'Pizza & Grill', status: 'Open', hours: '11:00 AM — 9:00 PM', untilClose: '2 hours' },
+        { name: 'Coffee House', status: 'Closed', hours: '7:00 AM — 3:00 PM', untilClose: 'Opens 7:00 AM' },
+        { name: 'Smoothie Bar', status: 'Open', hours: '10:00 AM — 8:00 PM', untilClose: '1 hour' },
+      ]
     }
   }),
   tool('health-wellness', 'Health & Wellness', '988 Crisis, Health Portal, and health and wellness resources.', 'https://my.alfredstate.edu', 'student-life', ['health', 'wellness', '988'], ['student'], false, 'LifeBuoy', {

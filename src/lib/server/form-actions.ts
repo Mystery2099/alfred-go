@@ -171,6 +171,7 @@ export const adminAnnouncementActions = {
     const id = String(formData.get('id') || `announcement-${Date.now()}`)
     const toolId = String(formData.get('toolId') || '').trim() || undefined
     const url = String(formData.get('url') || '').trim() || undefined
+    const audienceRoles = formData.getAll('audienceRoles').map(String) as Role[]
 
     const announcement: Announcement = {
       id,
@@ -181,6 +182,7 @@ export const adminAnnouncementActions = {
       actionLabel: String(formData.get('actionLabel') || '').trim() || undefined,
       toolId,
       url,
+      audienceRoles: audienceRoles.length ? audienceRoles : ['student'],
       sortOrder: Number(formData.get('sortOrder') || 0),
       isActive: formData.get('isActive') !== 'off',
       createdAt: now,

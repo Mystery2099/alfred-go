@@ -76,6 +76,7 @@ export type Announcement = {
   actionLabel?: string
   toolId?: string
   url?: string
+  audienceRoles: Role[]
   sortOrder: number
   isActive: boolean
   createdAt: string
