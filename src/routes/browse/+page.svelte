@@ -9,7 +9,7 @@
 <section class="mx-auto max-w-6xl space-y-6">
   <!-- Search bar -->
   <div class="rounded-[28px] bg-surface p-4 shadow-sm ring-1 ring-border sm:p-6">
-    <label class="flex items-center gap-3 rounded-2xl border border-border bg-muted px-4 py-3.5 transition focus-within:border-campus-blue focus-within:ring-2 focus-within:ring-campus-blue/20">
+    <label class="flex items-center gap-3 rounded-2xl border border-border bg-muted px-4 py-3.5 ring-2 ring-transparent transition focus-within:border-campus-blue focus-within:ring-campus-blue/20">
       <Search class="h-5 w-5 text-text-muted" />
       <input
         value={app.query}

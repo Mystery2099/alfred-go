@@ -24,7 +24,7 @@
     onclick,
   }: Props = $props()
 
-  const base = 'inline-flex items-center justify-center gap-2 rounded-xl font-bold transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-link/40 disabled:opacity-50 disabled:cursor-not-allowed'
+  const base = 'inline-flex items-center justify-center gap-2 rounded-xl font-bold transition-all duration-150 focus:outline-none ring-2 ring-transparent focus:ring-link/40 disabled:opacity-50 disabled:cursor-not-allowed'
 
   const variants = {
     primary: 'bg-link text-white hover:bg-link/90 shadow-sm',

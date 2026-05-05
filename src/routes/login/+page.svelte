@@ -76,7 +76,7 @@
           <label class="text-xs font-extrabold uppercase tracking-[0.18em] text-[var(--app-text-muted)]" for="email">
             Email
           </label>
-          <div class="flex items-center gap-3 rounded-2xl border border-[var(--app-border)] bg-[var(--app-surface)] px-5 py-4 shadow-sm transition focus-within:border-campus-blue focus-within:ring-2 focus-within:ring-campus-blue/20">
+          <div class="flex items-center gap-3 rounded-2xl border border-[var(--app-border)] bg-[var(--app-surface)] px-5 py-4 shadow-sm ring-2 ring-transparent transition focus-within:border-campus-blue focus-within:ring-campus-blue/20">
             <Mail class="h-5 w-5 shrink-0 text-[var(--app-text-muted)]" />
             <input
               id="email"
@@ -100,7 +100,7 @@
               Forgot password?
             </a>
           </div>
-          <div class="flex items-center gap-3 rounded-2xl border border-[var(--app-border)] bg-[var(--app-surface)] px-5 py-4 shadow-sm transition focus-within:border-campus-blue focus-within:ring-2 focus-within:ring-campus-blue/20">
+          <div class="flex items-center gap-3 rounded-2xl border border-[var(--app-border)] bg-[var(--app-surface)] px-5 py-4 shadow-sm ring-2 ring-transparent transition focus-within:border-campus-blue focus-within:ring-campus-blue/20">
             <LockKeyhole class="h-5 w-5 shrink-0 text-[var(--app-text-muted)]" />
             <input
               id="password"
@@ -134,7 +134,7 @@
         <div class="grid grid-cols-2 gap-3">
           {#each data.users || [] as user}
             <button
-              class="rounded-2xl border border-[var(--app-border)] bg-[var(--app-surface)] p-4 text-left shadow-sm transition hover:-translate-y-0.5 hover:shadow-md hover:ring-2 hover:ring-campus-blue/20 active:scale-[0.98]"
+              class="rounded-2xl border border-[var(--app-border)] bg-[var(--app-surface)] p-4 text-left shadow-sm ring-2 ring-transparent transition hover:-translate-y-0.5 hover:shadow-md hover:ring-campus-blue/20 active:scale-[0.98]"
               onclick={() => {
                 email = user.email || ''
                 password = defaultPasswordForRole(user.role)

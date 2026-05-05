@@ -44,7 +44,7 @@
 <div class="mx-auto max-w-6xl">
   <!-- Search -->
   <div class="mb-5">
-    <label class="flex items-center gap-3 rounded-2xl border border-border bg-surface px-4 py-3 shadow-sm transition focus-within:border-campus-blue focus-within:ring-2 focus-within:ring-campus-blue/20">
+    <label class="flex items-center gap-3 rounded-2xl border border-border bg-surface px-4 py-3 shadow-sm ring-2 ring-transparent transition focus-within:border-campus-blue focus-within:ring-campus-blue/20">
       <Search class="h-5 w-5 text-text-muted" />
       <input
         type="text"
