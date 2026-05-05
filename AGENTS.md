@@ -110,13 +110,13 @@ This is a SvelteKit app using the Node adapter. There is no separate Express API
 - Avoid Card Grids
 - Take inspiration from material 3 design
 - Take inspiration from the android settings app
+- feel free to use bits-ui
 
 
 ---
 
 ## TODO
 
-- Search bar currently allows infinite input, should add limit
 - replace search bar in header with search button that opens a command bar of sorts
 - figure out whether that button should be in the header or not on mobile
 - add hotkeys with tanstack hotkeys

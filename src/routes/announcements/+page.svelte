@@ -47,9 +47,11 @@
     <label class="flex items-center gap-3 rounded-2xl border border-border bg-surface px-4 py-3 shadow-sm transition focus-within:border-campus-blue focus-within:ring-2 focus-within:ring-campus-blue/20">
       <Search class="h-5 w-5 text-text-muted" />
       <input
-        bind:value={searchQuery}
+        type="text"
         class="w-full bg-transparent text-sm outline-none"
         placeholder="Search announcements..."
+        bind:value={searchQuery}
+        maxlength="100"
       />
       {#if searchQuery}
         <button onclick={() => searchQuery = ''} class="rounded-lg p-1 text-text-muted hover:bg-muted">

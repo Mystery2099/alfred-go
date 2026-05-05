@@ -16,6 +16,7 @@
         oninput={(e) => app.setQuery(e.currentTarget.value)}
         class="w-full bg-transparent text-sm outline-none"
         placeholder="Search by name, tag, category..."
+        maxlength="100"
       />
     </label>
     <div class="mt-4 grid gap-3 sm:grid-cols-2">
