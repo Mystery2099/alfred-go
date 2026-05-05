@@ -44,72 +44,67 @@
   }
 </script>
 
-<section class="space-y-3" aria-label="Announcements">
-  <!-- Header and filters -->
-  <div>
-    <div class="flex items-center justify-between mb-3">
-      <h2 class="text-lg font-semibold text-slate-800 dark:text-slate-100">What&apos;s Happening</h2>
-      {#if !isPreview}
-        <a href="/announcements" class="text-xs font-medium text-campus-blue-700 dark:text-campus-blue-400 hover:underline hidden sm:inline-flex items-center gap-1">
-          View all
-          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
-        </a>
-      {/if}
-    </div>
-    {#if !isPreview}
-      <div class="flex flex-wrap gap-1.5 sm:gap-2">
-        {#each filters as f (f)}
-          <button
-            onclick={() => { activeFilter = f }}
-            class="px-2.5 py-1 rounded-full text-xs font-medium transition duration-150 ease-out border {activeFilter === f ? 'bg-campus-blue-600 text-white border-campus-blue-600 dark:bg-campus-blue-500 dark:border-campus-blue-500' : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-750 active:scale-95'}"
-            aria-pressed={activeFilter === f}
-          >
-            {f}
-          </button>
-        {/each}
-      </div>
-    {/if}
-  </div>
-
-  <!-- Compact list (no scroll on dashboard) -->
-  <div class="space-y-2 {isPreview ? '' : 'max-h-[280px] overflow-y-auto visible-scrollbar scroll-fade pr-1'}">
-    {#each filteredAnnouncements() as a (a.id)}
-      <a
-        href={a.toolId ? `/tools/${a.toolId}` : (a.url || '#')}
-        class="group block bg-white dark:bg-slate-800 rounded-xl border border-slate-200/60 dark:border-slate-700/40 border-l-4 {borderColors[a.tone ?? 'default']} hover:bg-slate-50 dark:hover:bg-slate-750 transition duration-200 ease-out active:scale-[0.995] p-2.5 sm:p-3"
-        aria-label="{a.title} — {a.body}"
-      >
-        <div class="flex items-start gap-2.5">
-          {#if a.tone}
-            {@const Icon = toneIcons[a.tone] || Megaphone}
-            <div class="mt-0.5 shrink-0 {toneColors[a.tone ?? 'default']}">
-              <Icon size={16} />
-            </div>
-          {/if}
-          <div class="min-w-0 flex-1">
-            <div class="flex items-start justify-between gap-2">
-              <p class="text-sm font-semibold text-slate-800 dark:text-slate-100 line-clamp-1">{a.title}</p>
-              {#if a.actionLabel}
-                <span class="shrink-0 hidden sm:inline-flex items-center gap-1 text-[11px] font-medium text-campus-blue-700 dark:text-campus-blue-400 group-hover:underline">
-                  {a.actionLabel}
-                  <svg class="w-3 h-3 transition duration-200 group-hover:translate-x-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
-                </span>
-              {/if}
-            </div>
-            <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5 line-clamp-2">{a.body}</p>
-          </div>
-        </div>
-      </a>
-    {/each}
-    {#if filteredAnnouncements().length === 0}
-      <div class="text-center py-6 text-sm text-slate-500 dark:text-slate-400">No announcements for this filter.</div>
-    {/if}
-  </div>
-
-  {#if isPreview && (app?.announcements?.length ?? 0) > limit}
-    <a href="/announcements" class="group flex w-full items-center justify-center gap-2 rounded-2xl bg-muted px-5 py-3.5 text-sm font-semibold text-link outline-none transition-all duration-200 hover:bg-link hover:text-white hover:shadow-md hover:shadow-link/20 focus-visible:ring-2 focus-visible:ring-link focus-visible:ring-offset-2 focus-visible:ring-offset-canvas active:scale-[0.995]">
-      <span>View all {app?.announcements?.length ?? 0} announcements</span>
-      <ChevronRight class="h-4 w-4 transition-transform duration-200 group-hover:translate-x-0.5" />
+{#if !isPreview}
+  <div class="flex items-center justify-between mb-3">
+    <h2 class="text-lg font-semibold text-slate-800 dark:text-slate-100">What&apos;s Happening</h2>
+    <a href="/announcements" class="text-xs font-medium text-campus-blue-700 dark:text-campus-blue-400 hover:underline hidden sm:inline-flex items-center gap-1">
+      View all
+      <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
     </a>
+  </div>
+  {#if !isPreview}
+    <div class="flex flex-wrap gap-1.5 sm:gap-2 mb-3">
+      {#each filters as f (f)}
+        <button
+          onclick={() => { activeFilter = f }}
+          class="px-2.5 py-1 rounded-full text-xs font-medium transition duration-150 ease-out border {activeFilter === f ? 'bg-campus-blue-600 text-white border-campus-blue-600 dark:bg-campus-blue-500 dark:border-campus-blue-500' : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-750 active:scale-95'}"
+          aria-pressed={activeFilter === f}
+        >
+          {f}
+        </button>
+      {/each}
+    </div>
   {/if}
-</section>
+{/if}
+
+<!-- Compact list (no scroll on dashboard) -->
+<div class="space-y-2 {isPreview ? '' : 'max-h-[280px] overflow-y-auto visible-scrollbar scroll-fade pr-1'}">
+  {#each filteredAnnouncements() as a (a.id)}
+    <a
+      href={a.toolId ? `/tools/${a.toolId}` : (a.url || '#')}
+      class="group block bg-white dark:bg-slate-800 rounded-xl border border-slate-200/60 dark:border-slate-700/40 border-l-4 {borderColors[a.tone ?? 'default']} hover:bg-slate-50 dark:hover:bg-slate-750 transition duration-200 ease-out active:scale-[0.995] p-2.5 sm:p-3"
+      aria-label="{a.title} — {a.body}"
+    >
+      <div class="flex items-start gap-2.5">
+        {#if a.tone}
+          {@const Icon = toneIcons[a.tone] || Megaphone}
+          <div class="mt-0.5 shrink-0 {toneColors[a.tone ?? 'default']}">
+            <Icon size={16} />
+          </div>
+        {/if}
+        <div class="min-w-0 flex-1">
+          <div class="flex items-start justify-between gap-2">
+            <p class="text-sm font-semibold text-slate-800 dark:text-slate-100 line-clamp-1">{a.title}</p>
+            {#if a.actionLabel}
+              <span class="shrink-0 hidden sm:inline-flex items-center gap-1 text-[11px] font-medium text-campus-blue-700 dark:text-campus-blue-400 group-hover:underline">
+                {a.actionLabel}
+                <svg class="w-3 h-3 transition duration-200 group-hover:translate-x-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+              </span>
+            {/if}
+          </div>
+          <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5 line-clamp-2">{a.body}</p>
+        </div>
+      </div>
+    </a>
+  {/each}
+  {#if filteredAnnouncements().length === 0}
+    <div class="text-center py-6 text-sm text-slate-500 dark:text-slate-400">No announcements for this filter.</div>
+  {/if}
+</div>
+
+{#if isPreview && (app?.announcements?.length ?? 0) > limit}
+  <a href="/announcements" class="group flex w-full items-center justify-center gap-2 rounded-2xl bg-muted px-5 py-3.5 text-sm font-semibold text-link outline-none transition-all duration-200 hover:bg-link hover:text-white hover:shadow-md hover:shadow-link/20 focus-visible:ring-2 focus-visible:ring-link focus-visible:ring-offset-2 focus-visible:ring-offset-canvas active:scale-[0.995]">
+    <span>View all {app?.announcements?.length ?? 0} announcements</span>
+    <ChevronRight class="h-4 w-4 transition-transform duration-200 group-hover:translate-x-0.5" />
+  </a>
+{/if}
