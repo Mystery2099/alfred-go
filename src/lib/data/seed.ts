@@ -151,7 +151,7 @@ export const announcements: Announcement[] = [
 ]
 
 export const tools: Tool[] = [
-  tool('my-learning', 'My Learning', 'Online coursework, class materials, assignments, and grades.', 'https://my.alfredstate.edu', 'academics', ['learning', 'courses', 'assignments', 'grades'], ['student', 'staff'], true, 'BookOpen', {
+  tool('my-learning', 'My Learning', 'Online coursework, class materials, assignments, and grades.', 'https://mylearning.alfredstate.edu', 'academics', ['learning', 'courses', 'assignments', 'grades'], ['student', 'staff'], true, 'BookOpen', {
     notes: 'Your central hub for all coursework. Grades are typically posted within 48 hours of submission.',
     helpUrl: 'https://alfredstate.teamdynamix.com/TDClient/277/Portal/KB/ArticleDet?ID=10521',
     contactInfo: 'Academic Success Center: success@alfredstate.edu',
