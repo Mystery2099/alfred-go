@@ -1,0 +1,15 @@
+.DS_Store
+.env
+.env.*
+!.env.example
+.git
+.gitignore
+.svelte-kit
+build
+node_modules
+coverage
+*.log
+alfredgo.sqlite
+*.sqlite
+*.sqlite-shm
+*.sqlite-wal
