@@ -185,22 +185,6 @@ textarea {
   @apply border-campus-blue bg-campus-blue text-white;
 }
 
-.admin-card {
-  @apply flex items-center gap-4 rounded-2xl border border-border bg-surface p-4 text-left shadow-sm transition hover:-translate-y-0.5 hover:shadow-md sm:p-5;
-}
-
-.admin-card svg {
-  @apply h-8 w-8 text-link;
-}
-
-.admin-card b {
-  @apply block text-lg;
-}
-
-.admin-card small {
-  @apply block text-sm text-text-muted;
-}
-
 .pill {
   @apply rounded-full px-3 py-1.5 text-xs font-extrabold text-text-muted transition-colors duration-300 hover:text-link;
 }
@@ -239,10 +223,6 @@ textarea {
   color: #fff;
 }
 
-.quick-card {
-  @apply flex min-h-32 w-full min-w-0 items-start gap-4 rounded-2xl bg-surface p-3 text-left shadow-sm ring-1 ring-border transition hover:-translate-y-0.5 hover:shadow-md hover:ring-2 hover:ring-campus-blue/20 sm:p-4;
-}
-
 .quick-icon {
   @apply grid h-11 w-11 shrink-0 place-items-center rounded-xl text-white;
 }
@@ -263,17 +243,6 @@ textarea {
   @apply bg-campus-darkBlue;
 }
 
-.recent-card {
-  @apply flex w-full min-w-0 items-center gap-3 rounded-2xl bg-surface p-3 text-left shadow-sm ring-1 ring-border transition hover:bg-muted hover:shadow-sm;
-}
-
-.recent-card b {
-  @apply block text-sm font-extrabold;
-}
-
-.recent-card small {
-  @apply block truncate text-xs text-text-muted;
-}
 
 .search-chip {
   @apply rounded-full bg-surface px-4 py-2 text-sm text-text-muted shadow-sm ring-1 ring-border transition hover:bg-selected hover:text-link;
