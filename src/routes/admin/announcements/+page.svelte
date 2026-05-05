@@ -125,12 +125,12 @@
         </button>
       </div>
     </form>
-    <div class="grid gap-3 md:grid-cols-2">
+    <div class="divide-y divide-border rounded-2xl bg-surface shadow-sm ring-1 ring-border overflow-hidden">
       {#each app.data?.announcements || [] as announcement}
-        <div class="flex items-start justify-between rounded-lg border border-border bg-surface p-4 shadow-sm">
+        <div class="flex items-start justify-between gap-3 px-5 py-4 transition hover:bg-muted">
           <div class="min-w-0 flex-1">
             <div class="flex items-center gap-2">
-              <b>{announcement.title}</b>
+              <span class="font-bold text-text">{announcement.title}</span>
               {#if !announcement.isActive}
                 <span class="rounded-md bg-border px-2 py-0.5 text-[10px] font-extrabold uppercase text-text-muted">Inactive</span>
               {/if}
@@ -144,7 +144,7 @@
               {/if}
             </div>
           </div>
-          <div class="ml-3 flex items-center gap-1">
+          <div class="flex items-center gap-1 shrink-0">
             <button title="Edit announcement" onclick={() => startEdit(announcement)} class="grid h-8 w-8 place-items-center rounded-lg text-text-muted transition hover:bg-muted hover:text-link">
               <Pencil class="h-4 w-4" />
             </button>
