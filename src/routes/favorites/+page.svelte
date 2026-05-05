@@ -7,7 +7,7 @@
   const tools = $derived(app.visibleTools.filter((tool) => app.favoriteIds.has(tool.id)))
 </script>
 
-<section class="mx-auto max-w-3xl space-y-6">
+<section class="mx-auto max-w-6xl space-y-6">
   <div class="rounded-[28px] bg-surface px-6 py-8 shadow-sm ring-1 ring-border sm:px-10">
     <p class="text-xs font-extrabold uppercase tracking-[0.18em] text-text-muted">Bookmarks</p>
     <h2 class="mt-2 text-3xl font-extrabold tracking-tight text-text">Favorites</h2>

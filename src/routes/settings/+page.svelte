@@ -203,7 +203,7 @@
   }
 </script>
 
-<section class="mx-auto max-w-3xl space-y-8 pb-8">
+<section class="mx-auto max-w-5xl space-y-8 pb-8">
   <div>
     <p class="text-xs font-extrabold uppercase tracking-[0.18em] text-link">Account controls</p>
     <SectionTitle>Settings</SectionTitle>

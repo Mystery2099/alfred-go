@@ -245,7 +245,7 @@
           <button
             onclick={() => history.back()}
             aria-label="Go back"
-            class="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-muted text-link shadow-sm transition-colors hover:bg-border lg:hidden"
+            class="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-muted text-link shadow-sm transition-colors hover:bg-border"
           >
             <ChevronLeft class="h-5 w-5" />
           </button>
