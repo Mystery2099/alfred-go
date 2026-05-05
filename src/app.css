@@ -145,7 +145,8 @@ textarea {
 }
 
 .nav-item.active {
-  @apply text-link transition-colors duration-300 ease-out;
+  @apply bg-selected text-link transition-colors duration-300 ease-out;
+  view-transition-name: sidebar-active-nav;
 }
 
 .mobile-item {
@@ -153,7 +154,27 @@ textarea {
 }
 
 .mobile-item.active {
-  @apply text-link transition-colors duration-300 ease-out;
+  @apply bg-selected text-link transition-colors duration-300 ease-out;
+  view-transition-name: mobile-active-nav;
+}
+
+::view-transition-group(sidebar-active-nav),
+::view-transition-group(mobile-active-nav) {
+  animation-duration: 240ms;
+  animation-timing-function: cubic-bezier(0.2, 0, 0, 1);
+}
+
+::view-transition-old(sidebar-active-nav),
+::view-transition-new(sidebar-active-nav),
+::view-transition-old(mobile-active-nav),
+::view-transition-new(mobile-active-nav) {
+  height: 100%;
+  overflow: clip;
+}
+
+.reduce-motion .nav-item.active,
+.reduce-motion .mobile-item.active {
+  view-transition-name: none;
 }
 
 .control {
