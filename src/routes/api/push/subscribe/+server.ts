@@ -24,7 +24,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
     saveSubscription(locals.user.id, subscription)
 
     return json({ success: true })
-  } catch (err: any) {
-    return json({ error: err.message || 'Failed to save subscription' }, { status: 500 })
+  } catch {
+    return json({ error: 'Failed to save subscription' }, { status: 500 })
   }
 }

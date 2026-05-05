@@ -16,7 +16,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
 
     deleteSubscription(endpoint)
     return json({ success: true })
-  } catch (err: any) {
-    return json({ error: err.message || 'Failed to remove subscription' }, { status: 500 })
+  } catch {
+    return json({ error: 'Failed to remove subscription' }, { status: 500 })
   }
 }

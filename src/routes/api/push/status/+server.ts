@@ -12,7 +12,7 @@ export const GET: RequestHandler = async ({ locals }) => {
 
     const subs = db.select().from(pushSubscriptions).where(eq(pushSubscriptions.userId, userId)).all()
     return json({ subscribed: subs.length > 0, count: subs.length })
-  } catch (err: any) {
-    return json({ error: err.message }, { status: 500 })
+  } catch {
+    return json({ error: 'Failed to read push status' }, { status: 500 })
   }
 }

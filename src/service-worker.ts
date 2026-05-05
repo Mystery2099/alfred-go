@@ -3,7 +3,7 @@
 
 import { cleanupOutdatedCaches, precacheAndRoute } from 'workbox-precaching'
 import { NavigationRoute, registerRoute } from 'workbox-routing'
-import { NetworkFirst, StaleWhileRevalidate, CacheFirst } from 'workbox-strategies'
+import { StaleWhileRevalidate, CacheFirst } from 'workbox-strategies'
 
 declare let self: ServiceWorkerGlobalScope
 
@@ -15,12 +15,7 @@ cleanupOutdatedCaches()
 // Fallback for navigation
 registerRoute(new NavigationRoute(async ({ request }) => {
   try {
-    const cache = await caches.open('pages-cache')
-    const cached = await cache.match(request)
-    if (cached) return cached
-    const response = await fetch(request)
-    if (response.ok) cache.put(request, response.clone())
-    return response
+    return await fetch(request)
   } catch {
     return (await caches.match('/offline')) || Response.error()
   }

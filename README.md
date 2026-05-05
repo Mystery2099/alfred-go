@@ -20,13 +20,13 @@ pnpm dlx sv@0.15.2 create --template minimal --types ts --install pnpm final-pro
 
 ## Developing
 
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
+Once you've created a project and installed dependencies with `pnpm install`, start a development server:
 
 ```sh
-npm run dev
+pnpm dev
 
 # or start the server and open the app in a new browser tab
-npm run dev -- --open
+pnpm dev -- --open
 ```
 
 ## Building
@@ -34,9 +34,15 @@ npm run dev -- --open
 To create a production version of your app:
 
 ```sh
-npm run build
+SESSION_SECRET="replace-with-a-long-random-secret" pnpm build
 ```
 
-You can preview the production build with `npm run preview`.
+You can preview the production build with `pnpm preview`.
+
+## Environment
+
+- `SESSION_SECRET` is required in production. Use a long random value and rotate it if session cookies may have been exposed.
+- `DATABASE_URL` can point at a SQLite file. If omitted, the app uses `alfredgo.sqlite`.
+- `VAPID_PRIVATE_KEY` enables push notifications. If omitted, push subscriptions fail closed and announcement broadcasts are skipped.
 
 > To deploy your app, you may need to install an [adapter](https://svelte.dev/docs/kit/adapters) for your target environment.
