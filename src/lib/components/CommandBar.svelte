@@ -1,19 +1,17 @@
 <script lang="ts">
   import { goto } from '$app/navigation'
-  import { page } from '$app/stores'
-  import { createHotkey } from '@tanstack/svelte-hotkeys'
+  import { resolve } from '$app/paths'
   import {
     Bell,
-    ExternalLink,
+    ClipboardCheck,
     FileText,
     FolderOpen,
-    Heart,
+    GraduationCap,
+    HelpCircle,
     Home,
-    LayoutDashboard,
     Search,
     Settings,
     ShieldCheck,
-    Sparkles,
     Star,
     User,
     Wrench,
@@ -41,6 +39,30 @@
   type AnnouncementResult = { type: 'announcement'; data: Announcement; icon: any }
   type CategoryResult = { type: 'category'; data: Category; icon: any }
   type ResultItem = ToolResult | PageResult | AnnouncementResult | CategoryResult
+
+  const onboardingByRole: Partial<Record<string, { title: string; body: string; suggestions: string[] }>> = {
+    applicant: {
+      title: 'Find admissions and aid tasks fast',
+      body: 'Search by what you are trying to do, even if you do not know the system name yet.',
+      suggestions: ['application status', 'missing documents', 'fafsa', 'tap', 'scholarships'],
+    },
+    accepted_student: {
+      title: 'Jump to new student setup',
+      body: 'Use plain words like bill, email, housing, classes, or account to find the right place.',
+      suggestions: ['financial aid offer', 'pay bill', 'housing', 'email', 'bannerweb', 'my learning'],
+    },
+    student: {
+      title: 'Search across campus tools',
+      body: 'Find classes, grades, billing, email, favorites, and campus resources without browsing categories.',
+      suggestions: ['classes', 'grades', 'degreeworks', 'email', 'dining'],
+    },
+  }
+
+  const defaultOnboarding = {
+    title: 'Search AlfredGO',
+    body: 'Find tools, pages, announcements, and categories from anywhere in the app.',
+    suggestions: ['browse', 'favorites', 'settings', 'help desk'],
+  }
 
   const pageItems: PageResult[] = [
     { type: 'page', name: 'Home', href: '/', icon: Home },
@@ -125,6 +147,8 @@
 
   let hasQuery = $derived(query.trim().length > 0)
   let hasResults = $derived(results.length > 0)
+  let onboarding = $derived(onboardingByRole[app.effectiveRole] ?? defaultOnboarding)
+  let showOnboarding = $derived(!hasQuery)
 
   $effect(() => {
     if (open) {
@@ -145,22 +169,28 @@
       if (launch) {
         app.launchTool(item.data)
       } else {
-        goto(`/tools/${item.data.id}`)
+        goto(resolve(`/tools/${item.data.id}`))
       }
     } else if (item.type === 'page') {
-      goto(item.href)
+      goto(resolve(item.href as '/'))
     } else if (item.type === 'announcement') {
       const a = item.data
       if (a.url) {
         window.open(a.url, '_blank', 'noopener,noreferrer')
       } else if (a.toolId) {
-        goto(`/tools/${a.toolId}`)
+        goto(resolve(`/tools/${a.toolId}`))
       } else {
-        goto('/announcements')
+        goto(resolve('/announcements'))
       }
     } else if (item.type === 'category') {
-      goto(`/categories/${item.data.id}`)
+      goto(resolve(`/categories/${item.data.id}`))
     }
+  }
+
+  function useSuggestion(value: string) {
+    query = value
+    selectedIndex = 0
+    requestAnimationFrame(() => inputRef?.focus())
   }
 
   function handleKeydown(event: KeyboardEvent) {
@@ -248,9 +278,9 @@
     class="fixed inset-0 z-[60] flex items-start justify-center bg-black/40 px-4 pt-[15vh] backdrop-blur-sm"
     onclick={(e) => { if (e.target === e.currentTarget) onClose() }}
   >
-    <div class="w-full max-w-xl overflow-hidden rounded-2xl border border-border bg-surface shadow-2xl">
+    <div class="w-full max-w-xl overflow-hidden rounded-[28px] border border-border bg-surface shadow-2xl">
       <!-- Search input -->
-      <div class="flex items-center gap-3 border-b border-border px-4 py-3">
+      <div class="flex items-center gap-3 border-b border-border px-4 py-3 sm:px-5">
         <Search class="h-5 w-5 shrink-0 text-text-muted" />
         <input
           bind:this={inputRef}
@@ -268,6 +298,39 @@
         <kbd class="hidden rounded-md border border-border bg-muted px-1.5 py-0.5 text-[10px] font-bold text-text-muted sm:inline-block">ESC</kbd>
       </div>
 
+      {#if showOnboarding}
+        <section class="border-b border-border px-4 py-4 sm:px-5" aria-labelledby="command-help-title">
+          <div class="flex items-start gap-3">
+            <div class="grid h-10 w-10 shrink-0 place-items-center rounded-[18px] bg-selected text-link">
+              {#if app.effectiveRole === 'applicant'}
+                <ClipboardCheck class="h-5 w-5" />
+              {:else if app.effectiveRole === 'accepted_student'}
+                <GraduationCap class="h-5 w-5" />
+              {:else}
+                <HelpCircle class="h-5 w-5" />
+              {/if}
+            </div>
+            <div class="min-w-0 flex-1">
+              <p class="text-xs font-extrabold uppercase tracking-[0.16em] text-text-soft">Command Palette</p>
+              <h2 id="command-help-title" class="mt-0.5 text-base font-extrabold leading-tight text-text">{onboarding.title}</h2>
+              <p class="mt-1 text-sm leading-5 text-text-muted">{onboarding.body}</p>
+            </div>
+          </div>
+
+          <div class="mt-4 flex flex-wrap gap-2" aria-label="Suggested searches">
+            {#each onboarding.suggestions as suggestion (suggestion)}
+              <button
+                type="button"
+                class="min-h-9 rounded-full bg-muted px-3 py-1.5 text-xs font-extrabold text-link transition hover:bg-selected active:scale-[0.98]"
+                onclick={() => useSuggestion(suggestion)}
+              >
+                {suggestion}
+              </button>
+            {/each}
+          </div>
+        </section>
+      {/if}
+
       <!-- Results -->
       <div bind:this={listRef} class="max-h-[50vh] overflow-y-auto visible-scrollbar">
         {#if !hasResults}
@@ -282,7 +345,7 @@
             {@const recent = getRecentTools().map((t) => ({ type: 'tool' as const, data: t, icon: Wrench }))}
             {@const recentAnnouncements = app.announcements.slice(0, 3).map((a) => ({ type: 'announcement' as const, data: a, icon: FileText }))}
             {@const recentItems = [...recent, ...recentAnnouncements]}
-            {#each recentItems as item, i}
+            {#each recentItems as item, i (`${item.type}-${item.type === 'tool' ? item.data.id : item.data.id}`)}
               <button
                 data-index={i}
                 class="flex w-full items-center gap-3 px-4 py-2.5 text-left transition-colors hover:bg-muted {selectedIndex === i ? 'bg-selected' : ''}"
@@ -307,11 +370,11 @@
             {/each}
           {/if}
         {:else}
-          {#each groupedResults as group}
+          {#each groupedResults as group (group.label)}
             <div class="px-4 py-2">
               <p class="text-[10px] font-extrabold uppercase tracking-wider text-text-soft">{group.label}</p>
             </div>
-            {#each group.rows as { item, index }}
+            {#each group.rows as { item, index } (`${item.type}-${index}`)}
               <button
                 data-index={index}
                 class="group flex w-full items-center gap-3 px-4 py-2.5 text-left transition-colors hover:bg-muted {selectedIndex === index ? 'bg-selected' : ''}"
