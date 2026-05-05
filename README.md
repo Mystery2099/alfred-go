@@ -73,7 +73,7 @@ The project seeds demo accounts on first run for local prototyping:
 | Role | Email | Password |
 |------|-------|----------|
 | Applicant | `applicant@alfredgo.local` | `ApplicantGo2026!` |
-| Accepted Student | `accepted@alfredgo.local` | `AcceptedGo2026!` |
+| Accepted Student | `accepted.student@alfredgo.local` | `AcceptedGo2026!` |
 | Student | `student@alfredgo.local` | `StudentGo2026!` |
 | Staff | `staff@alfredgo.local` | `StaffGo2026!` |
 | Admin | `admin@alfredgo.local` | `AdminGo2026!` |

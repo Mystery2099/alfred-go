@@ -204,7 +204,7 @@
     <!-- Header -->
     <header class="sticky top-0 z-20 border-b border-border bg-surface px-4 py-5 lg:px-8">
       <div class="mx-auto flex max-w-6xl items-center gap-4">
-        {#if $page.url.pathname !== '/'}
+        {#if !['/', '/browse', '/favorites', '/profile'].includes($page.url.pathname)}
           <button
             onclick={() => history.back()}
             aria-label="Go back"

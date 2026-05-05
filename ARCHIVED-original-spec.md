@@ -1,3 +1,6 @@
+> **⚠️ ARCHIVED / OUTDATED**
+> This document describes the original prototype specification using React, Express, and Prisma. The project has since pivoted to **SvelteKit, Drizzle ORM, and SQLite**. This file is preserved for reference only and does not reflect the current architecture or tech stack.
+
 # AlfredGO – Prototype Specification
 
 ## 📌 Overview

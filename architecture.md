@@ -417,8 +417,4 @@ These still need to be decided before or during early implementation:
 
 ---
 
-## Demo Preview
 
-A preview of the planned UI can be found here:
-
-[https://alfredgo-preview.space.z.ai/](https://alfredgo-preview.space.z.ai/)
