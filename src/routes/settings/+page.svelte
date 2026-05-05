@@ -1,5 +1,6 @@
 <script lang="ts">
   import { enhance } from '$app/forms'
+  import { resolve } from '$app/paths'
   import { getAppState, roleLabels, roles } from '$lib/app-state.svelte'
   import { resetChecklistStorage } from '$lib/onboarding'
   import type { Activity, Tool } from '$lib/types'
@@ -9,6 +10,7 @@
     Download,
     ExternalLink,
     History,
+    KeyRound,
     Palette,
     RotateCcw,
     Sparkles,
@@ -25,8 +27,8 @@
   let { data } = $props()
   const allActivities = $derived((data.activities || []) as Activity[])
 
-  const favoriteTools = $derived(() => app.visibleTools.filter((tool) => app.favoriteIds.has(tool.id)))
-  const featuredTools = $derived(() => app.visibleTools.filter((tool) => tool.isFeatured).slice(0, 4))
+  const favoriteTools = $derived.by(() => app.visibleTools.filter((tool) => app.favoriteIds.has(tool.id)))
+  const featuredTools = $derived.by(() => app.visibleTools.filter((tool) => tool.isFeatured).slice(0, 4))
 
   function accessibilityEnabled(key: string): boolean {
     const settings = app.currentPreference?.accessibilitySettings
@@ -35,8 +37,7 @@
   }
 
   function resourcePreview(): Tool[] {
-    const favorites = favoriteTools()
-    return (favorites.length ? favorites : featuredTools()).slice(0, 4)
+    return (favoriteTools.length ? favoriteTools : featuredTools).slice(0, 4)
   }
 
   function formatActivityType(type: string, toolName?: string | null) {
@@ -124,7 +125,7 @@
           <small>System follows your device preference</small>
         </span>
         <div class="flex flex-wrap justify-end gap-1">
-          {#each ['system', 'light', 'dark'] as theme}
+          {#each ['system', 'light', 'dark'] as theme (theme)}
             <form method="POST" action="?/savePreference" use:enhance>
               <input type="hidden" name="theme" value={theme} />
               <button class="segmented {app.currentPreference?.theme === theme ? 'active' : ''}">
@@ -150,7 +151,7 @@
               value={app.effectiveRole}
               onchange={(event) => event.currentTarget.form?.requestSubmit()}
             >
-              {#each roles as role}
+              {#each roles as role (role)}
                 {#if app.isAdmin || role !== 'admin'}
                   <option value={role}>{roleLabels[role]}</option>
                 {/if}
@@ -161,7 +162,7 @@
       {/if}
 
       <!-- Accessibility toggles -->
-      {#each accessibilityItems as [title, body, ItemIcon, key]}
+      {#each accessibilityItems as [title, body, ItemIcon, key] (key)}
         <form method="POST" action="?/savePreference" use:enhance class="border-t border-border">
           <input type="hidden" name="accessibilitySettings" value={toggleAccessibilitySetting(key)} />
           <button type="submit" class="profile-row">
@@ -185,7 +186,7 @@
         <p class="text-sm font-extrabold text-link">Quick access preview</p>
       </div>
       <div class="mt-3 grid min-w-0 gap-2 sm:grid-cols-2">
-        {#each resourcePreview() as tool}
+        {#each resourcePreview() as tool (tool.id)}
           <div class="min-w-0 rounded-lg bg-surface px-3 py-2 ring-1 ring-border">
             <p class="truncate text-sm font-extrabold">{tool.name}</p>
             <p class="truncate text-xs text-text-muted">{tool.description}</p>
@@ -243,7 +244,7 @@
       {/if}
 
       <!-- Security info items -->
-      {#each securityItems as [title, body, ItemIcon], i}
+      {#each securityItems as [title, body, ItemIcon], i (title)}
         <div class="profile-row {i > 0 || showPasswordForm ? 'border-t border-border' : ''}">
           <span class="profile-icon tone-0 shrink-0"><ItemIcon class="h-5 w-5" /></span>
           <span class="min-w-0 flex-1">
@@ -270,7 +271,7 @@
             <p class="text-sm text-text-muted">No recent activity recorded for this account.</p>
           {:else}
             <div class="divide-y divide-border rounded-2xl bg-surface shadow-sm ring-1 ring-border overflow-hidden">
-              {#each allActivities as activity}
+              {#each allActivities as activity (activity.id)}
                 <div class="flex items-center justify-between px-4 py-3">
                   <span class="text-sm font-extrabold text-text">{formatActivityType(activity.type, activity.toolName)}</span>
                   <span class="text-xs text-text-soft">{formatDate(activity.createdAt)}</span>
@@ -287,7 +288,7 @@
   <div>
     <h2 class="mb-2 px-4 text-xs font-extrabold uppercase tracking-wider text-text-soft">Help & Feedback</h2>
     <div class="overflow-hidden rounded-2xl bg-surface shadow-sm ring-1 ring-border">
-      {#each helpItems as [title, body, url], i}
+      {#each helpItems as [title, body, url], i (title)}
         {#if url}
           <a href={url} target="_blank" rel="noopener noreferrer" class="profile-row {i > 0 ? 'border-t border-border' : ''}">
             <span class="profile-icon tone-3"><CircleHelp class="h-5 w-5" /></span>
@@ -335,7 +336,7 @@
           <b>Export favorites</b>
           <small>Download your saved resources as a JSON file</small>
         </span>
-        <a href="/api/export/favorites" download class="secondary-button text-xs py-2 px-3">
+        <a href={resolve('/api/export/favorites')} download class="secondary-button text-xs py-2 px-3">
           <Download class="h-4 w-4" />
           Export
         </a>
