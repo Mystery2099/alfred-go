@@ -103,7 +103,7 @@
 </div>
 
 {#if isPreview && (app?.announcements?.length ?? 0) > limit}
-  <a href="/announcements" class="group flex w-full items-center justify-center gap-2 rounded-2xl bg-muted px-5 py-3.5 text-sm font-semibold text-link outline-none transition-all duration-200 hover:bg-link hover:text-white hover:shadow-md hover:shadow-link/20 focus-visible:ring-2 focus-visible:ring-link focus-visible:ring-offset-2 focus-visible:ring-offset-canvas active:scale-[0.995]">
+  <a href="/announcements" class="group mt-3 flex w-full items-center justify-center gap-2 rounded-2xl bg-muted px-5 py-3.5 text-sm font-semibold text-link outline-none transition-all duration-200 hover:bg-border focus-visible:ring-2 focus-visible:ring-link focus-visible:ring-offset-2 focus-visible:ring-offset-canvas active:scale-[0.995]">
     <span>View all {app?.announcements?.length ?? 0} announcements</span>
     <ChevronRight class="h-4 w-4 transition-transform duration-200 group-hover:translate-x-0.5" />
   </a>

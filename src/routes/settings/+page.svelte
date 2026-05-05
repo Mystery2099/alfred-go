@@ -216,11 +216,11 @@
       <!-- Theme -->
       <div class="profile-row">
         <span class="profile-icon tone-0"><Palette class="h-5 w-5" /></span>
-        <span class="min-w-0 flex-1">
+        <span class="min-w-0 flex-1 basis-40">
           <b>Theme</b>
           <small>System follows your device preference</small>
         </span>
-        <div class="flex gap-1">
+        <div class="flex flex-wrap justify-end gap-1">
           {#each ['system', 'light', 'dark'] as theme}
             <form method="POST" action="?/savePreference" use:enhance>
               <input type="hidden" name="theme" value={theme} />
@@ -236,7 +236,7 @@
       {#if app.isAdmin || app.currentRole === 'staff'}
         <div class="profile-row border-t border-border">
           <span class="profile-icon tone-0"><UserRound class="h-5 w-5" /></span>
-          <span class="min-w-0 flex-1">
+          <span class="min-w-0 flex-1 basis-40">
             <b>Preferred role view</b>
             <small>Preview resources for another campus role</small>
           </span>
@@ -281,9 +281,9 @@
         <Sparkles class="h-4 w-4 text-link" />
         <p class="text-sm font-extrabold text-link">Quick access preview</p>
       </div>
-      <div class="mt-3 grid gap-2 sm:grid-cols-2">
+      <div class="mt-3 grid min-w-0 gap-2 sm:grid-cols-2">
         {#each resourcePreview() as tool}
-          <div class="rounded-lg bg-surface px-3 py-2 ring-1 ring-border">
+          <div class="min-w-0 rounded-lg bg-surface px-3 py-2 ring-1 ring-border">
             <p class="truncate text-sm font-extrabold">{tool.name}</p>
             <p class="truncate text-xs text-text-muted">{tool.description}</p>
           </div>
@@ -478,7 +478,7 @@
       <!-- Export -->
       <div class="profile-row">
         <span class="profile-icon tone-0"><Download class="h-5 w-5" /></span>
-        <span class="min-w-0 flex-1">
+        <span class="min-w-0 flex-1 basis-40">
           <b>Export favorites</b>
           <small>Download your saved resources as a JSON file</small>
         </span>

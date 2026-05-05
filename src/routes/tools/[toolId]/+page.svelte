@@ -21,6 +21,20 @@
     return app.data.announcements.filter((a) => a.toolId === tool.id && a.isActive).slice(0, 3)
   })
 
+  const showAudienceDetail = $derived(app.currentRole === 'staff' || app.currentRole === 'admin')
+  let shareStatus = $state<'idle' | 'copying' | 'shared' | 'copied' | 'failed'>('idle')
+  let shareStatusTimeout: ReturnType<typeof setTimeout> | undefined
+
+  function setShareStatus(status: typeof shareStatus) {
+    shareStatus = status
+    if (shareStatusTimeout) clearTimeout(shareStatusTimeout)
+    if (status !== 'idle') {
+      shareStatusTimeout = setTimeout(() => {
+        shareStatus = 'idle'
+      }, 2500)
+    }
+  }
+
   function statusIcon(status?: string | null) {
     if (status === 'online') return CheckCircle2
     if (status === 'maintenance') return AlertTriangle
@@ -37,13 +51,54 @@
     return 'text-text-muted bg-muted'
   }
 
+  async function copyToolLink(url: string) {
+    const textarea = document.createElement('textarea')
+    textarea.value = url
+    textarea.setAttribute('readonly', '')
+    textarea.style.position = 'fixed'
+    textarea.style.left = '-9999px'
+    document.body.appendChild(textarea)
+    textarea.select()
+
+    try {
+      if (navigator.clipboard?.writeText) {
+        await Promise.race([
+          navigator.clipboard.writeText(url),
+          new Promise((_, reject) => setTimeout(() => reject(new Error('Clipboard timed out')), 1000)),
+        ])
+        return
+      }
+
+      const copied = document.execCommand('copy')
+      if (!copied) {
+        throw new Error('Copy failed')
+      }
+    } catch {
+      const copied = document.execCommand('copy')
+      if (!copied) {
+        throw new Error('Copy failed')
+      }
+    } finally {
+      document.body.removeChild(textarea)
+    }
+  }
+
   async function shareTool() {
     if (!tool) return
+    setShareStatus('copying')
     const shareData = { title: tool.name, text: tool.description, url: window.location.href }
-    if (navigator.share) {
-      try { await navigator.share(shareData) } catch { /* ignored */ }
-    } else {
-      try { await navigator.clipboard.writeText(window.location.href) } catch { /* ignored */ }
+    try {
+      if (navigator.share && (!navigator.canShare || navigator.canShare(shareData))) {
+        await navigator.share(shareData)
+        setShareStatus('shared')
+        return
+      }
+
+      await copyToolLink(shareData.url)
+      setShareStatus('copied')
+    } catch (error) {
+      if (error instanceof DOMException && error.name === 'AbortError') return
+      setShareStatus('failed')
     }
   }
 </script>
@@ -72,6 +127,7 @@
         <!-- Actions -->
         <div class="mt-4 flex flex-wrap items-center gap-3">
           <button
+            type="button"
             class="inline-flex items-center gap-2 rounded-xl bg-campus-blue px-5 py-2.5 text-sm font-extrabold text-white shadow-sm transition duration-150 hover:bg-campus-darkBlue active:scale-[0.97]"
             onclick={() => app.launchTool(tool)}
           >
@@ -91,11 +147,23 @@
           </form>
 
           <button
+            type="button"
+            aria-live="polite"
             class="inline-flex items-center gap-2 rounded-xl border border-border bg-surface px-4 py-2.5 text-sm font-extrabold text-link transition duration-150 hover:bg-muted active:scale-[0.97]"
-            onclick={shareTool}
+            onclick={() => { void shareTool() }}
           >
             <Share2 class="h-4 w-4" />
-            Share
+            {#if shareStatus === 'copying'}
+              Copying...
+            {:else if shareStatus === 'copied'}
+              Link copied
+            {:else if shareStatus === 'shared'}
+              Shared
+            {:else if shareStatus === 'failed'}
+              Copy failed
+            {:else}
+              Share
+            {/if}
           </button>
         </div>
       </div>
@@ -502,15 +570,17 @@
             <span class="block text-sm font-extrabold text-text">{app.categoryName(tool.categoryId)}</span>
           </div>
         </div>
-        <div class="flex items-center gap-4 px-6 py-4 sm:px-8">
-          <div class="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-muted text-link">
-            <Users class="h-5 w-5" />
+        {#if showAudienceDetail}
+          <div class="flex items-center gap-4 px-6 py-4 sm:px-8">
+            <div class="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-muted text-link">
+              <Users class="h-5 w-5" />
+            </div>
+            <div class="min-w-0 flex-1">
+              <span class="block text-xs font-bold uppercase tracking-wider text-text-soft">Audience</span>
+              <span class="block text-sm font-extrabold text-text">{tool.audienceRoles.map((role) => roleLabels[role]).join(', ')}</span>
+            </div>
           </div>
-          <div class="min-w-0 flex-1">
-            <span class="block text-xs font-bold uppercase tracking-wider text-text-soft">Audience</span>
-            <span class="block text-sm font-extrabold text-text">{tool.audienceRoles.map((role) => roleLabels[role]).join(', ')}</span>
-          </div>
-        </div>
+        {/if}
         <div class="flex items-center gap-4 px-6 py-4 sm:px-8">
           <div class="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-muted text-link">
             <Clock class="h-5 w-5" />
@@ -599,17 +669,17 @@
     {#if relatedTools.length > 0}
       <div>
         <p class="mb-3 text-xs font-extrabold uppercase tracking-[0.18em] text-text-muted">More in {app.categoryName(tool.categoryId)}</p>
-        <div class="grid gap-3 sm:grid-cols-2">
+        <div class="grid min-w-0 gap-3 sm:grid-cols-2">
           {#each relatedTools as rt}
             <a
               href="/tools/{rt.id}"
-              class="group flex items-center gap-4 rounded-2xl bg-surface px-5 py-4 shadow-sm ring-1 ring-border/60 transition duration-200 ease-out hover:bg-muted/60 active:scale-[0.995]"
+              class="group flex min-w-0 items-center gap-3 rounded-2xl bg-surface px-4 py-4 shadow-sm ring-1 ring-border/60 transition duration-200 ease-out hover:bg-muted/60 active:scale-[0.995] sm:gap-4 sm:px-5"
             >
               <div class="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-muted text-link transition duration-200 group-hover:scale-105">
                 <Icon name={rt.icon} class="h-6 w-6" />
               </div>
               <div class="min-w-0 flex-1">
-                <span class="block text-sm font-extrabold text-text">{rt.name}</span>
+                <span class="block truncate text-sm font-extrabold text-text">{rt.name}</span>
                 <span class="block truncate text-xs text-text-muted">{rt.description}</span>
               </div>
               <ChevronRight class="h-5 w-5 shrink-0 text-text-soft transition duration-200 group-hover:translate-x-0.5 group-hover:text-link" />

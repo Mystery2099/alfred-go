@@ -24,9 +24,9 @@
     <p class="mt-1 text-sm text-text-muted">Try a different search, category, or role view.</p>
   </div>
 {:else}
-  <div class="grid gap-3">
+  <div class="grid min-w-0 gap-3">
     {#each tools as tool}
-      <div         class="group relative flex items-center gap-4 rounded-2xl bg-surface px-5 py-4 shadow-sm ring-1 ring-border/60 transition duration-200 ease-out hover:bg-muted/60 active:scale-[0.995]">
+      <div class="group relative flex min-w-0 items-center gap-3 rounded-2xl bg-surface px-4 py-4 shadow-sm ring-1 ring-border/60 transition duration-200 ease-out hover:bg-muted/60 active:scale-[0.995] sm:gap-4 sm:px-5">
         <!-- Tonal icon container -->
         <a
           href="/tools/{tool.id}"
@@ -37,8 +37,8 @@
 
         <!-- Content -->
         <a href="/tools/{tool.id}" class="min-w-0 flex-1">
-          <div class="flex items-center gap-2">
-            <span class="block text-[15px] font-extrabold text-text">{tool.name}</span>
+          <div class="flex min-w-0 items-center gap-2">
+            <span class="block truncate text-[15px] font-extrabold text-text">{tool.name}</span>
             {#if tool.status === 'maintenance'}
               <span class="inline-flex h-2 w-2 rounded-full bg-amber-500" title="Maintenance"></span>
             {:else if tool.status === 'degraded'}

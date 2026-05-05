@@ -22,7 +22,7 @@
     <span class="grid h-14 w-14 place-items-center rounded-full border-2 border-white/35 bg-surface/20 text-xl font-bold text-white">{app.displayName?.charAt(0) || 'A'}</span>
     <div class="min-w-0 flex-1">
       <h2 class="text-lg font-extrabold text-white">{app.displayName}</h2>
-      <p class="text-sm text-white/80">{user?.email} · {roleLabels[app.currentRole]}</p>
+      <p class="break-all text-sm text-white/80">{user?.email} · {roleLabels[app.currentRole]}</p>
     </div>
     <form method="POST" action="?/logout">
     <button class="inline-flex items-center gap-2 rounded-xl bg-white/15 px-3 py-2 text-sm font-extrabold text-white transition hover:bg-white/25">

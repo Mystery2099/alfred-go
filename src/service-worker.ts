@@ -21,9 +21,13 @@ registerRoute(new NavigationRoute(async ({ request }) => {
   }
 }))
 
-// Runtime caching for assets
+// Runtime caching for assets (same-origin only)
 registerRoute(
-  ({ request }) => request.destination === 'script' || request.destination === 'style',
+  ({ request }) => {
+    const url = new URL(request.url)
+    return url.origin === self.location.origin &&
+      (request.destination === 'script' || request.destination === 'style')
+  },
   new StaleWhileRevalidate({
     cacheName: 'assets-cache',
     plugins: [
@@ -37,9 +41,12 @@ registerRoute(
   })
 )
 
-// Runtime caching for images
+// Runtime caching for images (same-origin only)
 registerRoute(
-  ({ request }) => request.destination === 'image',
+  ({ request }) => {
+    const url = new URL(request.url)
+    return url.origin === self.location.origin && request.destination === 'image'
+  },
   new CacheFirst({
     cacheName: 'images-cache',
     plugins: [
