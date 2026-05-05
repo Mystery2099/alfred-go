@@ -22,7 +22,7 @@
     ['all', 'All tones', ''],
     ['urgent', 'Urgent', 'bg-rose-100 text-rose-600'],
     ['deadline', 'Deadline', 'bg-amber-100 text-amber-600'],
-    ['reminder', 'Reminder', 'bg-campus-blue/10 text-campus-blue'],
+    ['reminder', 'Reminder', 'bg-muted text-link'],
   ]
 
   const filtered = $derived(() => {
@@ -37,7 +37,7 @@
   function toneBg(tone: string) {
     if (tone === 'urgent') return 'bg-rose-100 text-rose-600'
     if (tone === 'deadline') return 'bg-amber-100 text-amber-600'
-    return 'bg-campus-blue/10 text-campus-blue'
+    return 'bg-muted text-link'
   }
 </script>
 

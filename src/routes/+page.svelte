@@ -33,16 +33,16 @@
           {#each quickTools as tool}
             <a
               href="/tools/{tool.id}"
-              class="group flex items-center gap-4 px-5 py-4 transition hover:bg-muted"
+              class="group flex items-center gap-4 px-5 py-4 transition duration-200 ease-out hover:bg-muted active:scale-[0.995]"
             >
-              <span class="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-campus-blue text-white">
+              <span class="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-campus-blue text-white transition duration-200 group-hover:scale-105">
                 <Icon name={tool.icon} />
               </span>
               <span class="min-w-0 flex-1">
                 <span class="block font-bold text-text">{tool.name}</span>
                 <span class="block truncate text-sm text-text-muted">{tool.description}</span>
               </span>
-              <span class="text-xs font-bold text-text-muted">{app.categoryName(tool.categoryId)}</span>
+              <span class="text-xs font-bold text-text-muted transition duration-200 group-hover:text-link">{app.categoryName(tool.categoryId)}</span>
             </a>
           {/each}
         </div>

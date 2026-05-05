@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Bell, Clock, Megaphone, TriangleAlert } from 'lucide-svelte'
+  import { Bell, ChevronRight, Clock, Megaphone, TriangleAlert } from 'lucide-svelte'
   import type { AppStore } from '$lib/app-state.svelte'
 
   let { app, limit = 0 }: { app: AppStore; limit?: number } = $props()
@@ -61,7 +61,7 @@
         {#each filters as f (f)}
           <button
             onclick={() => { activeFilter = f }}
-            class="px-2.5 py-1 rounded-full text-xs font-medium transition-colors border {activeFilter === f ? 'bg-campus-blue-600 text-white border-campus-blue-600 dark:bg-campus-blue-500 dark:border-campus-blue-500' : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-750'}"
+            class="px-2.5 py-1 rounded-full text-xs font-medium transition duration-150 ease-out border {activeFilter === f ? 'bg-campus-blue-600 text-white border-campus-blue-600 dark:bg-campus-blue-500 dark:border-campus-blue-500' : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-750 active:scale-95'}"
             aria-pressed={activeFilter === f}
           >
             {f}
@@ -76,7 +76,7 @@
     {#each filteredAnnouncements() as a (a.id)}
       <a
         href={a.toolId ? `/tools/${a.toolId}` : (a.url || '#')}
-        class="group block bg-white dark:bg-slate-800 rounded-xl border border-slate-200/60 dark:border-slate-700/40 border-l-4 {borderColors[a.tone ?? 'default']} hover:bg-slate-50 dark:hover:bg-slate-750 transition-colors p-2.5 sm:p-3"
+        class="group block bg-white dark:bg-slate-800 rounded-xl border border-slate-200/60 dark:border-slate-700/40 border-l-4 {borderColors[a.tone ?? 'default']} hover:bg-slate-50 dark:hover:bg-slate-750 transition duration-200 ease-out active:scale-[0.995] p-2.5 sm:p-3"
         aria-label="{a.title} — {a.body}"
       >
         <div class="flex items-start gap-2.5">
@@ -92,7 +92,7 @@
               {#if a.actionLabel}
                 <span class="shrink-0 hidden sm:inline-flex items-center gap-1 text-[11px] font-medium text-campus-blue-700 dark:text-campus-blue-400 group-hover:underline">
                   {a.actionLabel}
-                  <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                  <svg class="w-3 h-3 transition duration-200 group-hover:translate-x-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
                 </span>
               {/if}
             </div>
@@ -107,8 +107,9 @@
   </div>
 
   {#if isPreview && (app?.announcements?.length ?? 0) > limit}
-    <a href="/announcements" class="block w-full text-center py-2.5 rounded-xl border border-dashed border-slate-300 dark:border-slate-600 text-sm font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-750 hover:border-campus-blue-300 dark:hover:border-campus-blue-700 transition-colors">
-      View all {app?.announcements?.length ?? 0} announcements
+    <a href="/announcements" class="flex w-full items-center justify-center gap-2 rounded-2xl bg-muted px-5 py-3.5 text-sm font-semibold text-link transition hover:bg-surface-variant active:scale-[0.995]">
+      <span>View all {app?.announcements?.length ?? 0} announcements</span>
+      <ChevronRight class="h-4 w-4" />
     </a>
   {/if}
 </section>

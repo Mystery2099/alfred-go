@@ -139,11 +139,87 @@ export const announcements: Announcement[] = [
 ]
 
 export const tools: Tool[] = [
-  tool('my-learning', 'My Learning', 'Online coursework, class materials, assignments, and grades.', 'https://my.alfredstate.edu', 'academics', ['learning', 'courses', 'assignments', 'grades'], ['student', 'staff'], true, 'BookOpen'),
-  tool('degreeworks', 'DegreeWorks', 'Track degree progress, requirements, credits, and audits.', 'https://my.alfredstate.edu', 'academics', ['degreeworks', 'degree', 'audit', 'progress'], ['student', 'staff'], true, 'GraduationCap'),
-  tool('class-schedule', 'Class Schedule', 'View the current weekly class schedule and term calendar.', 'https://my.alfredstate.edu', 'academics', ['schedule', 'classes', 'calendar'], ['student', 'staff'], true, 'Clock3'),
-  tool('classes', 'Classes', 'Review enrolled courses, meeting times, locations, and instructors.', 'https://my.alfredstate.edu', 'academics', ['classes', 'courses', 'term'], ['student', 'staff'], true, 'ClipboardList'),
-  tool('register-for-classes', 'Register for Classes', 'DegreeWorks, schedule planning, advisor verification, and SSB registration.', 'https://my.alfredstate.edu', 'academics', ['registration', 'degreeworks', 'advisor'], ['student', 'staff'], true, 'FileCheck'),
+  tool('my-learning', 'My Learning', 'Online coursework, class materials, assignments, and grades.', 'https://my.alfredstate.edu', 'academics', ['learning', 'courses', 'assignments', 'grades'], ['student', 'staff'], true, 'BookOpen', {
+    notes: 'Your central hub for all coursework. Grades are typically posted within 48 hours of submission.',
+    helpUrl: 'https://alfredstate.teamdynamix.com/TDClient/277/Portal/KB/ArticleDet?ID=10521',
+    contactInfo: 'Academic Success Center: success@alfredstate.edu',
+    status: 'online',
+    requirements: 'Alfred State Microsoft login',
+    liveData: {
+      currentTerm: 'Spring 2026',
+      enrolledCourses: 5,
+      upcomingAssignments: 3,
+      currentGPA: '3.42',
+      nextDeadline: 'May 8 — CISY 7203 Final Project',
+      recentGrades: [
+        { course: 'CISY 7203', assignment: 'Midterm Exam', grade: '88%' },
+        { course: 'MATH 2043', assignment: 'Problem Set 7', grade: '92%' },
+      ]
+    }
+  }),
+  tool('degreeworks', 'DegreeWorks', 'Track degree progress, requirements, credits, and audits.', 'https://my.alfredstate.edu', 'academics', ['degreeworks', 'degree', 'audit', 'progress'], ['student', 'staff'], true, 'GraduationCap', {
+    notes: 'DegreeWorks is refreshed nightly from Banner. If you see discrepancies, contact the Registrar.',
+    helpUrl: 'https://www.alfredstate.edu/registrar/degreeworks',
+    contactInfo: 'Registrar: registrar@alfredstate.edu | (607) 587-4020',
+    status: 'online',
+    requirements: 'Alfred State Microsoft login',
+    liveData: {
+      degreeProgress: 72,
+      creditsEarned: 86,
+      creditsRequired: 120,
+      major: 'B.T. in Information Technology',
+      concentration: 'Web Development',
+      advisor: 'Dr. Sarah Mitchell',
+      auditDate: 'May 5, 2026',
+      flags: ['Missing 3 credits of upper-level electives']
+    }
+  }),
+  tool('class-schedule', 'Class Schedule', 'View the current weekly class schedule and term calendar.', 'https://my.alfredstate.edu', 'academics', ['schedule', 'classes', 'calendar'], ['student', 'staff'], true, 'Clock3', {
+    notes: 'Schedule updates in real-time. Last day of classes is May 9. Finals run May 12–16.',
+    helpUrl: 'https://www.alfredstate.edu/registrar/academic-calendar',
+    contactInfo: 'Registrar: registrar@alfredstate.edu',
+    status: 'online',
+    requirements: 'Alfred State Microsoft login',
+    liveData: {
+      currentTerm: 'Spring 2026',
+      nextClass: {
+        course: 'CISY 7203',
+        time: '2:00 PM — 4:50 PM',
+        location: 'Business Building 204',
+        days: 'Tuesday, Thursday'
+      },
+      classesToday: 3,
+      totalCredits: 15
+    }
+  }),
+  tool('classes', 'Classes', 'Review enrolled courses, meeting times, locations, and instructors.', 'https://my.alfredstate.edu', 'academics', ['classes', 'courses', 'term'], ['student', 'staff'], true, 'ClipboardList', {
+    notes: 'Instructor contact info and syllabi are available for each course.',
+    status: 'online',
+    requirements: 'Alfred State Microsoft login',
+    liveData: {
+      courses: [
+        { code: 'CISY 7203', name: 'Web Development', instructor: 'Prof. James Chen', grade: 'A-' },
+        { code: 'MATH 2043', name: 'Calculus II', instructor: 'Dr. Lisa Park', grade: 'B+' },
+        { code: 'ENGL 2083', name: 'Technical Writing', instructor: 'Prof. Mark Torres', grade: 'A' },
+        { code: 'PHYS 1023', name: 'Physics I', instructor: 'Dr. Anna Reed', grade: 'B' },
+        { code: 'BUSN 3013', name: 'Project Management', instructor: 'Prof. David Kim', grade: 'A-' },
+      ]
+    }
+  }),
+  tool('register-for-classes', 'Register for Classes', 'DegreeWorks, schedule planning, advisor verification, and SSB registration.', 'https://my.alfredstate.edu', 'academics', ['registration', 'degreeworks', 'advisor'], ['student', 'staff'], true, 'FileCheck', {
+    notes: 'Registration for Summer/Fall 2026 opens May 12. Meet with your advisor before your time slot.',
+    helpUrl: 'https://www.alfredstate.edu/registrar/registration',
+    contactInfo: 'Registrar: registrar@alfredstate.edu',
+    status: 'online',
+    requirements: 'Advisor hold clearance + Alfred State Microsoft login',
+    liveData: {
+      registrationWindow: 'May 12, 2026 at 8:00 AM',
+      advisorHold: 'Cleared',
+      balanceHold: 'None',
+      plannedCourses: 6,
+      creditsPlanned: 18
+    }
+  }),
   tool('academic-resources', 'Academic Resources', 'Catalog, Academic Advising Center, Student Success Center, and tutoring supports.', 'https://my.alfredstate.edu', 'academics', ['catalog', 'advising', 'tutoring', 'success'], ['student', 'staff'], false, 'BookOpen'),
   tool('academic-forms', 'Academic Forms', 'Add/drop, enrollment verification, transcript requests, and degree program changes.', 'https://my.alfredstate.edu', 'academics', ['forms', 'transcript', 'enrollment'], ['student', 'staff'], false, 'FileCheck'),
   tool('academic-calendar', 'Academic Calendar', 'Final exam matrix, withdrawal dates, and academic deadlines.', 'https://my.alfredstate.edu', 'academics', ['calendar', 'deadlines', 'exams'], ['student', 'staff'], false, 'Clock3'),
@@ -151,25 +227,193 @@ export const tools: Tool[] = [
   tool('campus-events', 'Campus Events', 'Important dates, deadlines, and campus event listings.', 'https://my.alfredstate.edu', 'community', ['events', 'deadlines'], ['student', 'staff'], false, 'Clock3'),
   tool('directory', 'Directory', 'Find faculty and staff contact information.', 'https://my.alfredstate.edu', 'community', ['directory', 'contacts'], ['student', 'staff', 'admin'], false, 'User'),
   tool('facilities-services', 'Facilities Services', 'Facility work order requests, MSDS Online, and facilities reports.', 'https://my.alfredstate.edu', 'community', ['facilities', 'work order', 'services'], ['student', 'staff'], false, 'Home'),
-  tool('financial-aid', 'Apply for Financial Aid', 'FAFSA, NYS TAP, Excelsior Scholarship, and aid requirements.', 'https://www.alfredstate.edu/financial-aid', 'financial', ['aid', 'fafsa', 'tap', 'scholarships'], ['applicant', 'accepted_student', 'student'], true, 'BadgeDollarSign'),
-  tool('financial-aid-offer', 'View My Financial Aid Offer', 'Review, accept, or decline financial aid offers.', 'https://my.alfredstate.edu', 'financial', ['aid', 'offer', 'awards'], ['accepted_student', 'student'], true, 'BadgeDollarSign'),
-  tool('pay-bill', 'Pay Bill', 'Billing steps, housing and meal plan choices, options, and Nelnet payment access.', 'https://my.alfredstate.edu', 'financial', ['billing', 'payments', 'nelnet'], ['accepted_student', 'student'], true, 'CreditCard'),
-  tool('scholarships', 'Scholarships', 'Alfred State scholarship opportunities, ScholarshipUniverse, and NYS scholarships.', 'https://my.alfredstate.edu', 'financial', ['scholarships', 'aid'], ['applicant', 'accepted_student', 'student'], false, 'BadgeDollarSign'),
-  tool('financial-forms', 'Financial Aid & Billing Forms', 'Bill extension, loan change request, BCC application, and additional forms.', 'https://my.alfredstate.edu', 'financial', ['forms', 'billing', 'loan'], ['accepted_student', 'student'], false, 'FileCheck'),
-  tool('cost-aid-requirements', 'Cost & Aid Requirements', 'Estimated costs, college cost comparison, aid requirements, and student forms.', 'https://my.alfredstate.edu', 'financial', ['costs', 'requirements', 'forms'], ['applicant', 'accepted_student', 'student'], false, 'CreditCard'),
+  tool('financial-aid', 'Apply for Financial Aid', 'FAFSA, NYS TAP, Excelsior Scholarship, and aid requirements.', 'https://www.alfredstate.edu/financial-aid', 'financial', ['aid', 'fafsa', 'tap', 'scholarships'], ['applicant', 'accepted_student', 'student'], true, 'BadgeDollarSign', {
+    notes: 'Priority deadline for FAFSA is March 1. NYS TAP requires a separate application.',
+    helpUrl: 'https://www.alfredstate.edu/financial-aid',
+    contactInfo: 'Financial Aid Office: finaid@alfredstate.edu | (607) 587-4022',
+    status: 'online',
+    requirements: 'Social Security Number + tax documents',
+    liveData: {
+      fafsaStatus: 'Submitted',
+      tapStatus: 'Submitted',
+      excelsiorStatus: 'Eligible — Pending Verification',
+      documentsNeeded: 1,
+      nextDeadline: 'June 30, 2026 — FAFSA final deadline'
+    }
+  }),
+  tool('financial-aid-offer', 'View My Financial Aid Offer', 'Review, accept, or decline financial aid offers.', 'https://my.alfredstate.edu', 'financial', ['aid', 'offer', 'awards'], ['accepted_student', 'student'], true, 'BadgeDollarSign', {
+    notes: 'Accept or decline each award individually. Loans require additional entrance counseling.',
+    helpUrl: 'https://www.alfredstate.edu/financial-aid/accepting-aid',
+    contactInfo: 'Financial Aid Office: finaid@alfredstate.edu',
+    status: 'online',
+    requirements: 'Alfred State Microsoft login',
+    liveData: {
+      totalOffered: '$18,450',
+      totalAccepted: '$14,200',
+      pendingAction: 2,
+      breakdown: [
+        { type: 'Federal Pell Grant', amount: '$4,200', status: 'Accepted' },
+        { type: 'NYS TAP', amount: '$3,100', status: 'Accepted' },
+        { type: 'Federal Direct Subsidized Loan', amount: '$3,500', status: 'Pending' },
+        { type: 'Federal Direct Unsubsidized Loan', amount: '$2,000', status: 'Pending' },
+        { type: 'Alfred State Merit Scholarship', amount: '$5,650', status: 'Accepted' },
+      ]
+    }
+  }),
+  tool('pay-bill', 'Pay Bill', 'Billing steps, housing and meal plan choices, options, and Nelnet payment access.', 'https://my.alfredstate.edu', 'financial', ['billing', 'payments', 'nelnet'], ['accepted_student', 'student'], true, 'CreditCard', {
+    notes: 'Payment plans available through Nelnet. Late fees apply after the 15th of each month.',
+    helpUrl: 'https://www.alfredstate.edu/student-accounts',
+    contactInfo: 'Student Accounts: studentaccounts@alfredstate.edu | (607) 587-4021',
+    status: 'online',
+    requirements: 'Alfred State Microsoft login',
+    liveData: {
+      currentBalance: '$1,240.00',
+      dueDate: 'May 15, 2026',
+      lastPayment: '$3,500.00 on April 12, 2026',
+      paymentPlan: 'Active — 4 installments remaining',
+      nextInstallment: '$310.00 on May 15, 2026'
+    }
+  }),
+  tool('scholarships', 'Scholarships', 'Alfred State scholarship opportunities, ScholarshipUniverse, and NYS scholarships.', 'https://my.alfredstate.edu', 'financial', ['scholarships', 'aid'], ['applicant', 'accepted_student', 'student'], false, 'BadgeDollarSign', {
+    notes: 'Check ScholarshipUniverse regularly for new opportunities. External scholarships must be reported to Financial Aid.',
+    helpUrl: 'https://www.alfredstate.edu/financial-aid/scholarships',
+    contactInfo: 'Financial Aid Office: finaid@alfredstate.edu',
+    status: 'online'
+  }),
+  tool('financial-forms', 'Financial Aid & Billing Forms', 'Bill extension, loan change request, BCC application, and additional forms.', 'https://my.alfredstate.edu', 'financial', ['forms', 'billing', 'loan'], ['accepted_student', 'student'], false, 'FileCheck', {
+    status: 'online',
+    requirements: 'Alfred State Microsoft login'
+  }),
+  tool('cost-aid-requirements', 'Cost & Aid Requirements', 'Estimated costs, college cost comparison, aid requirements, and student forms.', 'https://my.alfredstate.edu', 'financial', ['costs', 'requirements', 'forms'], ['applicant', 'accepted_student', 'student'], false, 'CreditCard', {
+    status: 'online'
+  }),
   tool('web-links', 'Web Links', 'Personal saved links and quick shortcuts.', 'https://my.alfredstate.edu', 'my-account', ['links', 'bookmarks'], ['student', 'staff', 'admin'], false, 'Star'),
   tool('todo-list', 'To-Do List', 'Create and manage personal tasks and reminders.', 'https://my.alfredstate.edu', 'my-account', ['tasks', 'to do', 'reminders'], ['student', 'staff', 'admin'], false, 'ClipboardList'),
   tool('mail-packages', 'Mail and Packages', 'Mailbox number and campus mailing address information.', 'https://my.alfredstate.edu', 'my-account', ['mail', 'packages', 'mailbox'], ['student'], false, 'Mail'),
-  tool('email', 'Outlook Email', 'Check Alfred State email via Outlook.', 'https://outlook.office.com', 'resources', ['email', 'outlook', 'microsoft'], ['accepted_student', 'student', 'staff', 'admin'], true, 'Mail'),
-  tool('microsoft-products', 'Microsoft Products', 'Word, Excel, PowerPoint, OneNote, Outlook, Teams, SharePoint, OneDrive, and Microsoft 365.', 'https://www.microsoft365.com', 'resources', ['microsoft', 'office', 'onedrive', 'teams'], ['accepted_student', 'student', 'staff', 'admin'], true, 'Grid2X2'),
-  tool('helpdesk', 'IT Help Desk', 'Help Desk home, device registration overview, and technology support.', 'https://alfredstate.teamdynamix.com/TDClient/277/Portal/Home/?ToUrl=%2fTDClient%2f277%2fPortal%2fHome%2f', 'resources', ['support', 'password', 'devices', 'help desk'], ['applicant', 'accepted_student', 'student', 'staff', 'admin'], true, 'LifeBuoy'),
-  tool('pharos-printing', 'Pharos Printing', 'My Print Center, Pharos packages, and Pharos help.', 'https://my.alfredstate.edu', 'resources', ['printing', 'pharos'], ['student', 'staff'], false, 'FileCheck'),
-  tool('rave-alert', 'RAVE Alert', 'Emergency and closing text alerts for your phone.', 'https://my.alfredstate.edu', 'resources', ['alerts', 'emergency'], ['student', 'staff'], false, 'Bell'),
-  tool('student-self-service', 'Student Self-Service', 'Quick access to student information and student dashboard tools.', 'https://my.alfredstate.edu', 'resources', ['self service', 'student dashboard'], ['student', 'staff'], false, 'User'),
-  tool('housing-dining', 'Housing & Dining Services', 'Housing and dining plan selections, meal plans, and account information.', 'https://my.alfredstate.edu', 'student-life', ['housing', 'dining', 'meal plans'], ['accepted_student', 'student'], true, 'Home'),
-  tool('dining', 'Dining Services', 'Dining, eAccounts, meal balances, menus, and campus dining details.', 'https://www.alfredstate.edu/dining', 'student-life', ['dining', 'meals', 'menus', 'eaccounts'], ['accepted_student', 'student', 'staff'], true, 'Utensils'),
-  tool('health-wellness', 'Health & Wellness', '988 Crisis, Health Portal, and health and wellness resources.', 'https://my.alfredstate.edu', 'student-life', ['health', 'wellness', '988'], ['student'], false, 'LifeBuoy'),
-  tool('safety-security', 'Safety and Security', 'On-call support, University Police, and Title IX resources.', 'https://my.alfredstate.edu', 'student-life', ['safety', 'security', 'police', 'title ix'], ['student', 'staff'], false, 'Shield'),
+  tool('email', 'Outlook Email', 'Check Alfred State email via Outlook.', 'https://outlook.office.com', 'resources', ['email', 'outlook', 'microsoft'], ['accepted_student', 'student', 'staff', 'admin'], true, 'Mail', {
+    notes: 'All official college communications are sent to your Alfred State email. Check it daily.',
+    helpUrl: 'https://alfredstate.teamdynamix.com/TDClient/277/Portal/KB/ArticleDet?ID=10482',
+    contactInfo: 'IT Help Desk: helpdesk@alfredstate.edu | (607) 587-4357',
+    status: 'online',
+    requirements: 'Alfred State Microsoft login',
+    liveData: {
+      unreadCount: 12,
+      lastSync: '2 minutes ago',
+      storageUsed: '4.2 GB',
+      storageTotal: '50 GB',
+      quickLinks: ['Inbox', 'Calendar', 'Sent Items', 'Drafts']
+    }
+  }),
+  tool('microsoft-products', 'Microsoft Products', 'Word, Excel, PowerPoint, OneNote, Outlook, Teams, SharePoint, OneDrive, and Microsoft 365.', 'https://www.microsoft365.com', 'resources', ['microsoft', 'office', 'onedrive', 'teams'], ['accepted_student', 'student', 'staff', 'admin'], true, 'Grid2X2', {
+    notes: 'Download Office apps on up to 5 devices. OneDrive provides 1 TB of cloud storage.',
+    helpUrl: 'https://alfredstate.teamdynamix.com/TDClient/277/Portal/KB/ArticleDet?ID=10491',
+    contactInfo: 'IT Help Desk: helpdesk@alfredstate.edu',
+    status: 'online',
+    requirements: 'Alfred State Microsoft login',
+    liveData: {
+      installedApps: ['Word', 'Excel', 'PowerPoint', 'Teams', 'OneDrive'],
+      oneDriveUsed: '12.4 GB',
+      oneDriveTotal: '1 TB',
+      devicesActive: 3
+    }
+  }),
+  tool('helpdesk', 'IT Help Desk', 'Help Desk home, device registration overview, and technology support.', 'https://alfredstate.teamdynamix.com/TDClient/277/Portal/Home/?ToUrl=%2fTDClient%2f277%2fPortal%2fHome%2f', 'resources', ['support', 'password', 'devices', 'help desk'], ['applicant', 'accepted_student', 'student', 'staff', 'admin'], true, 'LifeBuoy', {
+    notes: 'Submit tickets for tech issues, password resets, and device problems. Walk-in support available in Engineering Technology Building.',
+    helpUrl: 'https://alfredstate.teamdynamix.com/TDClient/277/Portal/Home/',
+    contactInfo: 'IT Help Desk: helpdesk@alfredstate.edu | (607) 587-4357 | ET Building Room 102',
+    status: 'online',
+    requirements: 'Alfred State login or guest ticket creation',
+    liveData: {
+      openTickets: 1,
+      lastTicket: 'Wi-Fi connection issue in Library — In Progress',
+      avgResponseTime: 'Under 2 hours',
+      walkInHours: 'Mon–Fri 8:00 AM – 5:00 PM'
+    }
+  }),
+  tool('pharos-printing', 'Pharos Printing', 'My Print Center, Pharos packages, and Pharos help.', 'https://my.alfredstate.edu', 'resources', ['printing', 'pharos'], ['student', 'staff'], false, 'FileCheck', {
+    notes: 'Each student receives $25 in print credits per semester. Black & white: $0.05/page. Color: $0.25/page.',
+    helpUrl: 'https://alfredstate.teamdynamix.com/TDClient/277/Portal/KB/ArticleDet?ID=10714',
+    contactInfo: 'IT Help Desk: helpdesk@alfredstate.edu',
+    status: 'online',
+    liveData: {
+      printBalance: '$18.45',
+      pagesPrinted: 131,
+      colorPages: 12,
+      nearestPrinter: 'Library 1st Floor — Online'
+    }
+  }),
+  tool('rave-alert', 'RAVE Alert', 'Emergency and closing text alerts for your phone.', 'https://my.alfredstate.edu', 'resources', ['alerts', 'emergency'], ['student', 'staff'], false, 'Bell', {
+    notes: 'Keep your phone number updated to receive emergency alerts. Text STOP to 226787 to opt out.',
+    contactInfo: 'University Police: (607) 587-3999',
+    status: 'online',
+    liveData: {
+      registeredNumber: '(607) ***-4821',
+      alertsThisMonth: 2,
+      lastAlert: 'Test alert — April 15, 2026'
+    }
+  }),
+  tool('student-self-service', 'Student Self-Service', 'Quick access to student information and student dashboard tools.', 'https://my.alfredstate.edu', 'resources', ['self service', 'student dashboard'], ['student', 'staff'], false, 'User', {
+    status: 'online',
+    requirements: 'Alfred State Microsoft login',
+    liveData: {
+      holds: 0,
+      gpa: '3.42',
+      academicStanding: 'Good Standing',
+      lastLogin: 'Today at 9:15 AM'
+    }
+  }),
+  tool('housing-dining', 'Housing & Dining Services', 'Housing and dining plan selections, meal plans, and account information.', 'https://my.alfredstate.edu', 'student-life', ['housing', 'dining', 'meal plans'], ['accepted_student', 'student'], true, 'Home', {
+    notes: 'Housing selection for Fall 2026 opens March 15. Meal plan changes must be made within the first two weeks of term.',
+    helpUrl: 'https://www.alfredstate.edu/student-life/housing-dining',
+    contactInfo: 'Residential Life: reslife@alfredstate.edu | (607) 587-4214',
+    status: 'online',
+    requirements: 'Alfred State Microsoft login',
+    liveData: {
+      currentRoom: 'MacKenzie East 312',
+      roomType: 'Double',
+      mealPlan: 'Unlimited + $200 Dining Dollars',
+      diningDollarsRemaining: '$87.30',
+      housingContract: 'Active through Spring 2026'
+    }
+  }),
+  tool('dining', 'Dining Services', 'Dining, eAccounts, meal balances, menus, and campus dining details.', 'https://www.alfredstate.edu/dining', 'student-life', ['dining', 'meals', 'menus', 'eaccounts'], ['accepted_student', 'student', 'staff'], true, 'Utensils', {
+    notes: 'Pioneer Café is open 7 AM – 10 PM on weekdays. Check the website for finals week extended hours.',
+    helpUrl: 'https://www.alfredstate.edu/dining',
+    contactInfo: 'Dining Services: dining@alfredstate.edu | (607) 587-4215',
+    status: 'online',
+    liveData: {
+      currentMealPeriod: 'Dinner',
+      pioneerCafeStatus: 'Open until 10:00 PM',
+      todaysSpecial: 'Grilled Chicken Alfredo',
+      mealSwipesUsedToday: 2,
+      diningDollarsBalance: '$87.30'
+    }
+  }),
+  tool('health-wellness', 'Health & Wellness', '988 Crisis, Health Portal, and health and wellness resources.', 'https://my.alfredstate.edu', 'student-life', ['health', 'wellness', '988'], ['student'], false, 'LifeBuoy', {
+    notes: 'The Health Portal is for non-emergency appointments. For emergencies, call 911 or University Police.',
+    helpUrl: 'https://www.alfredstate.edu/student-life/health-wellness',
+    contactInfo: 'Health Center: (607) 587-4200 | Counseling: (607) 587-4218',
+    status: 'online',
+    requirements: 'Alfred State login for Health Portal',
+    liveData: {
+      healthCenterHours: 'Mon–Fri 8:00 AM – 4:30 PM',
+      upcomingAppointment: 'Physical — May 10 at 10:00 AM',
+      immunizationsComplete: true,
+      insuranceOnFile: true
+    }
+  }),
+  tool('safety-security', 'Safety and Security', 'On-call support, University Police, and Title IX resources.', 'https://my.alfredstate.edu', 'student-life', ['safety', 'security', 'police', 'title ix'], ['student', 'staff'], false, 'Shield', {
+    notes: 'Blue light emergency phones are located across campus. University Police is available 24/7.',
+    helpUrl: 'https://www.alfredstate.edu/university-police',
+    contactInfo: 'Emergency: 911 | University Police: (607) 587-3999 | Title IX: titleix@alfredstate.edu',
+    status: 'online',
+    liveData: {
+      campusAlertLevel: 'Normal',
+      universityPoliceStatus: '24/7 Active',
+      escortService: 'Available — Call (607) 587-3999',
+      blueLightPhones: 18
+    }
+  }),
   tool('career-development', 'Career Development', 'Joblink, Skills First, and career development resources.', 'https://my.alfredstate.edu', 'student-life', ['career', 'jobs', 'skills'], ['student'], false, 'Briefcase'),
   tool('travel', 'Travel', 'Transportation, rental cars, escort, and parking on campus.', 'https://my.alfredstate.edu', 'student-life', ['travel', 'transportation', 'parking'], ['student', 'staff'], false, 'Map'),
   tool('student-clubs-orgs', 'Student Clubs & Orgs', 'CORQ event registration, Pioneer Link, and campus organization discovery.', 'https://my.alfredstate.edu', 'student-life', ['clubs', 'organizations', 'events'], ['student'], false, 'Map'),
@@ -258,7 +502,8 @@ function tool(
   tags: string[],
   audienceRoles: Role[],
   isFeatured: boolean,
-  icon: string
+  icon: string,
+  extras?: Partial<Omit<Tool, 'id' | 'name' | 'description' | 'url' | 'categoryId' | 'tags' | 'audienceRoles' | 'isFeatured' | 'icon' | 'createdAt' | 'updatedAt'>>
 ): Tool {
-  return { id, name, description, url, categoryId, icon, tags, audienceRoles, isFeatured, isActive: true, createdAt: now, updatedAt: now }
+  return { id, name, description, url, categoryId, icon, tags, audienceRoles, isFeatured, isActive: true, createdAt: now, updatedAt: now, ...extras }
 }

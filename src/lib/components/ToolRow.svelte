@@ -22,9 +22,9 @@
   href={tool.url}
   target="_blank"
   rel="noopener noreferrer"
-  class="group flex items-start gap-3 rounded-xl border border-border bg-surface p-3 transition-all hover:shadow-md hover:border-link/30"
+  class="group flex items-start gap-3 rounded-xl border border-border bg-surface p-3 transition duration-200 ease-out hover:bg-muted/60 active:scale-[0.995]"
 >
-  <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-link/10 text-link">
+  <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-muted text-link">
     <ExternalLink class="h-5 w-5" />
   </div>
   <div class="min-w-0 flex-1">
@@ -44,5 +44,5 @@
       {/each}
     </div>
   </div>
-  <ChevronRight class="h-5 w-5 shrink-0 text-text-soft group-hover:text-link transition-colors" />
+  <ChevronRight class="h-5 w-5 shrink-0 text-text-soft transition duration-200 group-hover:translate-x-0.5 group-hover:text-link" />
 </a>

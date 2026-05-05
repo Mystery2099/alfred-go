@@ -117,8 +117,6 @@ This is a SvelteKit app using the Node adapter. There is no separate Express API
 ## TODO
 
 - Search bar currently allows infinite input, should add limit
-- View All announcements button is ugly as hell
-- hover styles are weird af in many areas
 - replace search bar in header with search button that opens a command bar of sorts
 - figure out whether that button should be in the header or not on mobile
 - add hotkeys with tanstack hotkeys

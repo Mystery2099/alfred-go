@@ -313,15 +313,15 @@ export function getAppState() {
 
     launchTool(tool: Tool) {
       if (!tool.url) return null
-      if (tool.url.startsWith('/')) {
-        window.location.href = tool.url
-        return tool.url
-      }
       fetch('/api/activity', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ type: 'tool_launch', toolId: tool.id, toolName: tool.name })
       }).catch(() => {})
+      if (tool.url.startsWith('/')) {
+        window.location.href = tool.url
+        return tool.url
+      }
       window.open(tool.url, '_blank', 'noopener,noreferrer')
       return null
     },

@@ -103,6 +103,42 @@ try {
   // column may already exist
 }
 
+try {
+  sqlite.exec(`ALTER TABLE tools ADD COLUMN notes TEXT;`)
+} catch {
+  // column may already exist
+}
+
+try {
+  sqlite.exec(`ALTER TABLE tools ADD COLUMN help_url TEXT;`)
+} catch {
+  // column may already exist
+}
+
+try {
+  sqlite.exec(`ALTER TABLE tools ADD COLUMN contact_info TEXT;`)
+} catch {
+  // column may already exist
+}
+
+try {
+  sqlite.exec(`ALTER TABLE tools ADD COLUMN status TEXT;`)
+} catch {
+  // column may already exist
+}
+
+try {
+  sqlite.exec(`ALTER TABLE tools ADD COLUMN requirements TEXT;`)
+} catch {
+  // column may already exist
+}
+
+try {
+  sqlite.exec(`ALTER TABLE tools ADD COLUMN live_data TEXT;`)
+} catch {
+  // column may already exist
+}
+
 sqlite.exec(`
   create table if not exists push_subscriptions (
     id text primary key,

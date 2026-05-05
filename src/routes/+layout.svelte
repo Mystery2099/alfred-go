@@ -313,7 +313,7 @@
                       onclick={() => notifOpen = false}
                     >
                       <span class="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg
-                        {notice.tone === 'urgent' ? 'bg-rose-100 text-rose-600' : notice.tone === 'deadline' ? 'bg-amber-100 text-amber-600' : 'bg-campus-blue/10 text-campus-blue'}">
+                        {notice.tone === 'urgent' ? 'bg-rose-100 text-rose-600' : notice.tone === 'deadline' ? 'bg-amber-100 text-amber-600' : 'bg-muted text-link'}">
                         {#if notice.tone === 'urgent'}
                           <Bell class="h-4 w-4" />
                         {:else if notice.tone === 'deadline'}

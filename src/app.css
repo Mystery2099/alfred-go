@@ -141,7 +141,7 @@ textarea {
 }
 
 .nav-item {
-  @apply flex w-full items-center gap-4 rounded-3xl px-4 py-3 text-sm font-bold text-text-muted transition-all duration-300 ease-out hover:bg-muted hover:text-link;
+  @apply flex w-full items-center gap-4 rounded-3xl px-4 py-3 text-sm font-bold text-text-muted transition-all duration-300 ease-out hover:bg-muted hover:text-link active:scale-[0.98];
 }
 
 .nav-item.active {
@@ -149,7 +149,7 @@ textarea {
 }
 
 .mobile-item {
-  @apply flex h-14 flex-col items-center justify-center gap-1 rounded-lg px-2 text-[11px] font-bold text-text-muted transition-colors duration-300 ease-out;
+  @apply flex h-14 flex-col items-center justify-center gap-1 rounded-lg px-2 text-[11px] font-bold text-text-muted transition-colors duration-300 ease-out active:scale-95;
 }
 
 .mobile-item.active {
@@ -161,7 +161,7 @@ textarea {
 }
 
 .primary-button {
-  @apply inline-flex items-center justify-center gap-2 rounded-2xl px-4 py-3 text-sm font-extrabold text-white shadow-sm transition;
+  @apply inline-flex items-center justify-center gap-2 rounded-2xl px-4 py-3 text-sm font-extrabold text-white shadow-sm transition duration-150 active:scale-[0.97];
   background-color: var(--app-accent);
 }
 
@@ -170,7 +170,7 @@ textarea {
 }
 
 .secondary-button {
-  @apply inline-flex items-center justify-center gap-2 rounded-2xl border border-border bg-surface px-4 py-3 text-sm font-extrabold text-link transition hover:bg-muted;
+  @apply inline-flex items-center justify-center gap-2 rounded-2xl border border-border bg-surface px-4 py-3 text-sm font-extrabold text-link transition duration-150 hover:bg-muted active:scale-[0.97];
 }
 
 .tag {
@@ -178,7 +178,7 @@ textarea {
 }
 
 .segmented {
-  @apply rounded-lg border border-border bg-surface px-3 py-2 text-sm font-bold capitalize text-text-muted transition hover:bg-muted;
+  @apply rounded-lg border border-border bg-surface px-3 py-2 text-sm font-bold capitalize text-text-muted transition duration-150 hover:bg-muted active:scale-[0.97];
 }
 
 .segmented.active {
@@ -210,7 +210,7 @@ textarea {
 }
 
 .action-chip {
-  @apply hidden items-center gap-1 rounded-full bg-selected px-4 py-2 text-xs font-extrabold text-link transition hover:bg-campus-blue hover:text-white md:inline-flex;
+  @apply hidden items-center gap-1 rounded-full bg-selected px-4 py-2 text-xs font-extrabold text-link transition duration-150 hover:bg-campus-blue hover:text-white active:scale-[0.97] md:inline-flex;
 }
 
 .dark .action-chip {
@@ -245,7 +245,7 @@ textarea {
 
 
 .search-chip {
-  @apply rounded-full bg-surface px-4 py-2 text-sm text-text-muted shadow-sm ring-1 ring-border transition hover:bg-selected hover:text-link;
+  @apply rounded-full bg-surface px-4 py-2 text-sm text-text-muted shadow-sm ring-1 ring-border transition duration-150 hover:bg-selected hover:text-link active:scale-[0.97];
 }
 
 .profile-hero {

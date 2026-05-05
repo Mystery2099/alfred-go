@@ -46,6 +46,12 @@ export const tools = sqliteTable('tools', {
   audienceRoles: text('audience_roles', { mode: 'json' }).$type<string[]>().notNull(),
   isFeatured: integer('is_featured', { mode: 'boolean' }).notNull(),
   isActive: integer('is_active', { mode: 'boolean' }).notNull(),
+  notes: text('notes'),
+  helpUrl: text('help_url'),
+  contactInfo: text('contact_info'),
+  status: text('status'),
+  requirements: text('requirements'),
+  liveData: text('live_data', { mode: 'json' }).$type<Record<string, any>>(),
   createdAt: text('created_at').notNull(),
   updatedAt: text('updated_at').notNull()
 })

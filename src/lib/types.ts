@@ -19,6 +19,8 @@ export type Category = {
   updatedAt: string
 }
 
+export type ToolStatus = 'online' | 'maintenance' | 'degraded' | 'offline'
+
 export type Tool = {
   id: string
   name: string
@@ -30,6 +32,12 @@ export type Tool = {
   audienceRoles: Role[]
   isFeatured: boolean
   isActive: boolean
+  notes?: string | null
+  helpUrl?: string | null
+  contactInfo?: string | null
+  status?: ToolStatus | null
+  requirements?: string | null
+  liveData?: Record<string, any> | null
   createdAt: string
   updatedAt: string
 }
