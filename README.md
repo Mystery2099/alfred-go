@@ -34,15 +34,15 @@ pnpm dev -- --open
 To create a production version of your app:
 
 ```sh
-SESSION_SECRET="replace-with-a-long-random-secret" pnpm build
+pnpm build
 ```
 
 You can preview the production build with `pnpm preview`.
 
 ## Environment
 
-- `SESSION_SECRET` is required in production. Use a long random value and rotate it if session cookies may have been exposed.
 - `DATABASE_URL` can point at a SQLite file. If omitted, the app uses `alfredgo.sqlite`.
 - `VAPID_PRIVATE_KEY` enables push notifications. If omitted, push subscriptions fail closed and announcement broadcasts are skipped.
+- `ALLOW_DEMO_SEED=true` allows the bundled demo accounts to seed in production. Leave it unset for a hardened deployment.
 
 > To deploy your app, you may need to install an [adapter](https://svelte.dev/docs/kit/adapters) for your target environment.

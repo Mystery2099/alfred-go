@@ -1,7 +1,8 @@
 import { fail, redirect } from '@sveltejs/kit'
 import { authenticateUser, getLoginData } from '$lib/server/app-data'
-import { createSessionCookie, sessionCookieOptions } from '$lib/server/auth'
+import { sessionCookieOptions } from '$lib/server/auth'
 import { checkRateLimit } from '$lib/server/rate-limit'
+import { createSession } from '$lib/server/session'
 import type { Actions, PageServerLoad } from './$types'
 
 export const load: PageServerLoad = async ({ locals }) => {
@@ -19,7 +20,7 @@ export const actions: Actions = {
 
     try {
       const user = authenticateUser(normalizedEmail, password)
-      cookies.set('alfredgo_session', createSessionCookie(user.id), sessionCookieOptions)
+      cookies.set('alfredgo_session', createSession(user.id), sessionCookieOptions)
     } catch {
       return fail(401, { email, authError: 'Invalid email or password' })
     }

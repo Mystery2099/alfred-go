@@ -1,10 +1,17 @@
 import { count } from 'drizzle-orm'
 import { db } from './db'
-import { activities, announcements, categories, favorites, tools, userCredentials, userPreferences, users } from './schema'
+import { activities, announcements, categories, favorites, tools, userCredentials, userPreferences, userSessions, users } from './schema'
 import { hashPassword, testAccounts } from './auth'
 import { seedData } from '../data/seed'
 
+function canSeedDemoData() {
+  return process.env.NODE_ENV !== 'production' || process.env.ALLOW_DEMO_SEED === 'true'
+}
+
 export async function reseed() {
+  if (!canSeedDemoData()) return
+
+  db.delete(userSessions).run()
   db.delete(activities).run()
   db.delete(announcements).run()
   db.delete(favorites).run()
@@ -24,6 +31,8 @@ export async function reseed() {
 }
 
 export async function seedIfEmpty() {
+  if (!canSeedDemoData()) return
+
   const [{ value }] = db.select({ value: count() }).from(users).all()
   if (value === 0) {
     await reseed()

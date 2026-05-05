@@ -20,6 +20,13 @@ sqlite.exec(`
     created_at text not null,
     updated_at text not null
   );
+  create table if not exists user_sessions (
+    id text primary key,
+    user_id text not null,
+    token_hash text not null unique,
+    expires_at text not null,
+    created_at text not null
+  );
   create table if not exists categories (
     id text primary key,
     name text not null,
