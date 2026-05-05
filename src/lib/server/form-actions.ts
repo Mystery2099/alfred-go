@@ -26,7 +26,13 @@ export const preferenceActions = {
     const notificationSettings = formData.get('notificationSettings')
     const accessibilitySettings = formData.get('accessibilitySettings')
     if (theme) prefs.theme = String(theme) as UserPreference['theme']
-    if (preferredRoleView) prefs.preferredRoleView = String(preferredRoleView) as Role
+    if (preferredRoleView) {
+      const role = String(preferredRoleView) as Role
+      // Only admin and staff can change role view; staff cannot select admin
+      if (locals.user && (locals.user.role === 'admin' || (locals.user.role === 'staff' && role !== 'admin'))) {
+        prefs.preferredRoleView = role
+      }
+    }
     if (notificationSettings) {
       try {
         prefs.notificationSettings = JSON.parse(String(notificationSettings))

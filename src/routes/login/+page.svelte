@@ -67,7 +67,7 @@
       <!-- Desktop header -->
       <div class="mb-8 hidden lg:block">
         <h2 class="text-2xl font-extrabold text-[var(--app-text)]">Sign in</h2>
-        <p class="mt-1 text-sm text-[var(--app-text-muted)]">Use your prototype account credentials</p>
+        <p class="mt-1 text-sm text-[var(--app-text-muted)]">Prototype accounts use local credentials. Use the cards below to auto-fill.</p>
       </div>
 
       <form class="space-y-5" method="POST">
@@ -92,9 +92,14 @@
 
         <!-- Password -->
         <div class="space-y-2">
-          <label class="text-xs font-extrabold uppercase tracking-[0.18em] text-[var(--app-text-muted)]" for="password">
-            Password
-          </label>
+          <div class="flex items-center justify-between">
+            <label class="text-xs font-extrabold uppercase tracking-[0.18em] text-[var(--app-text-muted)]" for="password">
+              Password
+            </label>
+            <a href="https://passwordreset.microsoftonline.com" target="_blank" rel="noopener noreferrer" class="text-xs font-extrabold text-link hover:underline">
+              Forgot password?
+            </a>
+          </div>
           <div class="flex items-center gap-3 rounded-2xl border border-[var(--app-border)] bg-[var(--app-surface)] px-5 py-4 shadow-sm transition focus-within:border-campus-blue focus-within:ring-2 focus-within:ring-campus-blue/20">
             <LockKeyhole class="h-5 w-5 shrink-0 text-[var(--app-text-muted)]" />
             <input

@@ -232,26 +232,30 @@
         </div>
       </div>
 
-      <!-- Role view -->
-      <div class="profile-row border-t border-border">
-        <span class="profile-icon tone-0"><UserRound class="h-5 w-5" /></span>
-        <span class="min-w-0 flex-1">
-          <b>Preferred role view</b>
-          <small>Preview resources for another campus role</small>
-        </span>
-        <form method="POST" action="?/savePreference" use:enhance>
-          <select
-            name="preferredRoleView"
-            class="control text-sm py-1.5 px-3"
-            value={app.effectiveRole}
-            onchange={(event) => event.currentTarget.form?.requestSubmit()}
-          >
-            {#each roles as role}
-              <option value={role}>{roleLabels[role]}</option>
-            {/each}
-          </select>
-        </form>
-      </div>
+      <!-- Role view (staff and admin only) -->
+      {#if app.isAdmin || app.currentRole === 'staff'}
+        <div class="profile-row border-t border-border">
+          <span class="profile-icon tone-0"><UserRound class="h-5 w-5" /></span>
+          <span class="min-w-0 flex-1">
+            <b>Preferred role view</b>
+            <small>Preview resources for another campus role</small>
+          </span>
+          <form method="POST" action="?/savePreference" use:enhance>
+            <select
+              name="preferredRoleView"
+              class="control text-sm py-1.5 px-3"
+              value={app.effectiveRole}
+              onchange={(event) => event.currentTarget.form?.requestSubmit()}
+            >
+              {#each roles as role}
+                {#if app.isAdmin || role !== 'admin'}
+                  <option value={role}>{roleLabels[role]}</option>
+                {/if}
+              {/each}
+            </select>
+          </form>
+        </div>
+      {/if}
 
       <!-- Accessibility toggles -->
       {#each accessibilityItems as [title, body, ItemIcon, key]}
