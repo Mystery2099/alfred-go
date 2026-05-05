@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { CheckCircle2, Circle, ChevronRight, X, Sparkles, AlertCircle, CreditCard, Mail, GraduationCap, Home, BookOpen, Star, ShieldCheck } from 'lucide-svelte'
+  import { CheckCircle2, Circle, ChevronRight, X, Sparkles, AlertCircle, CreditCard, Mail, GraduationCap, Home, BookOpen, Star, ShieldCheck, ClipboardCheck } from 'lucide-svelte'
   import type { AppStore } from '$lib/app-state.svelte'
   import type { Role } from '$lib/types'
 
@@ -117,6 +117,7 @@
 
   const checklists: Partial<Record<Role, ChecklistItem[]>> = {
     applicant: [
+      { id: 'app-status', label: 'Check My Application Status', description: 'Track your application and missing documents', toolId: 'application-status', icon: ClipboardCheck, urgency: 'high' },
       { id: 'app-fafsa', label: 'Apply for FAFSA', description: 'Federal student aid application', toolId: 'fafsa', icon: CreditCard },
       { id: 'app-tap', label: 'Apply for NYS TAP', description: 'New York State Tuition Assistance', toolId: 'nys-tap', icon: CreditCard },
       { id: 'app-scholarships', label: 'Search for Scholarships', description: 'ScholarshipUniverse and more', toolId: 'scholarshipuniverse', icon: Star },
@@ -124,6 +125,7 @@
       { id: 'app-costs', label: 'Review Costs & Aid Requirements', description: 'Estimated costs and required forms', toolId: 'cost-aid-requirements', icon: BookOpen },
     ],
     accepted_student: [
+      { id: 'acc-status', label: 'Check My Application Status', description: 'Track your enrollment steps and missing documents', toolId: 'application-status', icon: ClipboardCheck, urgency: 'high' },
       { id: 'acc-aid', label: 'Review & Accept Financial Aid Offer', description: 'Accept or decline your awards', toolId: 'financial-aid-offer', icon: CreditCard, urgency: 'high' },
       { id: 'acc-bill', label: 'Pay Enrollment Deposit / Bill', description: 'Check balance and payment options', toolId: 'pay-bill', icon: CreditCard, urgency: 'high' },
       { id: 'acc-housing', label: 'Apply for Housing', description: 'Select room and meal plan', toolId: 'erez-life', icon: Home, urgency: 'high' },

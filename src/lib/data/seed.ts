@@ -151,7 +151,7 @@ export const announcements: Announcement[] = [
 ]
 
 export const tools: Tool[] = [
-  tool('my-learning', 'My Learning', 'Online coursework, class materials, assignments, and grades.', 'https://mylearning.alfredstate.edu', 'academics', ['learning', 'courses', 'assignments', 'grades'], ['student', 'staff'], true, 'BookOpen', {
+  tool('my-learning', 'My Courses & Grades (My Learning)', 'Online coursework, class materials, assignments, and grades.', 'https://mylearning.alfredstate.edu', 'academics', ['learning', 'courses', 'assignments', 'grades', 'my courses', 'my grades'], ['student', 'staff'], true, 'BookOpen', {
     notes: 'Your central hub for all coursework. Grades are typically posted within 48 hours of submission.',
     helpUrl: 'https://alfredstate.teamdynamix.com/TDClient/277/Portal/KB/ArticleDet?ID=10521',
     contactInfo: 'Academic Success Center: success@alfredstate.edu',
@@ -176,7 +176,7 @@ export const tools: Tool[] = [
       ]
     }
   }),
-  tool('degreeworks', 'DegreeWorks', 'Track degree progress, requirements, credits, and audits.', 'https://my.alfredstate.edu', 'academics', ['degreeworks', 'degree', 'audit', 'progress'], ['student', 'staff'], true, 'GraduationCap', {
+  tool('degreeworks', 'Check My Degree Progress (DegreeWorks)', 'Track degree progress, requirements, credits, and audits.', 'https://my.alfredstate.edu', 'academics', ['degreeworks', 'degree', 'audit', 'progress', 'check my degree'], ['student', 'staff'], true, 'GraduationCap', {
     notes: 'DegreeWorks is refreshed nightly from Banner. If you see discrepancies, contact the Registrar.',
     helpUrl: 'https://www.alfredstate.edu/registrar/degreeworks',
     contactInfo: 'Registrar: registrar@alfredstate.edu | (607) 587-4020',
@@ -282,7 +282,7 @@ export const tools: Tool[] = [
       ]
     }
   }),
-  tool('pay-bill', 'Pay Bill', 'Billing steps, housing and meal plan choices, options, and Nelnet payment access.', 'https://my.alfredstate.edu', 'financial', ['billing', 'payments', 'nelnet'], ['accepted_student', 'student'], true, 'CreditCard', {
+  tool('pay-bill', 'Pay My Bill (Nelnet)', 'Billing steps, housing and meal plan choices, options, and Nelnet payment access.', 'https://my.alfredstate.edu', 'financial', ['billing', 'payments', 'nelnet', 'my bill', 'pay bill'], ['accepted_student', 'student'], true, 'CreditCard', {
     notes: 'Payment plans available through Nelnet. Late fees apply after the 15th of each month.',
     helpUrl: 'https://www.alfredstate.edu/student-accounts',
     contactInfo: 'Student Accounts: studentaccounts@alfredstate.edu | (607) 587-4021',
@@ -369,7 +369,7 @@ export const tools: Tool[] = [
       ]
     }
   }),
-  tool('pharos-printing', 'Pharos Printing', 'My Print Center, Pharos packages, and Pharos help.', 'https://my.alfredstate.edu', 'resources', ['printing', 'pharos'], ['student', 'staff'], false, 'FileCheck', {
+  tool('pharos-printing', 'Campus Printing (Pharos)', 'My Print Center, Pharos packages, and Pharos help.', 'https://my.alfredstate.edu', 'resources', ['printing', 'pharos', 'campus printing'], ['student', 'staff'], false, 'FileCheck', {
     notes: 'Each student receives $25 in print credits per semester. Black & white: $0.05/page. Color: $0.25/page.',
     helpUrl: 'https://alfredstate.teamdynamix.com/TDClient/277/Portal/KB/ArticleDet?ID=10714',
     contactInfo: 'IT Help Desk: helpdesk@alfredstate.edu',
@@ -468,42 +468,68 @@ export const tools: Tool[] = [
   tool('employee-portal', 'Employee Portal', 'Staff services, time, benefits, and internal resources.', 'https://my.alfredstate.edu', 'staff', ['employee', 'hr', 'time'], ['staff', 'admin'], true, 'Briefcase'),
   tool('admin-tools', 'AlfredGO Admin', 'Manage tools, categories, dashboard defaults, and role visibility.', '/admin', 'staff', ['admin', 'tools', 'categories'], ['admin'], true, 'Settings'),
   // Real portal links from links.csv
-  tool('erez-life', 'eRez Life', 'Select your housing and meal plan.', 'https://alfredstate.erezlife.com/', 'student-life', ['housing', 'meal plan', 'residential'], ['student'], false, 'Home'),
-  tool('starfish', 'Starfish', 'Schedule meetings with faculty and academic advisors.', 'https://alfredstate.starfishsolutions.com/starfish-ops', 'academics', ['advising', 'faculty', 'meetings', 'success'], ['student', 'staff'], false, 'Star'),
+  tool('erez-life', 'Housing Selection (eRez Life)', 'Select your housing and meal plan.', 'https://alfredstate.erezlife.com/', 'student-life', ['housing', 'meal plan', 'residential', 'housing selection'], ['student'], false, 'Home'),
+  tool('starfish', 'Meet With My Advisor (Starfish)', 'Schedule meetings with faculty and academic advisors.', 'https://alfredstate.starfishsolutions.com/starfish-ops', 'academics', ['advising', 'faculty', 'meetings', 'success', 'my advisor'], ['student', 'staff'], false, 'Star'),
   tool('tutor-request', 'Tutor Request', 'Schedule a tutoring appointment through the Success Center.', 'https://alfredstate.mywconline.com/', 'academics', ['tutoring', 'academic support', 'success'], ['student'], false, 'BookOpen'),
-  tool('clockwork', 'Clockwork', 'Schedule a proctored test or exam accommodation.', 'https://clockwork.alfredstate.edu/ClockWork/custom/misc/home.aspx', 'academics', ['testing', 'proctor', 'accommodation'], ['student', 'staff'], false, 'Clock3'),
+  tool('clockwork', 'Test Accommodations (Clockwork)', 'Schedule a proctored test or exam accommodation.', 'https://clockwork.alfredstate.edu/ClockWork/custom/misc/home.aspx', 'academics', ['testing', 'proctor', 'accommodation', 'test accommodations'], ['student', 'staff'], false, 'Clock3'),
   tool('alfred-catalogue', 'Alfred Catalogue', 'List of courses and programs offered by Alfred State.', 'https://catalog2.alfredstate.edu/', 'academics', ['catalog', 'courses', 'programs', 'catalogue'], ['student', 'staff'], false, 'BookOpen'),
   tool('fitness-center', 'Fitness Center Membership', 'Sign up for fitness center access and memberships.', 'https://federation.ngwebsolutions.com/sp/startSSO.ping?PartnerIdpId=https://sts.windows.net/9847450c-4365-4e32-b26e-b73baa0ea04b/&SpSessionAuthnAdapterId=alfredstateDF&TargetResource=https%3a%2f%2fdynamicforms.ngwebsolutions.com%2fSubmit%2fStart%2f6dcc23ee-5211-4d13-9c2c-d3df93c8ff9c', 'student-life', ['gym', 'workout', 'fitness', 'membership'], ['student'], false, 'Home'),
   tool('intramurals', 'Intramurals', 'View athletic and socially engaging activities offered by Alfred State.', 'https://pioneerlink.alfredstate.edu/organization/intramurals', 'student-life', ['sports', 'activities', 'athletics'], ['student'], false, 'Home'),
   tool('order-books', 'Order Books', 'View and purchase textbooks for your classes.', 'https://banner.alfredstate.edu/BannerExtensibility/customPage/page/alf_bookstore_auth', 'resources', ['textbooks', 'bookstore', 'supplies'], ['student'], false, 'BookOpen'),
-  tool('pharos-packages', 'Pharos Packages', 'Download software and drivers to use campus printers.', 'https://alfredstateedu14176.sharepoint.com/sites/PharosPackages', 'resources', ['printing', 'printers', 'drivers', 'software'], ['student', 'staff'], false, 'Grid2X2'),
+  tool('pharos-packages', 'Printer Software (Pharos)', 'Download software and drivers to use campus printers.', 'https://alfredstateedu14176.sharepoint.com/sites/PharosPackages', 'resources', ['printing', 'printers', 'drivers', 'software', 'printer software'], ['student', 'staff'], false, 'Grid2X2'),
   tool('pharos-help', 'Pharos Help', 'Guide to using campus printers and troubleshooting printing issues.', 'https://alfredstate.teamdynamix.com/TDClient/277/Portal/KB/ArticleDet?ID=10714', 'resources', ['printing', 'printers', 'help', 'support'], ['student', 'staff'], false, 'LifeBuoy'),
   tool('university-police', 'University Police', 'View information about university police and campus safety.', 'https://www.alfredstate.edu/university-police', 'student-life', ['safety', 'security', 'police'], ['student', 'staff'], false, 'Shield'),
   tool('title-ix', 'Title IX', 'Read about Title IX policies and reporting procedures.', 'https://www.alfredstate.edu/title-ix', 'student-life', ['title ix', 'discrimination', 'reporting'], ['student', 'staff'], false, 'Shield'),
   tool('988-hotline', '988 Hotline', 'Suicide and crisis lifeline available 24/7.', 'https://988lifeline.org', 'student-life', ['crisis', 'mental health', 'suicide', 'hotline', 'support'], ['student', 'staff'], false, 'LifeBuoy'),
-  tool('scholarshipuniverse', 'ScholarshipUniverse', 'Apply for scholarships and view offers through Alfred State.', 'https://alfredstate.scholarshipuniverse.com/', 'financial', ['scholarships', 'aid', 'universe'], ['applicant', 'accepted_student', 'student'], false, 'BadgeDollarSign'),
+  tool('scholarshipuniverse', 'Find Scholarships (ScholarshipUniverse)', 'Apply for scholarships and view offers through Alfred State.', 'https://alfredstate.scholarshipuniverse.com/', 'financial', ['scholarships', 'aid', 'universe', 'find scholarships'], ['applicant', 'accepted_student', 'student'], false, 'BadgeDollarSign'),
   tool('formal-academic-complaint', 'Formal Academic Complaint', 'PDF form for filing academic complaints.', 'https://www.alfredstate.edu/sites/default/files/2025-12/academic-complaint-form.pdf', 'academics', ['complaint', 'form', 'academic'], ['student', 'staff'], false, 'FileCheck'),
   tool('rental-cars', 'Rental Cars', 'Rent vehicles on campus with low rates that include fuel.', 'https://www.enterprisecarshare.com/us/en/programs/university/alfred-state.html', 'student-life', ['transportation', 'cars', 'rental', 'enterprise'], ['student', 'staff'], false, 'Map'),
   tool('campus-parking', 'Campus Parking Information', 'Parking permits, rules, and campus parking details.', 'https://www.alfredstate.edu/university-police/parking-campus', 'student-life', ['parking', 'transportation', 'permits'], ['student', 'staff'], false, 'Map'),
   tool('financial-aid-offers', 'Financial Aid Offers', 'Accept and decline Federal Direct Loans offered to you.', 'https://banner.alfredstate.edu/StudentSelfService/ssb/financialAid#!/dashboard/home/2627', 'financial', ['financial aid', 'loans', 'offers', 'awards'], ['accepted_student', 'student'], false, 'BadgeDollarSign'),
-  tool('bannerweb', 'Bannerweb', 'Dashboard for student information, registration, and records.', 'https://banner.alfredstate.edu/StudentSelfService/ssb/studentProfile', 'my-account', ['student', 'dashboard', 'ssb', 'banner'], ['student', 'staff', 'admin'], false, 'User'),
+  tool('bannerweb', 'My Student Account (Bannerweb)', 'Dashboard for student information, registration, and records.', 'https://banner.alfredstate.edu/StudentSelfService/ssb/studentProfile', 'my-account', ['student', 'dashboard', 'ssb', 'banner', 'my account'], ['student', 'staff', 'admin'], false, 'User'),
   tool('health-portal', 'Health Portal', 'Portal for Alfred State health and wellness services.', 'https://alfredst.studenthealthportal.com/', 'student-life', ['health', 'wellness', 'portal', 'medical'], ['student'], false, 'LifeBuoy'),
   tool('excelsior-scholarship', 'Excelsior Scholarship Application', 'Apply for the New York State Excelsior Scholarship.', 'https://hesc.ny.gov/find-aid/nys-grants-scholarships/excelsior-scholarship-program', 'financial', ['scholarships', 'aid', 'excelsior', 'state'], ['applicant', 'accepted_student', 'student'], false, 'BadgeDollarSign'),
   tool('fafsa', 'FAFSA Application', 'Apply for federal student aid through the Free Application for Federal Student Aid.', 'https://studentaid.gov/h/apply-for-aid/fafsa', 'financial', ['fafsa', 'federal aid', 'student aid'], ['applicant', 'accepted_student', 'student'], false, 'BadgeDollarSign'),
   tool('nys-tap', 'NYS TAP Application', 'Apply for New York State Tuition Assistance Program.', 'https://www.tap.hesc.ny.gov/totw/', 'financial', ['tap', 'state aid', 'tuition'], ['applicant', 'accepted_student', 'student'], false, 'BadgeDollarSign'),
-  tool('joblink', 'JobLink', 'View employment and internship opportunities.', 'https://alfredstate-csm.symplicity.com/students/?signin_tab=0', 'student-life', ['jobs', 'employment', 'career', 'internships'], ['student'], false, 'Briefcase'),
-  tool('skills-first', 'Skills First', 'AI powered resume builder and career preparation tool.', 'https://skillsfirst.com/organizations/alfredstate', 'student-life', ['resume', 'career', 'ai', 'skills'], ['student'], false, 'Briefcase'),
+  tool('joblink', 'Find Jobs & Internships (JobLink)', 'View employment and internship opportunities.', 'https://alfredstate-csm.symplicity.com/students/?signin_tab=0', 'student-life', ['jobs', 'employment', 'career', 'internships', 'find jobs'], ['student'], false, 'Briefcase'),
+  tool('skills-first', 'Build My Resume (Skills First)', 'AI powered resume builder and career preparation tool.', 'https://skillsfirst.com/organizations/alfredstate', 'student-life', ['resume', 'career', 'ai', 'skills', 'build my resume'], ['student'], false, 'Briefcase'),
   tool('campus-store', 'Campus Store', 'Shop textbooks and supplies from the campus bookstore.', 'https://www.alfredstatebookstore.com/home', 'student-life', ['textbooks', 'supplies', 'bookstore', 'merchandise'], ['student', 'staff'], false, 'BookOpen'),
   tool('financial-aid-guides', 'Financial Aid Guides', 'Financial aid guides, resources, and reference documents.', 'https://alfredstateedu14176.sharepoint.com/sites/Finances', 'financial', ['financial aid', 'guides', 'resources'], ['student', 'staff'], false, 'BadgeDollarSign'),
-  tool('schedule-planner', 'Schedule Planner', 'Register for classes and plan your schedule for upcoming semesters.', 'https://alfredstate.collegescheduler.com/', 'academics', ['registration', 'classes', 'planner', 'schedule'], ['student', 'staff'], false, 'Clock3'),
+  tool('schedule-planner', 'Plan My Schedule (College Scheduler)', 'Register for classes and plan your schedule for upcoming semesters.', 'https://alfredstate.collegescheduler.com/', 'academics', ['registration', 'classes', 'planner', 'schedule', 'plan my schedule'], ['student', 'staff'], false, 'Clock3'),
   tool('veteran-certification', 'Veteran Certification Form', 'Get benefits for military service and veteran status.', 'https://federation.ngwebsolutions.com/sp/ACS.saml2', 'staff', ['veterans', 'military', 'benefits', 'certification'], ['staff', 'admin'], false, 'FileCheck'),
   tool('veteran-services', 'Veteran Services and Benefits', 'View veteran benefits and services offered by Alfred State.', 'https://www.alfredstate.edu/admissions/applying-alfred/veterans-military', 'student-life', ['veterans', 'military', 'benefits', 'services'], ['student', 'staff'], false, 'Shield'),
-  tool('pioneer-link', 'Pioneer Link', 'Find events, organizations, and news happening at Alfred State.', 'https://pioneerlink.alfredstate.edu/', 'student-life', ['events', 'organizations', 'news', 'campus life'], ['student'], false, 'Map'),
+  tool('pioneer-link', 'Campus Events & Clubs (Pioneer Link)', 'Find events, organizations, and news happening at Alfred State.', 'https://pioneerlink.alfredstate.edu/', 'student-life', ['events', 'organizations', 'news', 'campus life', 'campus events'], ['student'], false, 'Map'),
   tool('microsoft-teams', 'Microsoft Teams', 'Chat and collaborate with Alfred State faculty and students.', 'https://teams.microsoft.com/v2/', 'my-account', ['microsoft', 'chat', 'communication', 'collaboration'], ['accepted_student', 'student', 'staff', 'admin'], false, 'Grid2X2'),
   tool('formal-administrative-complaint', 'Formal Administrative Complaint', 'PDF form for filing administrative complaints.', 'https://www.alfredstate.edu/sites/default/files/2025-12/administrative-complaint-form.pdf', 'staff', ['complaint', 'form', 'administrative'], ['staff', 'admin'], false, 'FileCheck'),
   tool('commencement-info', 'Commencement Information', 'Information about commencement ceremonies and graduation.', 'https://www.alfredstate.edu/commencement', 'academics', ['graduation', 'ceremony', 'commencement'], ['student', 'staff'], false, 'GraduationCap'),
   tool('pay-commencement-fee', 'Pay Commencement Fee', 'Pay your commencement ceremony fee online.', 'https://federation.ngwebsolutions.com/sp/startSSO.ping?PartnerIdpId=https://sts.windows.net/9847450c-4365-4e32-b26e-b73baa0ea04b/&SpSessionAuthnAdapterId=alfredstateDF&TargetResource=https%3a%2f%2fdynamicforms.ngwebsolutions.com%2fSubmit%2fStart%2fd52b16b1-4cf0-4e7c-9846-41289bcfb807', 'academics', ['graduation', 'ceremony', 'payment', 'fee'], ['student'], false, 'CreditCard'),
-  tool('hinkle-library', 'Hinkle Library', 'Search and request books from the Hinkle Memorial Library.', 'https://library.alfredstate.edu/c.php?g=372677', 'academics', ['books', 'research', 'library', 'hinkle'], ['student', 'staff'], false, 'BookOpen')
+  tool('hinkle-library', 'Hinkle Library', 'Search and request books from the Hinkle Memorial Library.', 'https://library.alfredstate.edu/c.php?g=372677', 'academics', ['books', 'research', 'library', 'hinkle'], ['student', 'staff'], false, 'BookOpen'),
+  tool('application-status', 'View My Application Status', 'Track your application status, missing documents, and next steps.', 'https://my.alfredstate.edu', 'my-account', ['application', 'status', 'admissions', 'missing documents', 'next steps'], ['applicant', 'accepted_student'], true, 'ClipboardCheck', {
+    notes: 'Application statuses are updated daily. If you submitted missing documents, allow 2–3 business days for review.',
+    helpUrl: 'https://www.alfredstate.edu/admissions',
+    contactInfo: 'Admissions: admissions@alfredstate.edu | (607) 587-4210',
+    status: 'online',
+    requirements: 'Alfred State Microsoft login',
+    liveData: {
+      applicationStatus: 'Under Review',
+      submittedDate: 'March 15, 2026',
+      lastUpdated: 'May 4, 2026',
+      documentsNeeded: 2,
+      holds: ['Missing official high school transcript', 'Immunization records not on file'],
+      nextSteps: [
+        'Submit official high school transcript',
+        'Upload immunization records',
+        'Monitor your email for the admission decision',
+      ],
+      checklistItems: [
+        { label: 'Application submitted', status: 'complete' },
+        { label: 'Application fee paid', status: 'complete' },
+        { label: 'High school transcript', status: 'missing' },
+        { label: 'Immunization records', status: 'missing' },
+        { label: 'Admission decision', status: 'pending' },
+      ],
+    }
+  }),
 ]
 
 export const preferences: UserPreference[] = users.map((user) => ({

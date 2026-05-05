@@ -301,6 +301,36 @@ export function getAppState() {
       return favoriteIds().has(toolId)
     },
 
+    optimisticToggleFavorite(toolId: string) {
+      if (!state.data || !state.userId) return
+      const idx = state.data.favorites.findIndex(
+        (f) => f.userId === state.userId && f.toolId === toolId
+      )
+      if (idx >= 0) {
+        state.data.favorites.splice(idx, 1)
+      } else {
+        state.data.favorites.push({
+          id: `fav-${state.userId}-${toolId}`,
+          userId: state.userId,
+          toolId,
+          createdAt: new Date().toISOString(),
+        })
+      }
+    },
+
+    async syncData() {
+      if (typeof window === 'undefined') return
+      try {
+        const res = await fetch('/api/data')
+        if (res.ok) {
+          const data = await res.json()
+          this.hydrate(data)
+        }
+      } catch {
+        // silently ignore sync errors
+      }
+    },
+
     applyTheme(theme?: string) {
       const root = document.documentElement
       const t = theme || currentPreference()?.theme || 'system'

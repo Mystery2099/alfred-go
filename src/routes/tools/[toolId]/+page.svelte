@@ -193,7 +193,7 @@
     <!-- Live Data / At a Glance -->
     {#if tool.liveData && Object.keys(tool.liveData).length > 0}
       {@const ld = tool.liveData}
-      {@const hasExplicit = ld.currentBalance !== undefined || ld.unreadCount !== undefined || ld.degreeProgress !== undefined || ld.courses || ld.breakdown || ld.nextClass || ld.recentGrades || ld.openTickets !== undefined || ld.diningDollarsRemaining !== undefined || ld.currentRoom || ld.printBalance !== undefined || ld.campusAlertLevel || ld.registrationWindow || ld.flags || ld.upcomingAssignments || ld.recentEmails || ld.locations || ld.paymentHistory || ld.tickets || ld.quickLinks || ld.storageUsed || ld.holds !== undefined || ld.roommates}
+      {@const hasExplicit = ld.currentBalance !== undefined || ld.unreadCount !== undefined || ld.degreeProgress !== undefined || ld.courses || ld.breakdown || ld.nextClass || ld.recentGrades || ld.openTickets !== undefined || ld.diningDollarsRemaining !== undefined || ld.currentRoom || ld.printBalance !== undefined || ld.campusAlertLevel || ld.registrationWindow || ld.flags || ld.upcomingAssignments || ld.recentEmails || ld.locations || ld.paymentHistory || ld.tickets || ld.quickLinks || ld.storageUsed || ld.holds !== undefined || ld.roommates || ld.applicationStatus || ld.checklistItems || ld.nextSteps}
       <div>
         <p class="mb-3 text-xs font-extrabold uppercase tracking-[0.18em] text-text-muted">At a Glance</p>
         <div class="overflow-hidden rounded-2xl bg-surface shadow-sm ring-1 ring-border">
