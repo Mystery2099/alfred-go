@@ -1,6 +1,6 @@
 <script lang="ts">
   import { getAppState, roleLabels } from '$lib/app-state.svelte'
-  import { LockKeyhole, LogIn, Mail } from 'lucide-svelte'
+  import { ClipboardCheck, GraduationCap, LockKeyhole, LogIn, Mail, ShieldCheck, UserRound } from 'lucide-svelte'
 
   let { data, form } = $props()
   const app = getAppState()
@@ -21,6 +21,14 @@
       admin: 'AdminGo2026!',
     }
     return passwords[role] || ''
+  }
+
+  const roleExplainers: Record<string, { helper: string; icon: any }> = {
+    applicant: { helper: 'Use this to learn admissions status, missing documents, FAFSA, TAP, and scholarships.', icon: ClipboardCheck },
+    accepted_student: { helper: 'Use this to set up aid, billing, housing, email, Bannerweb, and class systems.', icon: GraduationCap },
+    student: { helper: 'Use this for daily class, account, favorites, grades, dining, and campus resources.', icon: UserRound },
+    staff: { helper: 'Use this to preview student resources and staff-facing tools.', icon: ShieldCheck },
+    admin: { helper: 'Use this to manage prototype resources, categories, and visibility.', icon: ShieldCheck },
   }
 </script>
 
@@ -130,19 +138,30 @@
 
       <!-- Role selector -->
       <div class="mt-8">
-        <p class="mb-4 text-xs font-extrabold uppercase tracking-[0.18em] text-[var(--app-text-muted)]">Quick Select</p>
-        <div class="grid grid-cols-2 gap-3">
-          {#each data.users || [] as user}
+        <div class="mb-4">
+          <p class="text-xs font-extrabold uppercase tracking-[0.18em] text-[var(--app-text-muted)]">Quick Select</p>
+          <p class="mt-1 text-sm leading-5 text-[var(--app-text-muted)]">Pick the role that matches the journey you want to explore. Applicants and accepted students include extra onboarding help.</p>
+        </div>
+        <div class="grid gap-3 sm:grid-cols-2">
+          {#each data.users || [] as user (user.id)}
+            {@const roleInfo = roleExplainers[user.role]}
+            {@const RoleIcon = roleInfo?.icon ?? UserRound}
             <button
-              class="rounded-2xl border border-[var(--app-border)] bg-[var(--app-surface)] p-4 text-left shadow-sm ring-2 ring-transparent transition hover:-translate-y-0.5 hover:shadow-md hover:ring-campus-blue/20 active:scale-[0.98]"
+              class="flex min-h-24 items-start gap-3 rounded-[24px] border border-[var(--app-border)] bg-[var(--app-surface)] p-4 text-left shadow-sm ring-2 ring-transparent transition hover:bg-muted hover:ring-campus-blue/20 active:scale-[0.98]"
               onclick={() => {
                 email = user.email || ''
                 password = defaultPasswordForRole(user.role)
               }}
               type="button"
             >
-              <span class="text-sm font-extrabold text-link">{roleLabels[user.role]}</span>
-              <span class="mt-1 block truncate text-xs text-[var(--app-text-soft)]">{user.email}</span>
+              <span class="grid h-10 w-10 shrink-0 place-items-center rounded-2xl bg-selected text-link">
+                <RoleIcon class="h-5 w-5" />
+              </span>
+              <span class="min-w-0 flex-1">
+                <span class="text-sm font-extrabold text-link">{roleLabels[user.role]}</span>
+                <span class="mt-1 block text-xs leading-5 text-[var(--app-text-muted)]">{roleInfo?.helper}</span>
+                <span class="mt-2 block truncate text-[11px] font-semibold text-[var(--app-text-soft)]">{user.email}</span>
+              </span>
             </button>
           {/each}
         </div>

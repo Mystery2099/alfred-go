@@ -21,10 +21,10 @@
     Palette,
     Radio,
     RotateCcw,
+    Sparkles,
     Settings,
     Shield,
     SlidersHorizontal,
-    Sparkles,
     Star,
     Sun,
     Trash2,
@@ -186,6 +186,15 @@
     if (!confirm('This will permanently delete your activity history. This cannot be undone. Continue?')) {
       return false
     }
+  }
+
+  function restartOnboarding() {
+    if (typeof window === 'undefined') return
+    const userKey = app.userId ?? 'guest'
+    const roleKey = app.effectiveRole
+    localStorage.removeItem(`alfredgo_checklist_${userKey}_${roleKey}`)
+    localStorage.removeItem(`alfredgo_checklist_dismissed_${userKey}_${roleKey}`)
+    window.location.href = '/'
   }
 
   function toggleAccessibilitySetting(key: string) {
@@ -475,8 +484,17 @@
   <div>
     <h2 class="mb-2 px-4 text-xs font-extrabold uppercase tracking-wider text-text-soft">Data Management</h2>
     <div class="overflow-hidden rounded-2xl bg-surface shadow-sm ring-1 ring-border">
+      <!-- Onboarding -->
+      <button type="button" class="profile-row w-full text-left" onclick={restartOnboarding}>
+        <span class="profile-icon tone-0"><Sparkles class="h-5 w-5" /></span>
+        <span class="min-w-0 flex-1 basis-40">
+          <b>Restart getting started</b>
+          <small>Show the role-based onboarding checklist again from the beginning</small>
+        </span>
+      </button>
+
       <!-- Export -->
-      <div class="profile-row">
+      <div class="profile-row border-t border-border">
         <span class="profile-icon tone-0"><Download class="h-5 w-5" /></span>
         <span class="min-w-0 flex-1 basis-40">
           <b>Export favorites</b>
