@@ -2,6 +2,7 @@
   import { getAppState } from '$lib/app-state.svelte'
   import Announcements from '$lib/components/Announcements.svelte'
   import DashboardSection from '$lib/components/DashboardSection.svelte'
+  import GettingStarted from '$lib/components/GettingStarted.svelte'
   import Icon from '$lib/components/shared/Icon.svelte'
   import RecentActivity from '$lib/components/RecentActivity.svelte'
   import SkeletonSection from '$lib/components/shared/SkeletonSection.svelte'
@@ -23,6 +24,11 @@
   </section>
 {:else}
   <section class="mx-auto max-w-6xl space-y-8">
+    <!-- Getting Started -->
+    {#if app.isAuthenticated}
+      <GettingStarted {app} />
+    {/if}
+
     <!-- Announcements -->
     <DashboardSection title="What's Happening" sectionKey="announcements" count={app.announcements.length}>
       <Announcements {app} limit={3} />

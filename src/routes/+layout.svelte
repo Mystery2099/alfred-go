@@ -63,6 +63,16 @@
         .then((keys) => Promise.all(keys.map((key) => caches.delete(key))))
         .catch(() => {})
     }
+
+    const handleVisibility = () => {
+      if (document.visibilityState === 'visible') {
+        app.syncData()
+      }
+    }
+    document.addEventListener('visibilitychange', handleVisibility)
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibility)
+    }
   })
 
   $effect(() => {

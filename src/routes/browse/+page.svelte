@@ -53,7 +53,7 @@
   <div>
     <p class="mb-3 px-1 text-xs font-extrabold uppercase tracking-[0.18em] text-text-muted">Try Searching For</p>
     <div class="flex flex-wrap gap-2 px-1">
-      {#each ['my learning', 'degreeworks', 'financial aid', 'dining', 'email', 'printing'] as term}
+      {#each ['my courses', 'my bill', 'financial aid', 'housing', 'email', 'advisor'] as term}
         <button class="search-chip" onclick={() => app.setQuery(term)}>{term}</button>
       {/each}
     </div>

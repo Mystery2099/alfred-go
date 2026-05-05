@@ -135,7 +135,12 @@
             Launch
           </button>
 
-          <form method="POST" action="?/toggleFavorite" use:enhance class="inline-flex">
+          <form method="POST" action="?/toggleFavorite" use:enhance={() => {
+            app.optimisticToggleFavorite(tool.id)
+            return async ({ result }) => {
+              if (result.type === 'failure') app.optimisticToggleFavorite(tool.id)
+            }
+          }} class="inline-flex">
             <input type="hidden" name="toolId" value={tool.id} />
             <button
               type="submit"
