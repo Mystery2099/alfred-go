@@ -511,6 +511,63 @@
               {/if}
             {/if}
 
+            {#if ld.applicationStatus}
+              <div class="mb-4">
+                <div class="mb-2 flex items-center justify-between rounded-xl {ld.applicationStatus === 'Accepted' || ld.applicationStatus === 'Complete' ? 'bg-emerald-50 dark:bg-emerald-900/20' : ld.applicationStatus === 'Under Review' ? 'bg-campus-blue/5 dark:bg-campus-blue/10' : 'bg-amber-50 dark:bg-amber-900/20'} px-4 py-3">
+                  <span class="text-sm font-bold text-text-muted">Application Status</span>
+                  <span class="text-sm font-extrabold {ld.applicationStatus === 'Accepted' || ld.applicationStatus === 'Complete' ? 'text-emerald-700 dark:text-emerald-300' : ld.applicationStatus === 'Under Review' ? 'text-campus-blue' : 'text-amber-700 dark:text-amber-300'}">{ld.applicationStatus}</span>
+                </div>
+                {#if ld.submittedDate}
+                  <div class="flex items-baseline justify-between px-1 text-sm">
+                    <span class="text-text-muted">Submitted</span>
+                    <span class="font-extrabold text-text">{ld.submittedDate}</span>
+                  </div>
+                {/if}
+                {#if ld.lastUpdated}
+                  <div class="flex items-baseline justify-between px-1 text-sm">
+                    <span class="text-text-muted">Last Updated</span>
+                    <span class="font-extrabold text-text">{ld.lastUpdated}</span>
+                  </div>
+                {/if}
+              </div>
+            {/if}
+
+            {#if ld.checklistItems && Array.isArray(ld.checklistItems)}
+              <div class="mb-2">
+                <p class="mb-2 text-xs font-extrabold uppercase tracking-[0.18em] text-text-muted">Application Checklist</p>
+                <div class="space-y-1.5">
+                  {#each ld.checklistItems as item}
+                    <div class="flex items-center gap-2.5 rounded-xl bg-muted px-4 py-2.5">
+                      {#if item.status === 'complete'}
+                        <CheckCircle2 class="h-4 w-4 shrink-0 text-emerald-500" />
+                        <span class="text-sm text-text-muted line-through">{item.label}</span>
+                      {:else if item.status === 'missing'}
+                        <XCircle class="h-4 w-4 shrink-0 text-rose-500" />
+                        <span class="text-sm font-bold text-rose-700 dark:text-rose-300">{item.label}</span>
+                      {:else}
+                        <Clock class="h-4 w-4 shrink-0 text-amber-500" />
+                        <span class="text-sm font-bold text-text">{item.label}</span>
+                      {/if}
+                    </div>
+                  {/each}
+                </div>
+              </div>
+            {/if}
+
+            {#if ld.nextSteps && Array.isArray(ld.nextSteps)}
+              <div class="mb-2">
+                <p class="mb-2 text-xs font-extrabold uppercase tracking-[0.18em] text-text-muted">Next Steps</p>
+                <div class="space-y-2">
+                  {#each ld.nextSteps as step, i}
+                    <div class="flex items-start gap-3 rounded-xl bg-muted px-4 py-3">
+                      <span class="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-campus-blue text-xs font-extrabold text-white">{i + 1}</span>
+                      <span class="text-sm text-text">{step}</span>
+                    </div>
+                  {/each}
+                </div>
+              </div>
+            {/if}
+
             {#if ld.flags && Array.isArray(ld.flags)}
               <div class="mb-2 space-y-2">
                 {#each ld.flags as flag}
@@ -532,9 +589,9 @@
             {/if}
 
             <!-- Generic scalar fallback -->
-            {#if Object.entries(ld).filter(([k, v]) => !['currentBalance','dueDate','unreadCount','degreeProgress','creditsEarned','creditsRequired','storageUsed','storageTotal','courses','upcomingAssignments','recentGrades','recentEmails','breakdown','paymentHistory','tickets','locations','nextClass','openTickets','lastTicket','diningDollarsRemaining','diningDollarsSpentThisMonth','currentRoom','roomType','mealPlan','roommates','printBalance','pagesPrinted','campusAlertLevel','registrationWindow','advisorHold','balanceHold','holds','flags','quickLinks','currentGPA','gpa','semesterGPA','enrolledCourses','creditsEnrolled','plannedCourses','classesToday'].includes(k) && (typeof v === 'string' || typeof v === 'number' || typeof v === 'boolean')).length > 0}
+            {#if Object.entries(ld).filter(([k, v]) => !['currentBalance','dueDate','unreadCount','degreeProgress','creditsEarned','creditsRequired','storageUsed','storageTotal','courses','upcomingAssignments','recentGrades','recentEmails','breakdown','paymentHistory','tickets','locations','nextClass','openTickets','lastTicket','diningDollarsRemaining','diningDollarsSpentThisMonth','currentRoom','roomType','mealPlan','roommates','printBalance','pagesPrinted','campusAlertLevel','registrationWindow','advisorHold','balanceHold','holds','flags','quickLinks','currentGPA','gpa','semesterGPA','enrolledCourses','creditsEnrolled','plannedCourses','classesToday','applicationStatus','submittedDate','lastUpdated','checklistItems','nextSteps','documentsNeeded'].includes(k) && (typeof v === 'string' || typeof v === 'number' || typeof v === 'boolean')).length > 0}
               <div class="mt-4 grid grid-cols-1 gap-2 sm:grid-cols-2">
-                {#each Object.entries(ld).filter(([k, v]) => !['currentBalance','dueDate','unreadCount','degreeProgress','creditsEarned','creditsRequired','storageUsed','storageTotal','courses','upcomingAssignments','recentGrades','recentEmails','breakdown','paymentHistory','tickets','locations','nextClass','openTickets','lastTicket','diningDollarsRemaining','diningDollarsSpentThisMonth','currentRoom','roomType','mealPlan','roommates','printBalance','pagesPrinted','campusAlertLevel','registrationWindow','advisorHold','balanceHold','holds','flags','quickLinks','currentGPA','gpa','semesterGPA','enrolledCourses','creditsEnrolled','plannedCourses','classesToday'].includes(k) && (typeof v === 'string' || typeof v === 'number' || typeof v === 'boolean')) as [key, value]}
+                {#each Object.entries(ld).filter(([k, v]) => !['currentBalance','dueDate','unreadCount','degreeProgress','creditsEarned','creditsRequired','storageUsed','storageTotal','courses','upcomingAssignments','recentGrades','recentEmails','breakdown','paymentHistory','tickets','locations','nextClass','openTickets','lastTicket','diningDollarsRemaining','diningDollarsSpentThisMonth','currentRoom','roomType','mealPlan','roommates','printBalance','pagesPrinted','campusAlertLevel','registrationWindow','advisorHold','balanceHold','holds','flags','quickLinks','currentGPA','gpa','semesterGPA','enrolledCourses','creditsEnrolled','plannedCourses','classesToday','applicationStatus','submittedDate','lastUpdated','checklistItems','nextSteps','documentsNeeded'].includes(k) && (typeof v === 'string' || typeof v === 'number' || typeof v === 'boolean')) as [key, value]}
                   <div class="flex items-center justify-between rounded-xl bg-muted px-4 py-3">
                     <span class="text-sm text-text-muted">{key.replace(/([A-Z])/g, ' $1').replace(/^./, (s) => s.toUpperCase())}</span>
                     <span class="text-sm font-extrabold text-text">{typeof value === 'boolean' ? (value ? 'Yes' : 'No') : String(value)}</span>
