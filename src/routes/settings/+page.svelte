@@ -1,6 +1,7 @@
 <script lang="ts">
   import { enhance } from '$app/forms'
   import { getAppState, roleLabels, roles } from '$lib/app-state.svelte'
+  import { resetChecklistStorage } from '$lib/onboarding'
   import type { Activity, Tool } from '$lib/types'
   import {
     Accessibility,
@@ -189,11 +190,7 @@
   }
 
   function restartOnboarding() {
-    if (typeof window === 'undefined') return
-    const userKey = app.userId ?? 'guest'
-    const roleKey = app.effectiveRole
-    localStorage.removeItem(`alfredgo_checklist_${userKey}_${roleKey}`)
-    localStorage.removeItem(`alfredgo_checklist_dismissed_${userKey}_${roleKey}`)
+    resetChecklistStorage(app.userId, app.effectiveRole)
     window.location.href = '/'
   }
 

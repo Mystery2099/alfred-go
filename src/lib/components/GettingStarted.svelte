@@ -1,45 +1,18 @@
 <script lang="ts">
   import { resolve } from '$app/paths'
-  import { CheckCircle2, Circle, ChevronDown, ChevronRight, X, Sparkles, AlertCircle, CreditCard, Mail, GraduationCap, Home, BookOpen, Star, ShieldCheck, ClipboardCheck, FileText, HelpCircle, Landmark } from 'lucide-svelte'
+  import { CheckCircle2, Circle, ChevronDown, ChevronRight, X, Sparkles, AlertCircle, HelpCircle } from 'lucide-svelte'
   import type { AppStore } from '$lib/app-state.svelte'
-  import type { Role } from '$lib/types'
-
-  interface ChecklistItem {
-    id: string
-    label: string
-    description?: string
-    category: string
-    what: string
-    why: string
-    next: string
-    toolId?: string
-    icon: any
-    urgency?: 'high' | 'medium' | 'low'
-  }
-
-  interface RoleOnboarding {
-    title: string
-    subtitle: string
-    focus: string[]
-  }
+  import { checklistDismissedStorageKey, checklistStorageKey, roleChecklists, roleOnboarding } from '$lib/onboarding'
 
   let { app }: { app: AppStore } = $props()
 
   const role = $derived(app.effectiveRole)
   const userId = $derived(app.userId)
 
-  function storageKey() {
-    return `alfredgo_checklist_${userId ?? 'guest'}_${role}`
-  }
-
-  function dismissedKey() {
-    return `alfredgo_checklist_dismissed_${userId ?? 'guest'}_${role}`
-  }
-
   function loadChecked(): Set<string> {
     if (typeof window === 'undefined') return new Set()
     try {
-      const raw = localStorage.getItem(storageKey())
+      const raw = localStorage.getItem(checklistStorageKey(userId, role))
       return raw ? new Set(JSON.parse(raw)) : new Set()
     } catch {
       return new Set()
@@ -49,7 +22,7 @@
   function loadDismissed(): boolean {
     if (typeof window === 'undefined') return false
     try {
-      return localStorage.getItem(dismissedKey()) === 'true'
+      return localStorage.getItem(checklistDismissedStorageKey(userId, role)) === 'true'
     } catch {
       return false
     }
@@ -68,13 +41,13 @@
 
   function saveChecked(ids: Set<string>) {
     if (typeof window !== 'undefined') {
-      localStorage.setItem(storageKey(), JSON.stringify(Array.from(ids)))
+      localStorage.setItem(checklistStorageKey(userId, role), JSON.stringify(Array.from(ids)))
     }
   }
 
   function saveDismissed(dismissed: boolean) {
     if (typeof window !== 'undefined') {
-      localStorage.setItem(dismissedKey(), String(dismissed))
+      localStorage.setItem(checklistDismissedStorageKey(userId, role), String(dismissed))
     }
   }
 
@@ -138,43 +111,9 @@
     return null
   }
 
-  const onboarding: Partial<Record<Role, RoleOnboarding>> = {
-    applicant: {
-      title: 'Your Admissions Path',
-      subtitle: 'Start with application status, then work through aid and scholarship steps.',
-      focus: ['Check missing documents', 'Apply for financial aid', 'Learn the next admissions steps'],
-    },
-    accepted_student: {
-      title: 'Your New Student Setup',
-      subtitle: 'Move from accepted to ready for classes by setting up money, housing, email, and student systems.',
-      focus: ['Confirm money and billing', 'Set up campus accounts', 'Learn where classes and records live'],
-    },
-  }
-
-  const checklists: Partial<Record<Role, ChecklistItem[]>> = {
-    applicant: [
-      { id: 'app-status', label: 'Check My Application Status', category: 'Admissions', description: 'Track your application and missing documents', what: 'Application Status is the place to see where your admissions file stands.', why: 'If a transcript, score, form, or other document is missing, this is usually where you find out first.', next: 'Open it and look for any missing documents or next steps before moving on.', toolId: 'application-status', icon: ClipboardCheck, urgency: 'high' },
-      { id: 'app-fafsa', label: 'Apply for FAFSA', category: 'Financial aid', description: 'Federal student aid application', what: 'FAFSA is the federal financial aid application used to review grants, loans, and work-study eligibility.', why: 'Many aid offers start with FAFSA, so completing it early can prevent delays.', next: 'Open FAFSA, start or continue your application, then come back here when it is submitted.', toolId: 'fafsa', icon: FileText },
-      { id: 'app-tap', label: 'Apply for NYS TAP', category: 'Financial aid', description: 'New York State Tuition Assistance', what: 'TAP is New York State aid for eligible students attending college in New York.', why: 'It may reduce what you owe, but it is separate from FAFSA.', next: 'Open the TAP application and use the same name and details you used on FAFSA.', toolId: 'nys-tap', icon: Landmark },
-      { id: 'app-scholarships', label: 'Search for Scholarships', category: 'Financial aid', description: 'ScholarshipUniverse and more', what: 'ScholarshipUniverse helps match you with scholarship opportunities.', why: 'Scholarships can lower costs and may have deadlines before classes begin.', next: 'Open it, complete your profile, and save scholarships you may qualify for.', toolId: 'scholarshipuniverse', icon: Star },
-      { id: 'app-financial-aid', label: 'Learn How Financial Aid Works', category: 'Financial aid', description: 'FAFSA, TAP, Excelsior Scholarship', what: 'The financial aid page collects the major aid tasks and explanations in one place.', why: 'Applicants often see several aid names at once. This gives you the map before you start clicking around.', next: 'Use it to confirm which aid steps apply to you.', toolId: 'financial-aid', icon: CreditCard },
-      { id: 'app-costs', label: 'Review Costs & Aid Requirements', category: 'Planning', description: 'Estimated costs and required forms', what: 'Cost and aid requirements help you understand the money side before enrollment.', why: 'Knowing estimated costs, deposits, and required forms makes later decisions easier.', next: 'Review the requirements and write down anything you need help understanding.', toolId: 'cost-aid-requirements', icon: BookOpen },
-    ],
-    accepted_student: [
-      { id: 'acc-status', label: 'Check My Application Status', category: 'Enrollment', description: 'Track enrollment steps and missing documents', what: 'Application Status continues to matter after acceptance because it can show enrollment steps and missing items.', why: 'Small missing items can block later setup, housing, or registration tasks.', next: 'Open it first and clear any required items you see.', toolId: 'application-status', icon: ClipboardCheck, urgency: 'high' },
-      { id: 'acc-aid', label: 'Review & Accept Financial Aid Offer', category: 'Money', description: 'Accept or decline your awards', what: 'Your financial aid offer shows the aid Alfred State can apply to your costs.', why: 'Some awards may need a decision before they can be applied.', next: 'Open your offer, review each award, and ask for help before declining anything you do not understand.', toolId: 'financial-aid-offer', icon: CreditCard, urgency: 'high' },
-      { id: 'acc-bill', label: 'Pay Enrollment Deposit / Bill', category: 'Money', description: 'Check balance and payment options', what: 'Billing tools show balances, due dates, payment options, and deposit steps.', why: 'A balance or deposit can affect your ability to move forward.', next: 'Open billing and check whether there is an amount due or a required deposit.', toolId: 'pay-bill', icon: CreditCard, urgency: 'high' },
-      { id: 'acc-housing', label: 'Apply for Housing', category: 'Campus life', description: 'Select room and meal plan', what: 'Housing selection is where residential students handle room and meal plan steps.', why: 'Housing and meal choices can have deadlines and may affect your first semester costs.', next: 'Open housing selection and check whether you need to complete an application.', toolId: 'erez-life', icon: Home, urgency: 'high' },
-      { id: 'acc-email', label: 'Set Up My Alfred State Email', category: 'Accounts', description: 'Outlook email and Microsoft 365', what: 'Your Alfred State email is the main channel for official college messages.', why: 'Important notices about classes, billing, aid, and campus updates may go there.', next: 'Open email, confirm you can sign in, and check for unread setup messages.', toolId: 'email', icon: Mail },
-      { id: 'acc-account', label: 'Learn Bannerweb / Student Account', category: 'Accounts', description: 'Records, billing, registration, and profile details', what: 'Bannerweb is the student records system behind your account, schedule, bill, and registration details.', why: 'You will return to it often, so learning the name now saves confusion later.', next: 'Open Bannerweb and look for your profile, holds, bill, and registration areas.', toolId: 'bannerweb', icon: ShieldCheck },
-      { id: 'acc-learning', label: 'Learn My Learning', category: 'Classes', description: 'Online coursework and class materials', what: 'My Learning is where many courses post materials, assignments, announcements, and grades.', why: 'Once classes begin, this is one of the first places to check each day.', next: 'Open My Learning and confirm whether any courses or orientation materials are visible.', toolId: 'my-learning', icon: BookOpen },
-      { id: 'acc-degreeworks', label: 'Learn DegreeWorks', category: 'Classes', description: 'Degree progress and requirements', what: 'DegreeWorks tracks how your courses apply to degree requirements.', why: 'It helps you understand what you have completed and what still remains.', next: 'Open DegreeWorks and scan the requirement sections without worrying about every detail yet.', toolId: 'degreeworks', icon: GraduationCap },
-    ],
-  }
-
-  const intro = $derived(onboarding[role])
-  const items = $derived(checklists[role] ?? [])
-  const isEligible = $derived(role in checklists)
+  const intro = $derived(roleOnboarding[role])
+  const items = $derived(roleChecklists[role] ?? [])
+  const isEligible = $derived(role in roleChecklists)
   const completedCount = $derived(items.filter((item) => checkedIds.has(item.id)).length)
   const totalCount = $derived(items.length)
   const isComplete = $derived(completedCount === totalCount && totalCount > 0)

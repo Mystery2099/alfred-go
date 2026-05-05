@@ -1,6 +1,7 @@
 <script lang="ts">
   import { getAppState, roleLabels } from '$lib/app-state.svelte'
-  import { ClipboardCheck, GraduationCap, LockKeyhole, LogIn, Mail, ShieldCheck, UserRound } from 'lucide-svelte'
+  import { loginRoleExplainers } from '$lib/onboarding'
+  import { LockKeyhole, LogIn, Mail, UserRound } from 'lucide-svelte'
 
   let { data, form } = $props()
   const app = getAppState()
@@ -21,14 +22,6 @@
       admin: 'AdminGo2026!',
     }
     return passwords[role] || ''
-  }
-
-  const roleExplainers: Record<string, { helper: string; icon: any }> = {
-    applicant: { helper: 'Use this to learn admissions status, missing documents, FAFSA, TAP, and scholarships.', icon: ClipboardCheck },
-    accepted_student: { helper: 'Use this to set up aid, billing, housing, email, Bannerweb, and class systems.', icon: GraduationCap },
-    student: { helper: 'Use this for daily class, account, favorites, grades, dining, and campus resources.', icon: UserRound },
-    staff: { helper: 'Use this to preview student resources and staff-facing tools.', icon: ShieldCheck },
-    admin: { helper: 'Use this to manage prototype resources, categories, and visibility.', icon: ShieldCheck },
   }
 </script>
 
@@ -144,7 +137,7 @@
         </div>
         <div class="grid gap-3 sm:grid-cols-2">
           {#each data.users || [] as user (user.id)}
-            {@const roleInfo = roleExplainers[user.role]}
+            {@const roleInfo = loginRoleExplainers[user.role]}
             {@const RoleIcon = roleInfo?.icon ?? UserRound}
             <button
               class="flex min-h-24 items-start gap-3 rounded-[24px] border border-[var(--app-border)] bg-[var(--app-surface)] p-4 text-left shadow-sm ring-2 ring-transparent transition hover:bg-muted hover:ring-campus-blue/20 active:scale-[0.98]"
