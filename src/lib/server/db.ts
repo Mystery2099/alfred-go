@@ -114,4 +114,11 @@ sqlite.exec(`
   );
 `)
 
+// Add unique index on endpoint for upsert support
+try {
+  sqlite.exec(`create unique index if not exists idx_push_subscriptions_endpoint on push_subscriptions(endpoint);`)
+} catch {
+  // index may already exist
+}
+
 export const db = drizzle(sqlite, { schema })

@@ -43,7 +43,6 @@
     if (app.dataReady) app.applyAccessibility()
   })
 
-  let collapsed = $state(false)
   let navContainerRef: HTMLDivElement | undefined = $state()
   let mobileNavRef: HTMLElement | undefined = $state()
   let searchRef: HTMLInputElement | undefined = $state()
@@ -54,41 +53,61 @@
 
   const recentAnnouncements = $derived(() => app.announcements.slice(0, 5))
 
-  $effect(() => {
-    const _ = $page.url.pathname
+  function updateNavPill() {
     if (!navContainerRef) return
     requestAnimationFrame(() => {
       const activeEl = navContainerRef!.querySelector('.nav-item.active') as HTMLElement | null
       if (activeEl) {
+        const containerRect = navContainerRef!.getBoundingClientRect()
+        const activeRect = activeEl.getBoundingClientRect()
         navPillStyle = {
-          top: `${activeEl.offsetTop}px`,
-          height: `${activeEl.offsetHeight}px`,
+          top: `${activeRect.top - containerRect.top}px`,
+          height: `${activeRect.height}px`,
           opacity: 1,
         }
       } else {
         navPillStyle = { ...navPillStyle, opacity: 0 }
       }
     })
-  })
+  }
 
-  $effect(() => {
-    const _ = $page.url.pathname
+  function updateMobilePill() {
     if (!mobileNavRef) return
     requestAnimationFrame(() => {
       const activeEl = mobileNavRef!.querySelector('.mobile-item.active') as HTMLElement | null
       if (activeEl) {
+        const containerRect = mobileNavRef!.getBoundingClientRect()
+        const activeRect = activeEl.getBoundingClientRect()
         mobilePillStyle = {
-          left: `${activeEl.offsetLeft}px`,
-          width: `${activeEl.offsetWidth}px`,
+          left: `${activeRect.left - containerRect.left}px`,
+          width: `${activeRect.width}px`,
           opacity: 1,
         }
       } else {
         mobilePillStyle = { ...mobilePillStyle, opacity: 0 }
       }
     })
+  }
+
+  $effect(() => {
+    const _ = $page.url.pathname
+    const __ = app.navCollapsed
+    updateNavPill()
+  })
+
+  $effect(() => {
+    const _ = $page.url.pathname
+    updateMobilePill()
   })
 
   onMount(() => {
+    const resizeObserver = new ResizeObserver(() => {
+      updateNavPill()
+      updateMobilePill()
+    })
+    if (navContainerRef) resizeObserver.observe(navContainerRef)
+    if (mobileNavRef) resizeObserver.observe(mobileNavRef)
+
     const systemTheme = window.matchMedia('(prefers-color-scheme: dark)')
     const updateSystemTheme = () => app.applyTheme()
     const handleKeydown = (event: KeyboardEvent) => {
@@ -113,6 +132,7 @@
     window.addEventListener('keydown', handleKeydown)
     window.addEventListener('mousedown', handleClickOutside)
     return () => {
+      resizeObserver.disconnect()
       systemTheme.removeEventListener('change', updateSystemTheme)
       window.removeEventListener('keydown', handleKeydown)
       window.removeEventListener('mousedown', handleClickOutside)
@@ -143,11 +163,11 @@
   <a href="#main" class="sr-only absolute left-0 top-0 z-50 bg-campus-blue px-4 py-2 text-sm font-bold text-white focus:not-sr-only focus:outline-none focus:ring-2 focus:ring-white">
     Skip to main content
   </a>
-  <aside class="fixed left-0 top-0 z-30 hidden h-screen flex-col overflow-y-auto border-r border-border bg-surface py-5 transition-all duration-300 lg:flex {collapsed ? 'w-16 px-3' : 'w-60 px-5'}">
+  <aside class="fixed left-0 top-0 z-30 hidden h-screen flex-col overflow-y-auto border-r border-border bg-surface py-5 transition-all duration-300 lg:flex {app.navCollapsed ? 'w-16 px-3' : 'w-60 px-5'}">
     <!-- Logo -->
-    <a href="/" class="mb-6 flex items-center gap-3 {collapsed ? 'justify-center px-0' : 'px-3'}">
-      <img src="/icons/alfred-state-logo-A.svg" alt="Alfred State" class="{collapsed ? 'h-10 w-10' : 'h-9 w-9'} text-link" />
-      {#if !collapsed}
+    <a href="/" class="mb-6 flex items-center gap-3 {app.navCollapsed ? 'justify-center px-0' : 'px-3'}">
+      <img src="/icons/alfred-state-logo-A.svg" alt="Alfred State" class="{app.navCollapsed ? 'h-10 w-10' : 'h-9 w-9'} text-link" />
+      {#if !app.navCollapsed}
         <span class="text-xl font-extrabold text-link tracking-tight">AlfredGO</span>
       {/if}
     </a>
@@ -159,30 +179,30 @@
         style="top: {navPillStyle.top}; height: {navPillStyle.height}; opacity: {navPillStyle.opacity};"
       ></div>
       <div class="relative z-10 space-y-1">
-        {#if !collapsed}
+        {#if !app.navCollapsed}
           <p class="px-4 pb-1 pt-4 text-[10px] font-extrabold uppercase tracking-wider text-text-soft">Menu</p>
         {/if}
         {#each navItems as [label, href, ItemIcon]}
           <a
             title={label}
             href={href}
-            class="nav-item {$page.url.pathname === href ? 'active' : ''} {collapsed ? 'h-12 justify-center px-0' : ''}"
+            class="nav-item {$page.url.pathname === href ? 'active' : ''} {app.navCollapsed ? 'h-12 justify-center px-0' : ''}"
           >
-            <ItemIcon class={collapsed ? '!h-8 !w-8 shrink-0' : 'h-5 w-5 shrink-0'} strokeWidth={2} />
-            {#if !collapsed}{label}{/if}
+            <ItemIcon class={app.navCollapsed ? '!h-8 !w-8 shrink-0' : 'h-5 w-5 shrink-0'} strokeWidth={2} />
+            {#if !app.navCollapsed}{label}{/if}
           </a>
         {/each}
         {#if isAdmin}
-          {#if !collapsed}
+          {#if !app.navCollapsed}
             <p class="mt-4 px-4 pb-1 text-[10px] font-extrabold uppercase tracking-wider text-text-soft">Administration</p>
           {/if}
           <a
             title="Admin"
             href="/admin"
-            class="nav-item {$page.url.pathname.startsWith('/admin') ? 'active' : ''} {collapsed ? 'h-12 justify-center px-0' : ''}"
+            class="nav-item {$page.url.pathname.startsWith('/admin') ? 'active' : ''} {app.navCollapsed ? 'h-12 justify-center px-0' : ''}"
           >
-            <Grid2X2 class={collapsed ? '!h-8 !w-8 shrink-0' : 'h-5 w-5 shrink-0'} strokeWidth={2} />
-            {#if !collapsed}Admin{/if}
+            <Grid2X2 class={app.navCollapsed ? '!h-8 !w-8 shrink-0' : 'h-5 w-5 shrink-0'} strokeWidth={2} />
+            {#if !app.navCollapsed}Admin{/if}
           </a>
         {/if}
       </div>
@@ -190,11 +210,11 @@
 
     <!-- Collapse toggle -->
     <button
-      aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
-      onclick={() => collapsed = !collapsed}
-      class="mt-3 flex h-8 w-8 items-center justify-center self-end rounded-lg text-text-muted transition-colors hover:bg-muted hover:text-link {collapsed ? 'self-center' : ''}"
+      aria-label={app.navCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+      onclick={() => app.setNavCollapsed(!app.navCollapsed)}
+      class="mt-3 flex h-8 w-8 items-center justify-center self-end rounded-lg text-text-muted transition-colors hover:bg-muted hover:text-link {app.navCollapsed ? 'self-center' : ''}"
     >
-      {#if collapsed}
+      {#if app.navCollapsed}
         <ChevronRight class="h-5 w-5" />
       {:else}
         <ChevronLeft class="h-5 w-5" />
@@ -206,10 +226,10 @@
       <a
         title="Profile"
         href="/profile"
-        class="flex items-center gap-3 rounded-xl px-3 py-2 transition-colors hover:bg-muted {$page.url.pathname === '/profile' ? 'bg-muted text-link' : 'text-text'} {collapsed ? 'justify-center px-0' : ''}"
+        class="flex items-center gap-3 rounded-xl px-3 py-2 transition-colors hover:bg-muted {$page.url.pathname === '/profile' ? 'bg-muted text-link' : 'text-text'} {app.navCollapsed ? 'justify-center px-0' : ''}"
       >
-        <span class="grid shrink-0 place-items-center rounded-full bg-campus-blue font-bold text-white shadow-md {collapsed ? 'h-9 w-9 text-sm' : 'avatar'}">{app.displayName?.charAt(0) || 'A'}</span>
-        {#if !collapsed}
+        <span class="grid shrink-0 place-items-center rounded-full bg-campus-blue font-bold text-white shadow-md {app.navCollapsed ? 'h-9 w-9 text-sm' : 'avatar'}">{app.displayName?.charAt(0) || 'A'}</span>
+        {#if !app.navCollapsed}
           <span>
             <span class="block text-sm font-extrabold text-link">{app.displayName}</span>
             <span class="text-xs font-medium text-text-muted">AlfredGo</span>
@@ -219,10 +239,19 @@
     </div>
   </aside>
 
-  <main id="main" class="pb-24 transition-all duration-300 lg:pb-8 {collapsed ? 'lg:ml-16' : 'lg:ml-60'}">
+  <main id="main" class="pb-24 transition-all duration-300 lg:pb-8 {app.navCollapsed ? 'lg:ml-16' : 'lg:ml-60'}">
     <!-- Header -->
     <header class="sticky top-0 z-20 border-b border-border bg-surface px-4 py-5 lg:px-8">
       <div class="mx-auto flex max-w-6xl items-center gap-4">
+        {#if $page.url.pathname !== '/'}
+          <button
+            onclick={() => history.back()}
+            aria-label="Go back"
+            class="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-muted text-link shadow-sm transition-colors hover:bg-border lg:hidden"
+          >
+            <ChevronLeft class="h-5 w-5" />
+          </button>
+        {/if}
         <div class="min-w-0 flex-1">
           {#if $page.url.pathname === '/'}
             <p class="text-sm text-text-muted">Good evening</p>
@@ -238,7 +267,12 @@
               '/admin/tools': 'Manage tools',
               '/admin/categories': 'Manage categories',
             }}
-            <h1 class="text-xl font-extrabold text-link">{titles[$page.url.pathname] || ''}</h1>
+            {@const path = $page.url.pathname}
+            {@const segments = path.split('/').filter(Boolean)}
+            {@const lastSegment = segments.at(-1) ?? ''}
+            {@const formatted = lastSegment.replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())}
+            {@const title = titles[path] ?? (path.startsWith('/tools/') ? `Tool | ${formatted}` : path.startsWith('/categories/') ? `Category | ${formatted}` : formatted)}
+            <h1 class="text-xl font-extrabold text-link">{title}</h1>
           {/if}
         </div>
         <label class="hidden min-w-0 flex-[1.1] items-center gap-3 rounded-3xl border border-border bg-muted px-4 py-3 shadow-sm transition focus-within:border-campus-blue focus-within:ring-2 focus-within:ring-campus-blue/20 md:flex">

@@ -40,11 +40,30 @@ interface AppState {
   tagFilter: string | 'all'
   noticeFilter: string | 'all'
   openCategoryIds: Set<string>
+  navCollapsed: boolean
   openProfilePanel: string | null
   authError: string | null
 }
 
-const defaultOpenCategoryIds = ['academics', 'financial', 'resources', 'student-life']
+const defaultOpenCategoryIds: string[] = ['academics', 'financial', 'resources', 'student-life']
+
+function loadLocalState(): { openCategoryIds: Set<string>; navCollapsed: boolean } {
+  if (typeof window === 'undefined') {
+    return { openCategoryIds: new Set<string>(defaultOpenCategoryIds), navCollapsed: false }
+  }
+  try {
+    const navCollapsed = localStorage.getItem('alfredgo_nav_collapsed') === 'true'
+    const savedCategories = localStorage.getItem('alfredgo_open_categories')
+    const openCategoryIds = savedCategories
+      ? new Set<string>(JSON.parse(savedCategories) as string[])
+      : new Set<string>(defaultOpenCategoryIds)
+    return { openCategoryIds, navCollapsed }
+  } catch {
+    return { openCategoryIds: new Set<string>(defaultOpenCategoryIds), navCollapsed: false }
+  }
+}
+
+const localState = loadLocalState()
 
 const defaultState: AppState = {
   data: null,
@@ -53,12 +72,13 @@ const defaultState: AppState = {
   categoryFilter: 'all',
   tagFilter: 'all',
   noticeFilter: 'all',
-  openCategoryIds: new Set(defaultOpenCategoryIds),
+  openCategoryIds: localState.openCategoryIds,
+  navCollapsed: localState.navCollapsed,
   openProfilePanel: null,
   authError: null,
 }
 
-let state = $state<AppState>({ ...defaultState, openCategoryIds: new Set(defaultOpenCategoryIds) })
+let state = $state<AppState>({ ...defaultState, openCategoryIds: new Set(localState.openCategoryIds) })
 
 // Derived values
 let currentUser = $derived(
@@ -181,6 +201,7 @@ export function getAppState() {
     get tagFilter() { return state.tagFilter },
     get noticeFilter() { return state.noticeFilter },
     get openCategoryIds() { return state.openCategoryIds },
+    get navCollapsed() { return state.navCollapsed },
     get openProfilePanel() { return state.openProfilePanel },
     get authError() { return state.authError },
 
@@ -243,6 +264,16 @@ export function getAppState() {
         next.add(id)
       }
       state.openCategoryIds = next
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('alfredgo_open_categories', JSON.stringify(Array.from(next)))
+      }
+    },
+
+    setNavCollapsed(collapsed: boolean) {
+      state.navCollapsed = collapsed
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('alfredgo_nav_collapsed', String(collapsed))
+      }
     },
 
     setOpenProfilePanel(open: string | null) {
