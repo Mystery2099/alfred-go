@@ -10,7 +10,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
     const body = await request.json()
     const { endpoint } = body
 
-    if (!endpoint) {
+    if (typeof endpoint !== 'string' || !endpoint.startsWith('https://')) {
       return json({ error: 'Endpoint required' }, { status: 400 })
     }
 

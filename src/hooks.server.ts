@@ -22,5 +22,11 @@ export const handle: Handle = async ({ event, resolve }) => {
     }
   }
 
-  return resolve(event)
+  const response = await resolve(event)
+  response.headers.set('x-content-type-options', 'nosniff')
+  response.headers.set('referrer-policy', 'strict-origin-when-cross-origin')
+  response.headers.set('x-frame-options', 'DENY')
+  response.headers.set('permissions-policy', 'camera=(), microphone=(), geolocation=()')
+  response.headers.set('content-security-policy', "base-uri 'self'; frame-ancestors 'none'; object-src 'none'")
+  return response
 }

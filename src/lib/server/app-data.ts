@@ -11,6 +11,12 @@ const roles = new Set(['applicant', 'accepted_student', 'student', 'staff', 'adm
 const themes = new Set(['system', 'light', 'dark'])
 const announcementTones = new Set(['urgent', 'deadline', 'reminder'])
 const announcementFilters = new Set(['updates', 'deadlines', 'reminders'])
+const activityTypes = new Set(['tool_launch', 'favorite', 'login'])
+const idPattern = /^[a-zA-Z0-9_-]{1,80}$/
+
+function assertId(value: string, label: string) {
+  if (!idPattern.test(value)) error(400, `Invalid ${label}`)
+}
 
 function assertRole(value: unknown): asserts value is User['role'] {
   if (!roles.has(String(value))) error(400, 'Invalid role')
@@ -105,6 +111,7 @@ export function authenticateUser(email: string, password: string): User {
 
 export function addFavorite(user: User | null, toolId: string) {
   const authUser = requireUser(user)
+  assertId(toolId, 'tool id')
   const id = `fav-${authUser.id}-${toolId}`
   db.insert(favorites)
     .values({ id, userId: authUser.id, toolId, createdAt: new Date().toISOString() })
@@ -115,6 +122,7 @@ export function addFavorite(user: User | null, toolId: string) {
 
 export function removeFavorite(user: User | null, toolId: string) {
   const authUser = requireUser(user)
+  assertId(toolId, 'tool id')
   db.delete(favorites).where(and(eq(favorites.userId, authUser.id), eq(favorites.toolId, toolId))).run()
   logEvent('info', 'favorite.removed', { userId: authUser.id, toolId })
 }
@@ -152,6 +160,8 @@ export function savePreference(user: User | null, prefs: Partial<UserPreference>
 
 export function saveTool(user: User | null, tool: Tool) {
   requireAdmin(user)
+  assertId(String(tool.id || ''), 'tool id')
+  assertId(String(tool.categoryId || ''), 'category id')
   tool.url = normalizePublicUrl(String(tool.url || ''))
   tool.audienceRoles.forEach(assertRole)
   const now = new Date().toISOString()
@@ -167,6 +177,7 @@ export function saveTool(user: User | null, tool: Tool) {
 
 export function saveCategory(user: User | null, category: Category) {
   requireAdmin(user)
+  assertId(String(category.id || ''), 'category id')
   const now = new Date().toISOString()
   const existing = db.select().from(categories).where(eq(categories.id, category.id)).all()
   const payload = {
@@ -180,6 +191,7 @@ export function saveCategory(user: User | null, category: Category) {
 
 export function deleteTool(user: User | null, toolId: string) {
   requireAdmin(user)
+  assertId(toolId, 'tool id')
   db.delete(favorites).where(eq(favorites.toolId, toolId)).run()
   db.delete(tools).where(eq(tools.id, toolId)).run()
   logEvent('info', 'tool.deleted', { toolId })
@@ -187,6 +199,7 @@ export function deleteTool(user: User | null, toolId: string) {
 
 export function deleteCategory(user: User | null, categoryId: string) {
   requireAdmin(user)
+  assertId(categoryId, 'category id')
   const toolsInCategory = db.select().from(tools).where(eq(tools.categoryId, categoryId)).all()
   if (toolsInCategory.length > 0) {
     error(400, `Cannot delete category with ${toolsInCategory.length} tool(s). Move or delete them first.`)
@@ -197,6 +210,8 @@ export function deleteCategory(user: User | null, categoryId: string) {
 
 export function saveAnnouncement(user: User | null, announcement: Announcement) {
   requireAdmin(user)
+  assertId(String(announcement.id || ''), 'announcement id')
+  if (announcement.toolId) assertId(announcement.toolId, 'tool id')
   if (!announcementTones.has(announcement.tone)) error(400, 'Invalid announcement tone')
   if (!announcementFilters.has(announcement.filter)) error(400, 'Invalid announcement filter')
   if (announcement.url) announcement.url = normalizePublicUrl(announcement.url)
@@ -222,18 +237,21 @@ export function saveAnnouncement(user: User | null, announcement: Announcement) 
 
 export function deleteAnnouncement(user: User | null, announcementId: string) {
   requireAdmin(user)
+  assertId(announcementId, 'announcement id')
   db.delete(announcements).where(eq(announcements.id, announcementId)).run()
   logEvent('info', 'announcement.deleted', { announcementId })
 }
 
 export function logActivity(userId: string, type: Activity['type'], toolId?: string, toolName?: string) {
+  if (!activityTypes.has(type)) error(400, 'Invalid activity type')
+  if (toolId) assertId(toolId, 'tool id')
   const id = `act-${userId}-${Date.now()}`
   db.insert(activities).values({
     id,
     userId,
     type,
     toolId: toolId ?? null,
-    toolName: toolName ?? null,
+    toolName: toolName ? toolName.slice(0, 120) : null,
     createdAt: new Date().toISOString(),
   }).run()
 }

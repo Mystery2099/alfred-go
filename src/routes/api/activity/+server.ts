@@ -8,7 +8,7 @@ export const POST: RequestHandler = async ({ request, locals }) => {
     const user = locals.user
     if (!user) return json({ error: 'Unauthorized' }, { status: 401 })
     const { type, toolId, toolName } = await request.json()
-    logActivity(user.id, type, toolId, toolName)
+    logActivity(user.id, type, toolId ? String(toolId) : undefined, toolName ? String(toolName) : undefined)
     return json({ success: true })
   } catch (error) {
     return jsonApiError(error)

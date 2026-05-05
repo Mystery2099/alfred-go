@@ -10,7 +10,14 @@ export const POST: RequestHandler = async ({ request, locals }) => {
     const body = await request.json()
     const { subscription } = body
 
-    if (!subscription || !subscription.endpoint || !subscription.keys) {
+    if (
+      !subscription ||
+      typeof subscription.endpoint !== 'string' ||
+      !subscription.endpoint.startsWith('https://') ||
+      !subscription.keys ||
+      typeof subscription.keys.p256dh !== 'string' ||
+      typeof subscription.keys.auth !== 'string'
+    ) {
       return json({ error: 'Invalid subscription payload' }, { status: 400 })
     }
 
