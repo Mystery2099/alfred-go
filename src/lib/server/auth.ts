@@ -1,5 +1,8 @@
 import { pbkdf2Sync, randomBytes, timingSafeEqual } from 'node:crypto'
+import { eq } from 'drizzle-orm'
 import type { Role } from '../types'
+import { db } from './db'
+import { userCredentials } from './schema'
 
 const iterations = 120000
 const keyLength = 32
@@ -34,6 +37,26 @@ export function verifyPassword(password: string, storedHash: string) {
   const stored = Buffer.from(hash, 'hex')
   const computed = Buffer.from(candidate, 'hex')
   return stored.length === computed.length && timingSafeEqual(stored, computed)
+}
+
+export function changeUserPassword(userId: string, currentPassword: string, newPassword: string) {
+  const [credential] = db.select().from(userCredentials)
+    .where(eq(userCredentials.userId, userId)).all()
+
+  if (!credential || !verifyPassword(currentPassword, credential.passwordHash)) {
+    return { ok: false, error: 'Current password is incorrect.' }
+  }
+
+  if (newPassword.length < 8) {
+    return { ok: false, error: 'Password must be at least 8 characters.' }
+  }
+
+  db.update(userCredentials)
+    .set({ passwordHash: hashPassword(newPassword), updatedAt: new Date().toISOString() })
+    .where(eq(userCredentials.userId, userId))
+    .run()
+
+  return { ok: true }
 }
 
 export const sessionCookieOptions = {

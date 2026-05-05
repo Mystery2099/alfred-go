@@ -151,6 +151,7 @@ export function savePreference(user: User | null, prefs: Partial<UserPreference>
     theme: prefs.theme ?? current?.theme ?? 'system',
     preferredRoleView: prefs.preferredRoleView ?? current?.preferredRoleView ?? authUser.role,
     notificationSettings: prefs.notificationSettings ?? current?.notificationSettings ?? null,
+    accessibilitySettings: prefs.accessibilitySettings ?? current?.accessibilitySettings ?? null,
     createdAt: current?.createdAt ?? now,
     updatedAt: now,
   }
@@ -240,6 +241,12 @@ export function deleteAnnouncement(user: User | null, announcementId: string) {
   assertId(announcementId, 'announcement id')
   db.delete(announcements).where(eq(announcements.id, announcementId)).run()
   logEvent('info', 'announcement.deleted', { announcementId })
+}
+
+export function clearUserActivities(user: User | null) {
+  const authUser = requireUser(user)
+  db.delete(activities).where(eq(activities.userId, authUser.id)).run()
+  logEvent('info', 'activities.cleared', { userId: authUser.id })
 }
 
 export function logActivity(userId: string, type: Activity['type'], toolId?: string, toolName?: string) {

@@ -110,6 +110,10 @@ let currentPreference = $derived(() => {
   return state.data.preferences.find((p) => p.userId === state.userId) || null
 })
 
+let accessibilitySettings = $derived(() => {
+  return currentPreference()?.accessibilitySettings || { reducedMotion: false, highContrast: false, compactDensity: false }
+})
+
 let announcements = $derived(() => {
   if (!state.data) return []
   return state.data.announcements.filter((a) => a.isActive).sort((a, b) => a.sortOrder - b.sortOrder)
@@ -196,6 +200,7 @@ export function getAppState() {
     get dataReady() { return !!state.data },
     get announcements() { return announcements() },
     get recentActivities() { return recentActivities() },
+    get accessibilitySettings() { return accessibilitySettings() },
 
     // Functions
     categoryName,
@@ -265,6 +270,14 @@ export function getAppState() {
           root.classList.add('light')
         }
       }
+    },
+
+    applyAccessibility(settings?: { reducedMotion?: boolean; highContrast?: boolean; compactDensity?: boolean }) {
+      const root = document.documentElement
+      const s = settings || currentPreference()?.accessibilitySettings || { reducedMotion: false, highContrast: false, compactDensity: false }
+      root.classList.toggle('reduce-motion', !!s.reducedMotion)
+      root.classList.toggle('high-contrast', !!s.highContrast)
+      root.classList.toggle('compact-density', !!s.compactDensity)
     },
 
     launchTool(tool: Tool) {

@@ -1,6 +1,7 @@
 import type { Actions } from '@sveltejs/kit'
 import type { Announcement, Category, Role, Tool, UserPreference } from '$lib/types'
-import { deleteAnnouncement, deleteCategory, deleteTool, logActivity, normalizePublicUrl, saveAnnouncement, saveCategory, savePreference, saveTool, toggleFavorite } from './app-data'
+import { changeUserPassword } from './auth'
+import { clearUserActivities, deleteAnnouncement, deleteCategory, deleteTool, logActivity, normalizePublicUrl, saveAnnouncement, saveCategory, savePreference, saveTool, toggleFavorite } from './app-data'
 
 export const favoriteActions = {
   toggleFavorite: async ({ request, locals }) => {
@@ -23,6 +24,7 @@ export const preferenceActions = {
     const theme = formData.get('theme')
     const preferredRoleView = formData.get('preferredRoleView')
     const notificationSettings = formData.get('notificationSettings')
+    const accessibilitySettings = formData.get('accessibilitySettings')
     if (theme) prefs.theme = String(theme) as UserPreference['theme']
     if (preferredRoleView) prefs.preferredRoleView = String(preferredRoleView) as Role
     if (notificationSettings) {
@@ -32,7 +34,51 @@ export const preferenceActions = {
         // ignore invalid JSON
       }
     }
+    if (accessibilitySettings) {
+      try {
+        prefs.accessibilitySettings = JSON.parse(String(accessibilitySettings))
+      } catch {
+        // ignore invalid JSON
+      }
+    }
     savePreference(locals.user, prefs)
+    return { ok: true }
+  },
+  changePassword: async ({ request, locals }) => {
+    const formData = await request.formData()
+    const currentPassword = String(formData.get('currentPassword') || '')
+    const newPassword = String(formData.get('newPassword') || '')
+    const confirmPassword = String(formData.get('confirmPassword') || '')
+
+    if (!locals.user) return { ok: false, error: 'Authentication required.' }
+    if (!currentPassword || !newPassword) return { ok: false, error: 'All fields are required.' }
+    if (newPassword !== confirmPassword) return { ok: false, error: 'New passwords do not match.' }
+
+    const result = changeUserPassword(locals.user.id, currentPassword, newPassword)
+    return result
+  },
+  resetPreferences: async ({ locals }) => {
+    if (!locals.user) return { ok: false, error: 'Authentication required.' }
+    savePreference(locals.user, {
+      theme: 'system',
+      preferredRoleView: locals.user.role,
+      notificationSettings: {
+        'Academic deadlines': true,
+        'Campus service updates': true,
+        'Financial aid tasks': true,
+        'Favorite resource changes': true,
+      },
+      accessibilitySettings: {
+        reducedMotion: false,
+        highContrast: false,
+        compactDensity: false,
+      },
+    })
+    return { ok: true }
+  },
+  clearActivities: async ({ locals }) => {
+    if (!locals.user) return { ok: false, error: 'Authentication required.' }
+    clearUserActivities(locals.user)
     return { ok: true }
   },
 } satisfies Actions

@@ -97,6 +97,12 @@ try {
   // column may already exist
 }
 
+try {
+  sqlite.exec(`ALTER TABLE user_preferences ADD COLUMN accessibility_settings TEXT;`)
+} catch {
+  // column may already exist
+}
+
 sqlite.exec(`
   create table if not exists push_subscriptions (
     id text primary key,

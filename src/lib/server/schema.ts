@@ -64,6 +64,7 @@ export const userPreferences = sqliteTable('user_preferences', {
   theme: text('theme').notNull(),
   preferredRoleView: text('preferred_role_view'),
   notificationSettings: text('notification_settings', { mode: 'json' }).$type<Record<string, boolean>>(),
+  accessibilitySettings: text('accessibility_settings', { mode: 'json' }).$type<Record<string, boolean>>(),
   createdAt: text('created_at').notNull(),
   updatedAt: text('updated_at').notNull()
 })

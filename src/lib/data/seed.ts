@@ -226,6 +226,11 @@ export const preferences: UserPreference[] = users.map((user) => ({
     'Financial aid tasks': true,
     'Favorite resource changes': true,
   },
+  accessibilitySettings: {
+    reducedMotion: false,
+    highContrast: false,
+    compactDensity: false,
+  },
   createdAt: now,
   updatedAt: now
 }))

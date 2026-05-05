@@ -41,6 +41,12 @@ export type Favorite = {
   createdAt: string
 }
 
+export type AccessibilitySettings = {
+  reducedMotion?: boolean
+  highContrast?: boolean
+  compactDensity?: boolean
+}
+
 export type UserPreference = {
   id: string
   userId: string
@@ -48,6 +54,7 @@ export type UserPreference = {
   theme: 'system' | 'light' | 'dark'
   preferredRoleView?: Role
   notificationSettings?: Record<string, boolean>
+  accessibilitySettings?: AccessibilitySettings
   createdAt: string
   updatedAt: string
 }
