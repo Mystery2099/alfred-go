@@ -1,0 +1,378 @@
+<script lang="ts">
+  import { goto } from '$app/navigation'
+  import { page } from '$app/stores'
+  import { createHotkey } from '@tanstack/svelte-hotkeys'
+  import {
+    Bell,
+    ExternalLink,
+    FileText,
+    FolderOpen,
+    Heart,
+    Home,
+    LayoutDashboard,
+    Search,
+    Settings,
+    ShieldCheck,
+    Sparkles,
+    Star,
+    User,
+    Wrench,
+    X
+  } from 'lucide-svelte'
+  import { getAppState } from '$lib/app-state.svelte'
+  import type { Announcement, Category, Tool } from '$lib/types'
+
+  interface Props {
+    open: boolean
+    onClose: () => void
+  }
+
+  let { open = $bindable(false), onClose }: Props = $props()
+
+  const app = getAppState()
+
+  let query = $state('')
+  let selectedIndex = $state(0)
+  let inputRef = $state<HTMLInputElement | undefined>(undefined)
+  let listRef = $state<HTMLDivElement | undefined>(undefined)
+
+  type ToolResult = { type: 'tool'; data: Tool; icon: any }
+  type PageResult = { type: 'page'; name: string; href: string; icon: any }
+  type AnnouncementResult = { type: 'announcement'; data: Announcement; icon: any }
+  type CategoryResult = { type: 'category'; data: Category; icon: any }
+  type ResultItem = ToolResult | PageResult | AnnouncementResult | CategoryResult
+
+  const pageItems: PageResult[] = [
+    { type: 'page', name: 'Home', href: '/', icon: Home },
+    { type: 'page', name: 'Browse', href: '/browse', icon: Search },
+    { type: 'page', name: 'Favorites', href: '/favorites', icon: Star },
+    { type: 'page', name: 'Announcements', href: '/announcements', icon: Bell },
+    { type: 'page', name: 'Profile', href: '/profile', icon: User },
+    { type: 'page', name: 'Settings', href: '/settings', icon: Settings },
+    ...(app.isAdmin ? [{ type: 'page' as const, name: 'Admin', href: '/admin', icon: ShieldCheck }] : []),
+  ]
+
+  function getRecentTools(): Tool[] {
+    if (!app.data) return []
+    const launched = app.recentActivities
+      .filter((a) => a.type === 'tool_launch' && a.toolId)
+      .map((a) => app.data!.tools.find((t) => t.id === a.toolId))
+      .filter((t): t is Tool => !!t && t.isActive && app.roleCanSeeTool(app.effectiveRole, t))
+    const seen = new Set<string>()
+    const unique: Tool[] = []
+    for (const tool of launched) {
+      if (!seen.has(tool.id)) {
+        seen.add(tool.id)
+        unique.push(tool)
+      }
+    }
+    return unique.slice(0, 5)
+  }
+
+  let results = $derived.by(() => {
+    if (!app.data) return []
+    const q = query.toLowerCase().trim()
+    if (!q) {
+      const recent = getRecentTools()
+      const recentItems: ResultItem[] = recent.map((t) => ({
+        type: 'tool',
+        data: t,
+        icon: Wrench,
+      }))
+      const announcementItems: ResultItem[] = app.announcements
+        .slice(0, 3)
+        .map((a) => ({ type: 'announcement', data: a, icon: FileText }))
+      return [...recentItems, ...announcementItems, ...(pageItems as ResultItem[])]
+    }
+
+    const items: ResultItem[] = []
+
+    const matchedTools = app.visibleTools
+      .filter((tool) => {
+        const cat = app.categories.find((c) => c.id === tool.categoryId)
+        const searchable = [tool.name, tool.description, cat?.name || '', ...tool.tags]
+          .join(' ')
+          .toLowerCase()
+        return searchable.includes(q)
+      })
+      .slice(0, 5)
+    items.push(...matchedTools.map((t) => ({ type: 'tool' as const, data: t, icon: Wrench })))
+
+    const matchedAnnouncements = app.announcements
+      .filter(
+        (a) =>
+          a.title.toLowerCase().includes(q) || a.body.toLowerCase().includes(q)
+      )
+      .slice(0, 3)
+    items.push(
+      ...matchedAnnouncements.map((a) => ({
+        type: 'announcement' as const,
+        data: a,
+        icon: FileText,
+      }))
+    )
+
+    const matchedPages = pageItems.filter((p) => p.name.toLowerCase().includes(q))
+    items.push(...matchedPages)
+
+    const matchedCategories = app.categories
+      .filter((c) => c.name.toLowerCase().includes(q))
+      .map((c) => ({ type: 'category' as const, data: c, icon: FolderOpen }))
+    items.push(...matchedCategories)
+
+    return items
+  })
+
+  let hasQuery = $derived(query.trim().length > 0)
+  let hasResults = $derived(results.length > 0)
+
+  $effect(() => {
+    if (open) {
+      query = ''
+      selectedIndex = 0
+      requestAnimationFrame(() => inputRef?.focus())
+    }
+  })
+
+  $effect(() => {
+    const _ = results.length
+    selectedIndex = 0
+  })
+
+  function handleSelect(item: ResultItem, launch = false) {
+    onClose()
+    if (item.type === 'tool') {
+      if (launch) {
+        app.launchTool(item.data)
+      } else {
+        goto(`/tools/${item.data.id}`)
+      }
+    } else if (item.type === 'page') {
+      goto(item.href)
+    } else if (item.type === 'announcement') {
+      const a = item.data
+      if (a.url) {
+        window.open(a.url, '_blank', 'noopener,noreferrer')
+      } else if (a.toolId) {
+        goto(`/tools/${a.toolId}`)
+      } else {
+        goto('/announcements')
+      }
+    } else if (item.type === 'category') {
+      goto(`/categories/${item.data.id}`)
+    }
+  }
+
+  function handleKeydown(event: KeyboardEvent) {
+    if (event.key === 'ArrowDown') {
+      event.preventDefault()
+      selectedIndex = (selectedIndex + 1) % results.length
+      scrollSelectedIntoView()
+    } else if (event.key === 'ArrowUp') {
+      event.preventDefault()
+      selectedIndex = (selectedIndex - 1 + results.length) % results.length
+      scrollSelectedIntoView()
+    } else if (event.key === 'Enter') {
+      event.preventDefault()
+      const item = results[selectedIndex]
+      if (item) {
+        handleSelect(item, event.metaKey || event.ctrlKey)
+      }
+    } else if (event.key === 'Escape') {
+      event.preventDefault()
+      onClose()
+    }
+  }
+
+  function scrollSelectedIntoView() {
+    requestAnimationFrame(() => {
+      const el = listRef?.querySelector(`[data-index="${selectedIndex}"]`)
+      if (el) {
+        el.scrollIntoView({ block: 'nearest', behavior: 'smooth' })
+      }
+    })
+  }
+
+  function groupLabel(item: ResultItem): string {
+    switch (item.type) {
+      case 'tool':
+        return 'Tools'
+      case 'page':
+        return 'Pages'
+      case 'announcement':
+        return 'Announcements'
+      case 'category':
+        return 'Categories'
+    }
+  }
+
+  function formatResultsForDisplay(items: ResultItem[]): { label: string; rows: { item: ResultItem; index: number }[] }[] {
+    const groups: { label: string; rows: { item: ResultItem; index: number }[] }[] = []
+    let currentLabel = ''
+    let currentRows: { item: ResultItem; index: number }[] = []
+    for (let i = 0; i < items.length; i++) {
+      const label = groupLabel(items[i])
+      if (label !== currentLabel) {
+        if (currentRows.length > 0) {
+          groups.push({ label: currentLabel, rows: currentRows })
+        }
+        currentLabel = label
+        currentRows = []
+      }
+      currentRows.push({ item: items[i], index: i })
+    }
+    if (currentRows.length > 0) {
+      groups.push({ label: currentLabel, rows: currentRows })
+    }
+    return groups
+  }
+
+  let groupedResults = $derived(formatResultsForDisplay(results))
+</script>
+
+<svelte:window onkeydown={(e) => {
+  if (e.key === '/' && !open) {
+    const target = e.target as HTMLElement | null
+    const isTyping = target && ['INPUT', 'TEXTAREA', 'SELECT'].includes(target.tagName)
+    if (!isTyping) {
+      e.preventDefault()
+      open = true
+    }
+  }
+}} />
+
+{#if open}
+  <!-- svelte-ignore a11y_click_events_have_key_events -->
+  <!-- svelte-ignore a11y_no_static_element_interactions -->
+  <div
+    class="fixed inset-0 z-[60] flex items-start justify-center bg-black/40 px-4 pt-[15vh] backdrop-blur-sm"
+    onclick={(e) => { if (e.target === e.currentTarget) onClose() }}
+  >
+    <div class="w-full max-w-xl overflow-hidden rounded-2xl border border-border bg-surface shadow-2xl">
+      <!-- Search input -->
+      <div class="flex items-center gap-3 border-b border-border px-4 py-3">
+        <Search class="h-5 w-5 shrink-0 text-text-muted" />
+        <input
+          bind:this={inputRef}
+          bind:value={query}
+          onkeydown={handleKeydown}
+          class="w-full bg-transparent text-sm outline-none placeholder:text-text-muted"
+          placeholder="Search tools, pages, announcements..."
+          maxlength="100"
+        />
+        {#if query}
+          <button onclick={() => { query = ''; inputRef?.focus() }} class="rounded-lg p-1 text-text-muted hover:bg-muted hover:text-link" aria-label="Clear search">
+            <X class="h-4 w-4" />
+          </button>
+        {/if}
+        <kbd class="hidden rounded-md border border-border bg-muted px-1.5 py-0.5 text-[10px] font-bold text-text-muted sm:inline-block">ESC</kbd>
+      </div>
+
+      <!-- Results -->
+      <div bind:this={listRef} class="max-h-[50vh] overflow-y-auto visible-scrollbar">
+        {#if !hasResults}
+          <div class="px-4 py-8 text-center">
+            <p class="text-sm font-semibold text-text-muted">No results found</p>
+            <p class="mt-1 text-xs text-text-soft">Try a different search term</p>
+          </div>
+          {#if getRecentTools().length > 0 || app.announcements.length > 0}
+            <div class="border-t border-border px-4 py-2">
+              <p class="text-[10px] font-extrabold uppercase tracking-wider text-text-soft">Recent</p>
+            </div>
+            {@const recent = getRecentTools().map((t) => ({ type: 'tool' as const, data: t, icon: Wrench }))}
+            {@const recentAnnouncements = app.announcements.slice(0, 3).map((a) => ({ type: 'announcement' as const, data: a, icon: FileText }))}
+            {@const recentItems = [...recent, ...recentAnnouncements]}
+            {#each recentItems as item, i}
+              <button
+                data-index={i}
+                class="flex w-full items-center gap-3 px-4 py-2.5 text-left transition-colors hover:bg-muted {selectedIndex === i ? 'bg-selected' : ''}"
+                onclick={() => handleSelect(item)}
+                onmouseenter={() => selectedIndex = i}
+              >
+                <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-muted text-link">
+                  {#if item.type === 'tool'}
+                    <Wrench class="h-4 w-4" />
+                  {:else}
+                    <FileText class="h-4 w-4" />
+                  {/if}
+                </span>
+                <div class="min-w-0 flex-1">
+                  <p class="truncate text-sm font-semibold text-link">{item.type === 'tool' ? item.data.name : item.data.title}</p>
+                  <p class="truncate text-xs text-text-muted">{item.type === 'tool' ? item.data.description : item.data.body}</p>
+                </div>
+                {#if item.type === 'tool'}
+                  <span class="hidden shrink-0 text-[10px] font-bold text-text-soft sm:inline">Go</span>
+                {/if}
+              </button>
+            {/each}
+          {/if}
+        {:else}
+          {#each groupedResults as group}
+            <div class="px-4 py-2">
+              <p class="text-[10px] font-extrabold uppercase tracking-wider text-text-soft">{group.label}</p>
+            </div>
+            {#each group.rows as { item, index }}
+              <button
+                data-index={index}
+                class="group flex w-full items-center gap-3 px-4 py-2.5 text-left transition-colors hover:bg-muted {selectedIndex === index ? 'bg-selected' : ''}"
+                onclick={() => handleSelect(item)}
+                onmouseenter={() => selectedIndex = index}
+              >
+                <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-muted text-link">
+                  {#if item.type === 'tool'}
+                    <Wrench class="h-4 w-4" />
+                  {:else if item.type === 'page'}
+                    <item.icon class="h-4 w-4" />
+                  {:else if item.type === 'announcement'}
+                    <FileText class="h-4 w-4" />
+                  {:else if item.type === 'category'}
+                    <FolderOpen class="h-4 w-4" />
+                  {/if}
+                </span>
+                <div class="min-w-0 flex-1">
+                  <p class="truncate text-sm font-semibold text-link">
+                    {#if item.type === 'tool'}
+                      {item.data.name}
+                    {:else if item.type === 'page'}
+                      {item.name}
+                    {:else if item.type === 'announcement'}
+                      {item.data.title}
+                    {:else if item.type === 'category'}
+                      {item.data.name}
+                    {/if}
+                  </p>
+                  <p class="truncate text-xs text-text-muted">
+                    {#if item.type === 'tool'}
+                      {app.categoryName(item.data.categoryId)} · {item.data.tags.slice(0, 3).join(', ')}
+                    {:else if item.type === 'page'}
+                      Navigate to page
+                    {:else if item.type === 'announcement'}
+                      {item.data.body}
+                    {:else if item.type === 'category'}
+                      {item.data.description || 'Browse category'}
+                    {/if}
+                  </p>
+                </div>
+                {#if item.type === 'tool'}
+                  <span class="hidden shrink-0 text-[10px] font-bold text-text-soft transition-colors group-hover:text-link sm:inline" title="Cmd+Enter to launch">Launch</span>
+                {/if}
+              </button>
+            {/each}
+          {/each}
+        {/if}
+      </div>
+
+      <!-- Footer hints -->
+      <div class="flex items-center justify-between border-t border-border bg-muted px-4 py-2 text-[10px] font-bold text-text-soft">
+        <div class="flex items-center gap-3">
+          <span class="flex items-center gap-1"><kbd class="rounded border border-border bg-surface px-1">↑↓</kbd> Navigate</span>
+          <span class="flex items-center gap-1"><kbd class="rounded border border-border bg-surface px-1">Enter</kbd> Select</span>
+          {#if results.some((r) => r.type === 'tool')}
+            <span class="hidden items-center gap-1 sm:flex"><kbd class="rounded border border-border bg-surface px-1">⌘+Enter</kbd> Launch</span>
+          {/if}
+        </div>
+        <span class="hidden sm:inline">{results.length} result{results.length === 1 ? '' : 's'}</span>
+      </div>
+    </div>
+  </div>
+{/if}

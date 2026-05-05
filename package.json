@@ -29,6 +29,8 @@
 		"vite-plugin-pwa": "^1.2.0"
 	},
 	"dependencies": {
+		"@tanstack/hotkeys": "^0.8.0",
+		"@tanstack/svelte-hotkeys": "^0.10.0",
 		"better-sqlite3": "^12.9.0",
 		"drizzle-orm": "^0.45.2",
 		"lucide-svelte": "^1.0.1",

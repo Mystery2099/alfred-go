@@ -4,13 +4,19 @@
   import { page } from '$app/stores'
   import { getAppState } from '$lib/app-state.svelte'
   import { onMount } from 'svelte'
+  import { createHotkey } from '@tanstack/svelte-hotkeys'
   import {
     Bell, ChevronLeft, ChevronRight, Clock3, Grid2X2,
     Home, Search, Settings, Star, User, X
   } from 'lucide-svelte'
+  import CommandBar from '$lib/components/CommandBar.svelte'
 
   let { children, data } = $props()
   const app = getAppState()
+  let commandBarOpen = $state(false)
+
+  createHotkey('Mod+K', () => { commandBarOpen = true })
+  createHotkey('/', () => { commandBarOpen = true })
 
   $effect.pre(() => {
     app.hydrate(data)
@@ -45,7 +51,6 @@
 
   let navContainerRef: HTMLDivElement | undefined = $state()
   let mobileNavRef: HTMLElement | undefined = $state()
-  let searchRef: HTMLInputElement | undefined = $state()
   let notifRef: HTMLDivElement | undefined = $state()
   let notifOpen = $state(false)
   let navPillStyle = $state({ top: '0px', height: '0px', opacity: 0 })
@@ -111,14 +116,7 @@
     const systemTheme = window.matchMedia('(prefers-color-scheme: dark)')
     const updateSystemTheme = () => app.applyTheme()
     const handleKeydown = (event: KeyboardEvent) => {
-      const target = event.target as HTMLElement | null
-      const isTyping = target && ['INPUT', 'TEXTAREA', 'SELECT'].includes(target.tagName)
-      if (event.key === '/' && !isTyping) {
-        event.preventDefault()
-        searchRef?.focus()
-      }
-      if (event.key === 'Escape') {
-        searchRef?.blur()
+      if (event.key === 'Escape' && !commandBarOpen) {
         app.setQuery('')
         notifOpen = false
       }
@@ -141,14 +139,14 @@
 
   const navItems = [
     ['Home', '/', Home],
-    ['Search', '/search', Search],
+    ['Browse', '/browse', Search],
     ['Favorites', '/favorites', Star],
     ['Settings', '/settings', Settings],
   ] as const
 
   const mobileItems = [
     ['Home', '/', Home],
-    ['Search', '/search', Search],
+    ['Browse', '/browse', Search],
     ['Favorites', '/favorites', Star],
     ['Profile', '/profile', User],
   ] as const
@@ -258,7 +256,7 @@
             <h1 class="text-2xl font-extrabold leading-none text-link">{app.displayName || 'AlfredGO'}</h1>
           {:else}
             {@const titles: Record<string, string> = {
-              '/search': 'Search',
+              '/browse': 'Browse',
               '/favorites': 'Favorites',
               '/profile': 'Profile',
               '/settings': 'Settings',
@@ -275,10 +273,13 @@
             <h1 class="text-xl font-extrabold text-link">{title}</h1>
           {/if}
         </div>
-        <label class="hidden min-w-0 flex-[1.1] items-center gap-3 rounded-3xl border border-border bg-muted px-4 py-3 shadow-sm transition focus-within:border-campus-blue focus-within:ring-2 focus-within:ring-campus-blue/20 md:flex">
-          <Search class="h-5 w-5 text-text-muted" />
-          <input bind:this={searchRef} value={app.query} oninput={(e) => app.setQuery(e.currentTarget.value)} class="w-full bg-transparent text-sm outline-none" placeholder="Search resources..." maxlength="100" />
-        </label>
+        <button
+          aria-label="Open command palette"
+          onclick={() => commandBarOpen = true}
+          class="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-muted text-link shadow-sm transition-colors hover:bg-border md:h-11 md:w-11"
+        >
+          <Search class="h-5 w-5" />
+        </button>
         <div class="relative" bind:this={notifRef}>
           <button
             aria-label="Notifications"
@@ -349,6 +350,8 @@
       {@render children()}
     </div>
   </main>
+
+  <CommandBar bind:open={commandBarOpen} onClose={() => commandBarOpen = false} />
 
   <!-- Mobile Nav -->
   <nav class="fixed bottom-0 left-0 right-0 z-40 grid grid-cols-4 border-t border-border bg-surface px-2 py-2 shadow-[var(--app-shadow)] lg:hidden" bind:this={mobileNavRef}>

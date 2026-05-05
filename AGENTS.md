@@ -117,6 +117,4 @@ This is a SvelteKit app using the Node adapter. There is no separate Express API
 
 ## TODO
 
-- replace search bar in header with search button that opens a command bar of sorts
-- figure out whether that button should be in the header or not on mobile
 - add hotkeys with tanstack hotkeys

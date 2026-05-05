@@ -282,7 +282,7 @@
       <div class="flex flex-wrap gap-2 px-1">
         {#each tool.tags as tag}
           <a
-            href="/search"
+            href="/browse"
             onclick={() => app.setTagFilter(tag)}
             class="inline-flex items-center gap-1.5 rounded-lg bg-surface px-3.5 py-2 text-xs font-extrabold text-text-muted shadow-sm ring-1 ring-border/60 transition hover:bg-muted hover:text-link"
           >
