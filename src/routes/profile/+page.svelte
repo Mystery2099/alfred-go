@@ -9,8 +9,10 @@
   const accessNotes = $derived([
     ['Signed in as', user?.email || 'No email on file'],
     ['Account role', roleLabels[app.currentRole]],
-    ['Viewing resources as', roleLabels[app.effectiveRole]],
-    ['Visible resources', `${app.visibleTools.length} tools`],
+    ...(app.isAdmin ? [
+      ['Viewing resources as', roleLabels[app.effectiveRole]],
+      ['Visible resources', `${app.visibleTools.length} tools`],
+    ] : []),
   ])
 
 </script>

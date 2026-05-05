@@ -1,34 +1,36 @@
 <script lang="ts">
   import { getAppState } from '$lib/app-state.svelte'
   import Announcements from '$lib/components/Announcements.svelte'
+  import DashboardSection from '$lib/components/DashboardSection.svelte'
   import Icon from '$lib/components/shared/Icon.svelte'
   import RecentActivity from '$lib/components/RecentActivity.svelte'
   import SkeletonSection from '$lib/components/shared/SkeletonSection.svelte'
   import ToolSections from '$lib/components/ToolSections.svelte'
+  import { ChevronRight } from 'lucide-svelte'
 
   const app = getAppState()
 
   const favoriteTools = $derived(app.visibleTools.filter((tool) => app.isFavorite(tool.id)))
-  const featured = $derived(app.visibleTools.filter((tool) => tool.isFeatured))
-  const quickTools = $derived((favoriteTools.length ? favoriteTools : featured).slice(0, 6))
-  const quickLabel = $derived(favoriteTools.length ? 'Pinned' : 'Quick Access')
+  const quickTools = $derived(favoriteTools.slice(0, 3))
 </script>
 
 {#if !app.dataReady}
   <section class="mx-auto max-w-6xl space-y-8">
     <SkeletonSection count={3} title="What's Happening" />
-    <SkeletonSection count={6} title="Quick Access" />
+    <SkeletonSection count={3} title="Favorites" />
     <SkeletonSection count={3} title="Recent" />
     <SkeletonSection count={4} title="All Resources" />
   </section>
 {:else}
   <section class="mx-auto max-w-6xl space-y-8">
-    <Announcements {app} limit={3} />
+    <!-- Announcements -->
+    <DashboardSection title="What's Happening" sectionKey="announcements" count={app.announcements.length}>
+      <Announcements {app} limit={3} />
+    </DashboardSection>
 
-    <!-- Quick Access / Pinned -->
-    <section>
-      <p class="mb-3 text-xs font-extrabold uppercase tracking-[0.18em] text-link">{quickLabel}</p>
-      {#if quickTools.length > 0}
+    <!-- Favorites -->
+    {#if quickTools.length > 0}
+      <DashboardSection title="Favorites" sectionKey="favorites" count={favoriteTools.length}>
         <div class="divide-y divide-border rounded-2xl bg-surface shadow-sm ring-1 ring-border overflow-hidden">
           {#each quickTools as tool}
             <a
@@ -46,20 +48,23 @@
             </a>
           {/each}
         </div>
-      {:else}
-        <p class="text-sm text-text-muted">No tools available.</p>
-      {/if}
-    </section>
+        {#if favoriteTools.length > 3}
+          <a href="/favorites" class="group mt-3 flex w-full items-center justify-center gap-2 rounded-2xl bg-muted px-5 py-3.5 text-sm font-semibold text-link outline-none transition-all duration-200 hover:bg-link hover:text-white hover:shadow-md hover:shadow-link/20 focus-visible:ring-2 focus-visible:ring-link focus-visible:ring-offset-2 focus-visible:ring-offset-canvas active:scale-[0.995]">
+            <span>View all {favoriteTools.length} favorites</span>
+            <ChevronRight class="h-4 w-4 transition-transform duration-200 group-hover:translate-x-0.5" />
+          </a>
+        {/if}
+      </DashboardSection>
+    {/if}
 
     <!-- Recent Activity -->
-    <section>
+    <DashboardSection title="Recent" sectionKey="recent">
       <RecentActivity />
-    </section>
+    </DashboardSection>
 
     <!-- All Resources -->
-    <section>
-      <p class="mb-3 text-xs font-extrabold uppercase tracking-[0.18em] text-link">All Resources</p>
+    <DashboardSection title="All Resources" sectionKey="resources" count={app.visibleTools.length}>
       <ToolSections tools={app.visibleTools} />
-    </section>
+    </DashboardSection>
   </section>
 {/if}

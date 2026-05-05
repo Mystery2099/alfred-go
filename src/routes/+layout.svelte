@@ -1,6 +1,7 @@
 <script lang="ts">
   import '../app.css'
-  import { goto } from '$app/navigation'
+  import { browser, dev } from '$app/environment'
+  import { goto, onNavigate } from '$app/navigation'
   import { page } from '$app/stores'
   import { getAppState } from '$lib/app-state.svelte'
   import { onMount } from 'svelte'
@@ -14,12 +15,28 @@
   let { children, data } = $props()
   const app = getAppState()
   let commandBarOpen = $state(false)
+  const hydrateLayoutData = () => app.hydrate(data)
+
+  if (!browser) {
+    hydrateLayoutData()
+  }
 
   createHotkey('Mod+K', () => { commandBarOpen = true })
   createHotkey('/', () => { commandBarOpen = true })
 
+  onNavigate((navigation) => {
+    if (!document.startViewTransition) return
+
+    return new Promise((resolve) => {
+      document.startViewTransition(async () => {
+        resolve(undefined)
+        await navigation.complete
+      })
+    })
+  })
+
   $effect.pre(() => {
-    app.hydrate(data)
+    hydrateLayoutData()
   })
 
   const isAuthenticated = $derived(app.isAuthenticated)
@@ -37,6 +54,14 @@
   onMount(() => {
     app.applyTheme()
     app.applyAccessibility()
+
+    if (dev && 'serviceWorker' in navigator) {
+      navigator.serviceWorker.getRegistrations()
+        .then((registrations) => Promise.all(registrations.map((registration) => registration.unregister())))
+        .then(() => caches.keys())
+        .then((keys) => Promise.all(keys.map((key) => caches.delete(key))))
+        .catch(() => {})
+    }
   })
 
   $effect(() => {
@@ -49,70 +74,12 @@
     if (app.dataReady) app.applyAccessibility()
   })
 
-  let navContainerRef: HTMLDivElement | undefined = $state()
-  let mobileNavRef: HTMLElement | undefined = $state()
   let notifRef: HTMLDivElement | undefined = $state()
   let notifOpen = $state(false)
-  let navPillStyle = $state({ top: '0px', height: '0px', opacity: 0 })
-  let mobilePillStyle = $state({ left: '0px', width: '0px', opacity: 0 })
 
-  const recentAnnouncements = $derived(() => app.announcements.slice(0, 5))
-
-  function updateNavPill() {
-    if (!navContainerRef) return
-    requestAnimationFrame(() => {
-      const activeEl = navContainerRef!.querySelector('.nav-item.active') as HTMLElement | null
-      if (activeEl) {
-        const containerRect = navContainerRef!.getBoundingClientRect()
-        const activeRect = activeEl.getBoundingClientRect()
-        navPillStyle = {
-          top: `${activeRect.top - containerRect.top}px`,
-          height: `${activeRect.height}px`,
-          opacity: 1,
-        }
-      } else {
-        navPillStyle = { ...navPillStyle, opacity: 0 }
-      }
-    })
-  }
-
-  function updateMobilePill() {
-    if (!mobileNavRef) return
-    requestAnimationFrame(() => {
-      const activeEl = mobileNavRef!.querySelector('.mobile-item.active') as HTMLElement | null
-      if (activeEl) {
-        const containerRect = mobileNavRef!.getBoundingClientRect()
-        const activeRect = activeEl.getBoundingClientRect()
-        mobilePillStyle = {
-          left: `${activeRect.left - containerRect.left}px`,
-          width: `${activeRect.width}px`,
-          opacity: 1,
-        }
-      } else {
-        mobilePillStyle = { ...mobilePillStyle, opacity: 0 }
-      }
-    })
-  }
-
-  $effect(() => {
-    const _ = $page.url.pathname
-    const __ = app.navCollapsed
-    updateNavPill()
-  })
-
-  $effect(() => {
-    const _ = $page.url.pathname
-    updateMobilePill()
-  })
+  const recentAnnouncements = $derived.by(() => app.announcements.slice(0, 5))
 
   onMount(() => {
-    const resizeObserver = new ResizeObserver(() => {
-      updateNavPill()
-      updateMobilePill()
-    })
-    if (navContainerRef) resizeObserver.observe(navContainerRef)
-    if (mobileNavRef) resizeObserver.observe(mobileNavRef)
-
     const systemTheme = window.matchMedia('(prefers-color-scheme: dark)')
     const updateSystemTheme = () => app.applyTheme()
     const handleKeydown = (event: KeyboardEvent) => {
@@ -130,7 +97,6 @@
     window.addEventListener('keydown', handleKeydown)
     window.addEventListener('mousedown', handleClickOutside)
     return () => {
-      resizeObserver.disconnect()
       systemTheme.removeEventListener('change', updateSystemTheme)
       window.removeEventListener('keydown', handleKeydown)
       window.removeEventListener('mousedown', handleClickOutside)
@@ -171,16 +137,12 @@
     </a>
 
     <!-- Nav -->
-    <div class="relative flex flex-1 flex-col" bind:this={navContainerRef}>
-      <div
-        class="pointer-events-none absolute left-0 right-0 z-0 rounded-3xl bg-selected transition-all duration-300 ease-out"
-        style="top: {navPillStyle.top}; height: {navPillStyle.height}; opacity: {navPillStyle.opacity};"
-      ></div>
-      <div class="relative z-10 space-y-1">
+    <div class="flex flex-1 flex-col">
+      <div class="space-y-1">
         {#if !app.navCollapsed}
           <p class="px-4 pb-1 pt-4 text-[10px] font-extrabold uppercase tracking-wider text-text-soft">Menu</p>
         {/if}
-        {#each navItems as [label, href, ItemIcon]}
+        {#each navItems as [label, href, ItemIcon] (href)}
           <a
             title={label}
             href={href}
@@ -304,10 +266,10 @@
                 </button>
               </div>
               <div class="visible-scrollbar max-h-[60vh] overflow-y-auto py-1 sm:max-h-80">
-                {#if recentAnnouncements().length === 0}
+                {#if recentAnnouncements.length === 0}
                   <p class="px-4 py-6 text-center text-sm text-text-muted">No new notifications</p>
                 {:else}
-                  {#each recentAnnouncements() as notice}
+                  {#each recentAnnouncements as notice (notice.id)}
                     <a
                       href={notice.url || (notice.toolId ? `/tools/${notice.toolId}` : '#')}
                       target={notice.url ? '_blank' : undefined}
@@ -356,12 +318,8 @@
   <CommandBar bind:open={commandBarOpen} onClose={() => commandBarOpen = false} />
 
   <!-- Mobile Nav -->
-  <nav class="fixed bottom-0 left-0 right-0 z-40 grid grid-cols-4 border-t border-border bg-surface px-2 py-2 shadow-[var(--app-shadow)] lg:hidden" bind:this={mobileNavRef}>
-    <div
-      class="pointer-events-none absolute bottom-2 top-2 z-0 rounded-xl bg-selected transition-all duration-300 ease-out"
-      style="left: {mobilePillStyle.left}; width: {mobilePillStyle.width}; opacity: {mobilePillStyle.opacity};"
-    ></div>
-    {#each mobileItems as [label, href, ItemIcon]}
+  <nav class="fixed bottom-0 left-0 right-0 z-40 grid grid-cols-4 border-t border-border bg-surface px-2 py-2 shadow-[var(--app-shadow)] lg:hidden">
+    {#each mobileItems as [label, href, ItemIcon] (href)}
       <a
         href={href}
         aria-label={label}
