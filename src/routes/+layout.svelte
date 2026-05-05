@@ -11,6 +11,7 @@
     Home, Search, Settings, Star, User, X
   } from 'lucide-svelte'
   import CommandBar from '$lib/components/CommandBar.svelte'
+  import AlfredStateLogo from '$lib/components/AlfredStateLogo.svelte'
 
   let { children, data } = $props()
   const app = getAppState()
@@ -130,7 +131,7 @@
   <aside class="fixed left-0 top-0 z-30 hidden h-screen flex-col overflow-y-auto border-r border-border bg-surface py-5 transition-all duration-300 lg:flex {app.navCollapsed ? 'w-16 px-3' : 'w-60 px-5'}">
     <!-- Logo -->
     <a href="/" class="mb-6 flex items-center gap-3 {app.navCollapsed ? 'justify-center px-0' : 'px-3'}">
-      <img src="/icons/alfred-state-logo-A.svg" alt="Alfred State" class="{app.navCollapsed ? 'h-10 w-10' : 'h-9 w-9'} text-link" />
+      <AlfredStateLogo class="{app.navCollapsed ? 'h-10 w-10' : 'h-9 w-9'} text-campus-blue dark:text-campus-gold" />
       {#if !app.navCollapsed}
         <span class="text-xl font-extrabold text-link tracking-tight">AlfredGO</span>
       {/if}
