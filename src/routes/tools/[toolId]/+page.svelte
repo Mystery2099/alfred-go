@@ -2,6 +2,7 @@
   import { resolve } from '$app/paths'
   import { page } from '$app/stores'
   import { getAppState, roleLabels } from '$lib/app-state.svelte'
+  import ListGroup from '$lib/components/ListGroup.svelte'
   import ToolHero from '$lib/features/tools/ToolHero.svelte'
   import ToolInfoRow from '$lib/features/tools/ToolInfoRow.svelte'
   import ToolLiveData from '$lib/features/tools/ToolLiveData.svelte'
@@ -63,21 +64,21 @@
     {#if tool.notes}
       <div>
         <p class="mb-3 text-xs font-extrabold uppercase tracking-[0.18em] text-text-muted">Important Info</p>
-        <div class="overflow-hidden rounded-2xl bg-surface shadow-sm ring-1 ring-border">
+        <ListGroup divided={false}>
           <div class="flex items-start gap-4 px-6 py-5 sm:px-8">
             <div class="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-muted text-link">
               <Info class="h-5 w-5" />
             </div>
             <p class="min-w-0 flex-1 text-sm leading-relaxed text-text">{tool.notes}</p>
           </div>
-        </div>
+        </ListGroup>
       </div>
     {/if}
 
     <!-- Details list group -->
     <div>
       <p class="mb-3 text-xs font-extrabold uppercase tracking-[0.18em] text-text-muted">Details</p>
-      <div class="divide-y divide-border overflow-hidden rounded-2xl bg-surface shadow-sm ring-1 ring-border">
+      <ListGroup>
         <ToolInfoRow icon={Folder} label="Category">
           <span class="block text-sm font-extrabold text-text">{app.categoryName(tool.categoryId)}</span>
         </ToolInfoRow>
@@ -89,14 +90,14 @@
         <ToolInfoRow icon={Clock} label="Status">
           <span class="block text-sm font-extrabold text-text">{tool.isActive ? 'Active' : 'Inactive'}</span>
         </ToolInfoRow>
-      </div>
+      </ListGroup>
     </div>
 
     <!-- Support & Requirements list group -->
     {#if tool.helpUrl || tool.contactInfo || tool.requirements}
       <div>
         <p class="mb-3 text-xs font-extrabold uppercase tracking-[0.18em] text-text-muted">Support & Requirements</p>
-        <div class="divide-y divide-border overflow-hidden rounded-2xl bg-surface shadow-sm ring-1 ring-border">
+        <ListGroup>
           {#if tool.requirements}
             <ToolInfoRow icon={Wrench} label="Requirements">
               <span class="block text-sm font-extrabold text-text">{tool.requirements}</span>
@@ -115,7 +116,7 @@
               <span class="block text-sm font-extrabold text-text">{tool.contactInfo}</span>
             </ToolInfoRow>
           {/if}
-        </div>
+        </ListGroup>
       </div>
     {/if}
 

@@ -1,5 +1,6 @@
 <script lang="ts">
   import { getAppState, roleLabels } from '$lib/app-state.svelte'
+  import ListGroup from '$lib/components/ListGroup.svelte'
   import { BookOpen, ChevronRight, Grid2X2, LogOut, Settings, Shield, Star } from 'lucide-svelte'
 
   const app = getAppState()
@@ -38,14 +39,14 @@
         <p class="text-xs font-extrabold uppercase tracking-[0.18em] text-text-muted">Account</p>
         <h2 class="mt-1 text-2xl font-extrabold text-link">Profile overview</h2>
       </div>
-      <div class="mt-5 divide-y divide-border rounded-2xl bg-surface shadow-sm ring-1 ring-border overflow-hidden">
-        {#each accessNotes as [label, value]}
+      <ListGroup class="mt-5">
+        {#each accessNotes as [label, value] (label)}
           <div class="px-5 py-4">
             <p class="text-xs font-extrabold uppercase tracking-wider text-text-soft">{label}</p>
             <p class="mt-1 text-sm font-extrabold text-text">{value}</p>
           </div>
         {/each}
-      </div>
+      </ListGroup>
     </section>
 
     <section class="rounded-xl border border-border bg-surface p-5 shadow-sm">

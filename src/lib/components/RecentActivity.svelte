@@ -1,12 +1,13 @@
 <script lang="ts">
   import { getAppState } from '$lib/app-state.svelte'
+  import ListGroup from '$lib/components/ListGroup.svelte'
   import { ExternalLink } from 'lucide-svelte'
   import Icon from './shared/Icon.svelte'
 
   const app = getAppState()
 
   // Only tool launches, deduplicated by toolId, most recent first
-  const recentLaunches = $derived(() => {
+  const recentLaunches = $derived.by(() => {
     if (!app.data || !app.userId) return []
     const seen = new Set<string>()
     const result = []
@@ -42,11 +43,11 @@
   }
 </script>
 
-{#if recentLaunches().length === 0}
+{#if recentLaunches.length === 0}
   <p class="text-sm text-text-muted">No recent tools yet. Launch some tools to see them here.</p>
 {:else}
-  <div class="divide-y divide-border rounded-2xl bg-surface shadow-sm ring-1 ring-border overflow-hidden">
-    {#each recentLaunches() as activity}
+  <ListGroup>
+    {#each recentLaunches as activity (activity.id)}
       {@const tool = findTool(activity.toolId)}
       <button
         type="button"
@@ -70,5 +71,5 @@
         {/if}
       </button>
     {/each}
-  </div>
+  </ListGroup>
 {/if}
