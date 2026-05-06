@@ -1,7 +1,9 @@
 <script lang="ts">
   import { enhance } from '$app/forms'
-  import { Heart, Pencil, Trash2, ExternalLink, ChevronRight } from 'lucide-svelte'
+  import { resolve } from '$app/paths'
+  import { Pencil, Trash2, ExternalLink, ChevronRight } from 'lucide-svelte'
   import { getAppState } from '$lib/app-state.svelte'
+  import FavoriteButton from '$lib/features/tools/FavoriteButton.svelte'
   import Icon from './Icon.svelte'
   import type { Tool } from '$lib/types'
 
@@ -25,18 +27,18 @@
   </div>
 {:else}
   <div class="grid min-w-0 gap-3">
-    {#each tools as tool}
+    {#each tools as tool (tool.id)}
       <div class="group relative flex min-w-0 items-center gap-3 rounded-2xl bg-surface px-4 py-4 shadow-sm ring-1 ring-border/60 transition duration-200 ease-out hover:bg-muted/60 active:scale-[0.995] sm:gap-4 sm:px-5">
         <!-- Tonal icon container -->
         <a
-          href="/tools/{tool.id}"
+          href={resolve(`/tools/${tool.id}`)}
           class="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-muted text-link transition duration-200 group-hover:scale-105"
         >
           <Icon name={tool.icon} class="h-6 w-6" />
         </a>
 
         <!-- Content -->
-        <a href="/tools/{tool.id}" class="min-w-0 flex-1">
+        <a href={resolve(`/tools/${tool.id}`)} class="min-w-0 flex-1">
           <div class="flex min-w-0 items-center gap-2">
             <span class="block truncate text-[15px] font-extrabold text-text">{tool.name}</span>
             {#if tool.status === 'maintenance'}
@@ -80,22 +82,9 @@
           </div>
         {:else}
           <div class="flex items-center gap-1 shrink-0">
-            <form method="POST" action="?/toggleFavorite" use:enhance={() => {
-              app.optimisticToggleFavorite(tool.id)
-              return async ({ result }) => {
-                if (result.type === 'failure') app.optimisticToggleFavorite(tool.id)
-              }
-            }}>
-              <input type="hidden" name="toolId" value={tool.id} />
-              <button
-                aria-label={app.isFavorite(tool.id) ? `Remove ${tool.name} from favorites` : `Add ${tool.name} to favorites`}
-                class="grid h-9 w-9 place-items-center rounded-xl text-text-muted transition duration-150 hover:scale-110 hover:bg-muted active:scale-90"
-              >
-                <Heart class="h-5 w-5 {app.isFavorite(tool.id) ? 'fill-campus-gold text-campus-gold' : 'text-text-soft'}" />
-              </button>
-            </form>
+            <FavoriteButton toolId={tool.id} toolName={tool.name} />
             <a
-              href="/tools/{tool.id}"
+              href={resolve(`/tools/${tool.id}`)}
               class="grid h-9 w-9 place-items-center rounded-xl text-text-soft transition duration-150 hover:bg-muted hover:text-link active:scale-90"
               aria-label="View {tool.name}"
             >

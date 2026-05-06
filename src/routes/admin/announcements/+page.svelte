@@ -1,8 +1,9 @@
 <script lang="ts">
   import { enhance } from '$app/forms'
-  import { getAppState, roleLabels, roles } from '$lib/app-state.svelte'
+  import { getAppState, roleLabels } from '$lib/app-state.svelte'
   import type { Announcement } from '$lib/types'
   import { Plus, X, Trash2, Pencil } from 'lucide-svelte'
+  import AudienceRolePicker from '$lib/features/admin/AudienceRolePicker.svelte'
 
   const app = getAppState()
 
@@ -92,21 +93,7 @@
           <option value="deadlines">Deadlines</option>
           <option value="reminders">Reminders</option>
         </select>
-        <div class="md:col-span-2 flex flex-wrap gap-2">
-          {#each roles as role}
-            <label class="segmented {draft.audienceRoles.includes(role) ? 'active' : ''}">
-              <input
-                class="sr-only"
-                type="checkbox"
-                name="audienceRoles"
-                value={role}
-                checked={draft.audienceRoles.includes(role)}
-                onchange={(event) => draft.audienceRoles = event.currentTarget.checked ? [...draft.audienceRoles, role] : draft.audienceRoles.filter((item) => item !== role)}
-              />
-              {roleLabels[role]}
-            </label>
-          {/each}
-        </div>
+        <AudienceRolePicker class="md:col-span-2" selected={draft.audienceRoles} onChange={(nextRoles) => draft.audienceRoles = nextRoles} />
         <div class="md:col-span-2 flex gap-2">
           <button type="button" onclick={() => linkType = 'tool'} class="segmented {linkType === 'tool' ? 'active' : ''}">Link to tool</button>
           <button type="button" onclick={() => linkType = 'url'} class="segmented {linkType === 'url' ? 'active' : ''}">Custom URL</button>
@@ -114,7 +101,7 @@
         {#if linkType === 'tool'}
           <select class="control md:col-span-2" name="toolId" bind:value={draft.toolId}>
             <option value="">Select a tool...</option>
-            {#each app.data?.tools || [] as tool}
+            {#each app.data?.tools || [] as tool (tool.id)}
               <option value={tool.id}>{tool.name}</option>
             {/each}
           </select>
@@ -142,7 +129,7 @@
       </div>
     </form>
     <div class="divide-y divide-border rounded-2xl bg-surface shadow-sm ring-1 ring-border overflow-hidden">
-      {#each app.data?.announcements || [] as announcement}
+      {#each app.data?.announcements || [] as announcement (announcement.id)}
         <div class="flex items-start justify-between gap-3 px-5 py-4 transition hover:bg-muted">
           <div class="min-w-0 flex-1">
             <div class="flex items-center gap-2">

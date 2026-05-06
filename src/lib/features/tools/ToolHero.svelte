@@ -1,20 +1,18 @@
 <script lang="ts">
-  import { enhance } from '$app/forms'
   import Icon from '$lib/components/shared/Icon.svelte'
   import type { Tool } from '$lib/types'
-  import { ExternalLink, Heart, Share2 } from 'lucide-svelte'
+  import { ExternalLink, Share2 } from 'lucide-svelte'
+  import FavoriteButton from './FavoriteButton.svelte'
   import { getToolStatusColor, getToolStatusIcon } from './tool-status'
 
   type ShareStatus = 'idle' | 'copying' | 'shared' | 'copied' | 'failed'
 
   interface Props {
     tool: Tool
-    isFavorite: boolean
     onLaunch: () => void
-    onOptimisticFavorite: () => void
   }
 
-  let { tool, isFavorite, onLaunch, onOptimisticFavorite }: Props = $props()
+  let { tool, onLaunch }: Props = $props()
 
   let shareStatus = $state<ShareStatus>('idle')
   let shareStatusTimeout: ReturnType<typeof setTimeout> | undefined
@@ -117,21 +115,7 @@
         Launch
       </button>
 
-      <form method="POST" action="?/toggleFavorite" use:enhance={() => {
-        onOptimisticFavorite()
-        return async ({ result }) => {
-          if (result.type === 'failure') onOptimisticFavorite()
-        }
-      }} class="inline-flex">
-        <input type="hidden" name="toolId" value={tool.id} />
-        <button
-          type="submit"
-          class="inline-flex items-center gap-2 rounded-xl border border-border bg-surface px-4 py-2.5 text-sm font-extrabold text-link transition duration-150 hover:bg-muted active:scale-[0.97]"
-        >
-          <Heart class="h-4 w-4 {isFavorite ? 'fill-campus-gold text-campus-gold' : ''}" />
-          {isFavorite ? 'Saved' : 'Save'}
-        </button>
-      </form>
+      <FavoriteButton toolId={tool.id} toolName={tool.name} variant="hero" />
 
       <button
         type="button"

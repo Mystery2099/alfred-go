@@ -1,7 +1,7 @@
 <script lang="ts">
-  import { enhance } from '$app/forms'
-  import { Heart, ExternalLink, ChevronRight } from 'lucide-svelte'
+  import { ExternalLink, ChevronRight } from 'lucide-svelte'
   import { getAppState } from '$lib/app-state.svelte'
+  import FavoriteButton from '$lib/features/tools/FavoriteButton.svelte'
   import Badge from './Badge.svelte'
   import type { Tool } from '$lib/types'
 
@@ -30,21 +30,11 @@
   <div class="min-w-0 flex-1">
     <div class="flex items-center gap-2">
       <b class="truncate text-sm font-extrabold text-text">{tool.name}</b>
-      <form method="POST" action="?/toggleFavorite" use:enhance={() => {
-        app.optimisticToggleFavorite(tool.id)
-        return async ({ result }) => {
-          if (result.type === 'failure') app.optimisticToggleFavorite(tool.id)
-        }
-      }}>
-        <input type="hidden" name="toolId" value={tool.id} />
-        <button class="shrink-0 transition-colors {app.isFavorite(tool.id) ? 'text-campus-gold' : 'text-text-soft hover:text-campus-gold'}">
-          <Heart class="h-4 w-4 {app.isFavorite(tool.id) ? 'fill-current' : ''}" />
-        </button>
-      </form>
+      <FavoriteButton toolId={tool.id} toolName={tool.name} variant="inline" />
     </div>
     <p class="mt-0.5 line-clamp-2 text-xs text-text-muted">{tool.description}</p>
     <div class="mt-1.5 flex flex-wrap gap-1">
-      {#each tool.tags.slice(0, 3) as tag}
+      {#each tool.tags.slice(0, 3) as tag (tag)}
         <Badge variant="secondary">{tag}</Badge>
       {/each}
     </div>

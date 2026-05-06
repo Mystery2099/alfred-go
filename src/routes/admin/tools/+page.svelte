@@ -1,9 +1,10 @@
 <script lang="ts">
   import { enhance } from '$app/forms'
-  import { getAppState, roleLabels, roles } from '$lib/app-state.svelte'
+  import { getAppState } from '$lib/app-state.svelte'
   import type { Tool } from '$lib/types'
   import { Plus, X } from 'lucide-svelte'
   import ToolGrid from '$lib/components/shared/ToolGrid.svelte'
+  import AudienceRolePicker from '$lib/features/admin/AudienceRolePicker.svelte'
 
   const app = getAppState()
 
@@ -87,7 +88,7 @@
         <input class="control" name="name" placeholder="Name" bind:value={draft.name} />
         <input class="control" name="url" placeholder="URL" bind:value={draft.url} />
         <select class="control" name="categoryId" bind:value={draft.categoryId}>
-          {#each app.categories as category}
+          {#each app.categories as category (category.id)}
             <option value={category.id}>{category.name}</option>
           {/each}
         </select>
@@ -100,21 +101,7 @@
         <input type="hidden" name="tags" value={draft.tags.join(', ')} />
         <textarea class="control md:col-span-2" name="description" rows="3" placeholder="Description" bind:value={draft.description}></textarea>
       </div>
-      <div class="mt-3 flex flex-wrap gap-2">
-        {#each roles as role}
-          <label class="segmented {draft.audienceRoles.includes(role) ? 'active' : ''}">
-            <input
-              class="sr-only"
-              type="checkbox"
-              name="audienceRoles"
-              value={role}
-              checked={draft.audienceRoles.includes(role)}
-              onchange={(event) => draft.audienceRoles = event.currentTarget.checked ? [...draft.audienceRoles, role] : draft.audienceRoles.filter((item) => item !== role)}
-            />
-            {roleLabels[role]}
-          </label>
-        {/each}
-      </div>
+      <AudienceRolePicker class="mt-3" selected={draft.audienceRoles} onChange={(nextRoles) => draft.audienceRoles = nextRoles} />
       <label class="mt-3 flex items-center gap-2">
         <input type="checkbox" name="isActive" checked={draft.isActive} class="h-4 w-4" onchange={(event) => draft.isActive = event.currentTarget.checked} />
         <span class="text-sm font-medium">Active</span>

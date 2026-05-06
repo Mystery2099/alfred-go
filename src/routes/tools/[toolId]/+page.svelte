@@ -33,9 +33,7 @@
   <section class="mx-auto max-w-4xl space-y-8">
     <ToolHero
       {tool}
-      isFavorite={app.isFavorite(tool.id)}
       onLaunch={() => app.launchTool(tool)}
-      onOptimisticFavorite={() => app.optimisticToggleFavorite(tool.id)}
     />
 
     {#if onboardingGuide && (app.currentRole === 'applicant' || app.currentRole === 'accepted_student')}
