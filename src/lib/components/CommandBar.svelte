@@ -2,22 +2,22 @@
   import { goto } from '$app/navigation'
   import { resolve } from '$app/paths'
   import {
-    Bell,
     FileText,
     FolderOpen,
-    Home,
     Search,
-    Settings,
-    ShieldCheck,
-    Star,
-    User,
     Wrench,
     X
   } from 'lucide-svelte'
   import { getAppState } from '$lib/app-state.svelte'
   import CommandOnboarding from '$lib/features/command-palette/CommandOnboarding.svelte'
+  import {
+    buildCommandResults,
+    commandResultKey,
+    getFallbackCommandResults,
+    groupCommandResults,
+    type ResultItem
+  } from '$lib/features/command-palette/search'
   import { commandPaletteOnboardingByRole, defaultCommandPaletteOnboarding } from '$lib/onboarding'
-  import type { Announcement, Category, Tool } from '$lib/types'
 
   interface Props {
     open: boolean
@@ -33,92 +33,8 @@
   let inputRef = $state<HTMLInputElement | undefined>(undefined)
   let listRef = $state<HTMLDivElement | undefined>(undefined)
 
-  type ToolResult = { type: 'tool'; data: Tool; icon: any }
-  type PageResult = { type: 'page'; name: string; href: string; icon: any }
-  type AnnouncementResult = { type: 'announcement'; data: Announcement; icon: any }
-  type CategoryResult = { type: 'category'; data: Category; icon: any }
-  type ResultItem = ToolResult | PageResult | AnnouncementResult | CategoryResult
-
-  const pageItems: PageResult[] = [
-    { type: 'page', name: 'Home', href: '/', icon: Home },
-    { type: 'page', name: 'Browse', href: '/browse', icon: Search },
-    { type: 'page', name: 'Favorites', href: '/favorites', icon: Star },
-    { type: 'page', name: 'Announcements', href: '/announcements', icon: Bell },
-    { type: 'page', name: 'Profile', href: '/profile', icon: User },
-    { type: 'page', name: 'Settings', href: '/settings', icon: Settings },
-    ...(app.isAdmin ? [{ type: 'page' as const, name: 'Admin', href: '/admin', icon: ShieldCheck }] : []),
-  ]
-
-  function getRecentTools(): Tool[] {
-    if (!app.data) return []
-    const launched = app.recentActivities
-      .filter((a) => a.type === 'tool_launch' && a.toolId)
-      .map((a) => app.data!.tools.find((t) => t.id === a.toolId))
-      .filter((t): t is Tool => !!t && t.isActive && app.roleCanSeeTool(app.effectiveRole, t))
-    const seen = new Set<string>()
-    const unique: Tool[] = []
-    for (const tool of launched) {
-      if (!seen.has(tool.id)) {
-        seen.add(tool.id)
-        unique.push(tool)
-      }
-    }
-    return unique.slice(0, 5)
-  }
-
-  let results = $derived.by(() => {
-    if (!app.data) return []
-    const q = query.toLowerCase().trim()
-    if (!q) {
-      const recent = getRecentTools()
-      const recentItems: ResultItem[] = recent.map((t) => ({
-        type: 'tool',
-        data: t,
-        icon: Wrench,
-      }))
-      const announcementItems: ResultItem[] = app.announcements
-        .slice(0, 3)
-        .map((a) => ({ type: 'announcement', data: a, icon: FileText }))
-      return [...recentItems, ...announcementItems, ...(pageItems as ResultItem[])]
-    }
-
-    const items: ResultItem[] = []
-
-    const matchedTools = app.visibleTools
-      .filter((tool) => {
-        const cat = app.categories.find((c) => c.id === tool.categoryId)
-        const searchable = [tool.name, tool.description, cat?.name || '', ...tool.tags]
-          .join(' ')
-          .toLowerCase()
-        return searchable.includes(q)
-      })
-      .slice(0, 5)
-    items.push(...matchedTools.map((t) => ({ type: 'tool' as const, data: t, icon: Wrench })))
-
-    const matchedAnnouncements = app.announcements
-      .filter(
-        (a) =>
-          a.title.toLowerCase().includes(q) || a.body.toLowerCase().includes(q)
-      )
-      .slice(0, 3)
-    items.push(
-      ...matchedAnnouncements.map((a) => ({
-        type: 'announcement' as const,
-        data: a,
-        icon: FileText,
-      }))
-    )
-
-    const matchedPages = pageItems.filter((p) => p.name.toLowerCase().includes(q))
-    items.push(...matchedPages)
-
-    const matchedCategories = app.categories
-      .filter((c) => c.name.toLowerCase().includes(q))
-      .map((c) => ({ type: 'category' as const, data: c, icon: FolderOpen }))
-    items.push(...matchedCategories)
-
-    return items
-  })
+  let results = $derived.by(() => buildCommandResults(app, query))
+  let fallbackResults = $derived.by(() => getFallbackCommandResults(app))
 
   let hasQuery = $derived(query.trim().length > 0)
   let hasResults = $derived(results.length > 0)
@@ -198,41 +114,7 @@
     })
   }
 
-  function groupLabel(item: ResultItem): string {
-    switch (item.type) {
-      case 'tool':
-        return 'Tools'
-      case 'page':
-        return 'Pages'
-      case 'announcement':
-        return 'Announcements'
-      case 'category':
-        return 'Categories'
-    }
-  }
-
-  function formatResultsForDisplay(items: ResultItem[]): { label: string; rows: { item: ResultItem; index: number }[] }[] {
-    const groups: { label: string; rows: { item: ResultItem; index: number }[] }[] = []
-    let currentLabel = ''
-    let currentRows: { item: ResultItem; index: number }[] = []
-    for (let i = 0; i < items.length; i++) {
-      const label = groupLabel(items[i])
-      if (label !== currentLabel) {
-        if (currentRows.length > 0) {
-          groups.push({ label: currentLabel, rows: currentRows })
-        }
-        currentLabel = label
-        currentRows = []
-      }
-      currentRows.push({ item: items[i], index: i })
-    }
-    if (currentRows.length > 0) {
-      groups.push({ label: currentLabel, rows: currentRows })
-    }
-    return groups
-  }
-
-  let groupedResults = $derived(formatResultsForDisplay(results))
+  let groupedResults = $derived(groupCommandResults(results))
 </script>
 
 <svelte:window onkeydown={(e) => {
@@ -284,14 +166,11 @@
             <p class="text-sm font-semibold text-text-muted">No results found</p>
             <p class="mt-1 text-xs text-text-soft">Try a different search term</p>
           </div>
-          {#if getRecentTools().length > 0 || app.announcements.length > 0}
+          {#if fallbackResults.length > 0}
             <div class="border-t border-border px-4 py-2">
               <p class="text-[10px] font-extrabold uppercase tracking-wider text-text-soft">Recent</p>
             </div>
-            {@const recent = getRecentTools().map((t) => ({ type: 'tool' as const, data: t, icon: Wrench }))}
-            {@const recentAnnouncements = app.announcements.slice(0, 3).map((a) => ({ type: 'announcement' as const, data: a, icon: FileText }))}
-            {@const recentItems = [...recent, ...recentAnnouncements]}
-            {#each recentItems as item, i (`${item.type}-${item.type === 'tool' ? item.data.id : item.data.id}`)}
+            {#each fallbackResults as item, i (commandResultKey(item))}
               <button
                 data-index={i}
                 class="flex w-full items-center gap-3 px-4 py-2.5 text-left transition-colors hover:bg-muted {selectedIndex === i ? 'bg-selected' : ''}"
