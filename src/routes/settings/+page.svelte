@@ -20,6 +20,8 @@
   } from 'lucide-svelte'
   import SectionTitle from '$lib/components/SectionTitle.svelte'
   import SettingsNotifications from '$lib/features/settings/SettingsNotifications.svelte'
+  import SettingsRow from '$lib/features/settings/SettingsRow.svelte'
+  import SwitchIndicator from '$lib/features/settings/SwitchIndicator.svelte'
   import { accessibilityItems, helpItems, securityItems } from '$lib/features/settings/settings-options'
 
   const app = getAppState()
@@ -118,63 +120,52 @@
     <h2 class="mb-2 px-4 text-xs font-extrabold uppercase tracking-wider text-text-soft">Appearance</h2>
     <div class="overflow-hidden rounded-2xl bg-surface shadow-sm ring-1 ring-border">
       <!-- Theme -->
-      <div class="profile-row">
-        <span class="profile-icon tone-0"><Palette class="h-5 w-5" /></span>
-        <span class="min-w-0 flex-1 basis-40">
-          <b>Theme</b>
-          <small>System follows your device preference</small>
-        </span>
-        <div class="flex flex-wrap justify-end gap-1">
-          {#each ['system', 'light', 'dark'] as theme (theme)}
-            <form method="POST" action="?/savePreference" use:enhance>
-              <input type="hidden" name="theme" value={theme} />
-              <button class="segmented {app.currentPreference?.theme === theme ? 'active' : ''}">
-                {theme}
-              </button>
-            </form>
-          {/each}
-        </div>
-      </div>
+      <SettingsRow icon={Palette} title="Theme" body="System follows your device preference" class="basis-40">
+        {#snippet action()}
+          <div class="flex flex-wrap justify-end gap-1">
+            {#each ['system', 'light', 'dark'] as theme (theme)}
+              <form method="POST" action="?/savePreference" use:enhance>
+                <input type="hidden" name="theme" value={theme} />
+                <button class="segmented {app.currentPreference?.theme === theme ? 'active' : ''}">
+                  {theme}
+                </button>
+              </form>
+            {/each}
+          </div>
+        {/snippet}
+      </SettingsRow>
 
       <!-- Role view (staff and admin only) -->
       {#if app.isAdmin || app.currentRole === 'staff'}
-        <div class="profile-row border-t border-border">
-          <span class="profile-icon tone-0"><UserRound class="h-5 w-5" /></span>
-          <span class="min-w-0 flex-1 basis-40">
-            <b>Preferred role view</b>
-            <small>Preview resources for another campus role</small>
-          </span>
-          <form method="POST" action="?/savePreference" use:enhance>
-            <select
-              name="preferredRoleView"
-              class="control text-sm py-1.5 px-3"
-              value={app.effectiveRole}
-              onchange={(event) => event.currentTarget.form?.requestSubmit()}
-            >
-              {#each roles as role (role)}
-                {#if app.isAdmin || role !== 'admin'}
-                  <option value={role}>{roleLabels[role]}</option>
-                {/if}
-              {/each}
-            </select>
-          </form>
-        </div>
+        <SettingsRow border icon={UserRound} title="Preferred role view" body="Preview resources for another campus role" class="basis-40">
+          {#snippet action()}
+            <form method="POST" action="?/savePreference" use:enhance>
+              <select
+                name="preferredRoleView"
+                class="control text-sm py-1.5 px-3"
+                value={app.effectiveRole}
+                onchange={(event) => event.currentTarget.form?.requestSubmit()}
+              >
+                {#each roles as role (role)}
+                  {#if app.isAdmin || role !== 'admin'}
+                    <option value={role}>{roleLabels[role]}</option>
+                  {/if}
+                {/each}
+              </select>
+            </form>
+          {/snippet}
+        </SettingsRow>
       {/if}
 
       <!-- Accessibility toggles -->
       {#each accessibilityItems as [title, body, ItemIcon, key] (key)}
         <form method="POST" action="?/savePreference" use:enhance class="border-t border-border">
           <input type="hidden" name="accessibilitySettings" value={toggleAccessibilitySetting(key)} />
-          <button type="submit" class="profile-row">
-            <span class="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-selected text-link"><ItemIcon class="h-5 w-5" /></span>
-            <span class="min-w-0 flex-1 text-left">
-              <b>{title}</b>
-              <small>{body}</small>
-            </span>
-            <span class="h-6 w-10 shrink-0 rounded-full p-0.5 transition {accessibilityEnabled(key) ? 'bg-campus-blue' : 'bg-border'}">
-              <span class="block h-5 w-5 rounded-full bg-white transition {accessibilityEnabled(key) ? 'translate-x-4' : ''}"></span>
-            </span>
-          </button>
+          <SettingsRow as="button" type="submit" icon={ItemIcon} {title} {body}>
+            {#snippet action()}
+              <SwitchIndicator checked={accessibilityEnabled(key)} />
+            {/snippet}
+          </SettingsRow>
         </form>
       {/each}
     </div>
@@ -203,16 +194,13 @@
     <h2 class="mb-2 px-4 text-xs font-extrabold uppercase tracking-wider text-text-soft">Privacy & Security</h2>
     <div class="overflow-hidden rounded-2xl bg-surface shadow-sm ring-1 ring-border">
       <!-- Change password -->
-      <button class="profile-row" onclick={() => showPasswordForm = !showPasswordForm}>
-        <span class="profile-icon tone-2"><KeyRound class="h-5 w-5" /></span>
-        <span class="min-w-0 flex-1 text-left">
-          <b>Change password</b>
-          <small>Update your account password</small>
-        </span>
-        <span class="transition {showPasswordForm ? 'rotate-180' : ''}">
-          <ChevronDown class="h-5 w-5 text-text-soft" />
-        </span>
-      </button>
+      <SettingsRow as="button" icon={KeyRound} tone="tone-2" title="Change password" body="Update your account password" onclick={() => showPasswordForm = !showPasswordForm}>
+        {#snippet action()}
+          <span class="transition {showPasswordForm ? 'rotate-180' : ''}">
+            <ChevronDown class="h-5 w-5 text-text-soft" />
+          </span>
+        {/snippet}
+      </SettingsRow>
       {#if showPasswordForm}
         <div class="border-t border-border px-4 pb-5 pt-2 sm:px-8">
           <form id="password-form" method="POST" action="?/changePassword" use:enhance={handlePasswordEnhance} class="space-y-3">
@@ -245,26 +233,17 @@
 
       <!-- Security info items -->
       {#each securityItems as [title, body, ItemIcon], i (title)}
-        <div class="profile-row {i > 0 || showPasswordForm ? 'border-t border-border' : ''}">
-          <span class="profile-icon tone-0 shrink-0"><ItemIcon class="h-5 w-5" /></span>
-          <span class="min-w-0 flex-1">
-            <b>{title}</b>
-            <small>{body}</small>
-          </span>
-        </div>
+        <SettingsRow border={i > 0 || showPasswordForm} icon={ItemIcon} {title} {body} />
       {/each}
 
       <!-- Activity history -->
-      <button class="profile-row border-t border-border" onclick={() => showActivity = !showActivity}>
-        <span class="profile-icon tone-0"><History class="h-5 w-5" /></span>
-        <span class="min-w-0 flex-1 text-left">
-          <b>Account activity</b>
-          <small>{allActivities.length} recent events</small>
-        </span>
-        <span class="transition {showActivity ? 'rotate-180' : ''}">
-          <ChevronDown class="h-5 w-5 text-text-soft" />
-        </span>
-      </button>
+      <SettingsRow border as="button" icon={History} title="Account activity" body={`${allActivities.length} recent events`} onclick={() => showActivity = !showActivity}>
+        {#snippet action()}
+          <span class="transition {showActivity ? 'rotate-180' : ''}">
+            <ChevronDown class="h-5 w-5 text-text-soft" />
+          </span>
+        {/snippet}
+      </SettingsRow>
       {#if showActivity}
         <div class="border-t border-border px-4 pb-4 pt-2 sm:px-8">
           {#if allActivities.length === 0}
@@ -290,22 +269,13 @@
     <div class="overflow-hidden rounded-2xl bg-surface shadow-sm ring-1 ring-border">
       {#each helpItems as [title, body, url], i (title)}
         {#if url}
-          <a href={url} target="_blank" rel="noopener noreferrer" class="profile-row {i > 0 ? 'border-t border-border' : ''}">
-            <span class="profile-icon tone-3"><CircleHelp class="h-5 w-5" /></span>
-            <span class="min-w-0 flex-1">
-              <b>{title}</b>
-              <small>{body}</small>
-            </span>
-            <ExternalLink class="h-4 w-4 shrink-0 text-text-soft" />
-          </a>
+          <SettingsRow as="a" href={url} border={i > 0} icon={CircleHelp} tone="tone-3" {title} {body}>
+            {#snippet action()}
+              <ExternalLink class="h-4 w-4 shrink-0 text-text-soft" />
+            {/snippet}
+          </SettingsRow>
         {:else}
-          <div class="profile-row {i > 0 ? 'border-t border-border' : ''}">
-            <span class="profile-icon tone-3"><CircleHelp class="h-5 w-5" /></span>
-            <span class="min-w-0 flex-1">
-              <b>{title}</b>
-              <small>{body}</small>
-            </span>
-          </div>
+          <SettingsRow border={i > 0} icon={CircleHelp} tone="tone-3" {title} {body} />
         {/if}
       {/each}
     </div>
@@ -321,47 +291,26 @@
     <h2 class="mb-2 px-4 text-xs font-extrabold uppercase tracking-wider text-text-soft">Data Management</h2>
     <div class="overflow-hidden rounded-2xl bg-surface shadow-sm ring-1 ring-border">
       <!-- Onboarding -->
-      <button type="button" class="profile-row w-full text-left" onclick={restartOnboarding}>
-        <span class="profile-icon tone-0"><Sparkles class="h-5 w-5" /></span>
-        <span class="min-w-0 flex-1 basis-40">
-          <b>Restart getting started</b>
-          <small>Show the role-based onboarding checklist again from the beginning</small>
-        </span>
-      </button>
+      <SettingsRow as="button" icon={Sparkles} title="Restart getting started" body="Show the role-based onboarding checklist again from the beginning" class="w-full basis-40 text-left" onclick={restartOnboarding} />
 
       <!-- Export -->
-      <div class="profile-row border-t border-border">
-        <span class="profile-icon tone-0"><Download class="h-5 w-5" /></span>
-        <span class="min-w-0 flex-1 basis-40">
-          <b>Export favorites</b>
-          <small>Download your saved resources as a JSON file</small>
-        </span>
-        <a href={resolve('/api/export/favorites')} download class="secondary-button text-xs py-2 px-3">
-          <Download class="h-4 w-4" />
-          Export
-        </a>
-      </div>
+      <SettingsRow border icon={Download} title="Export favorites" body="Download your saved resources as a JSON file" class="basis-40">
+        {#snippet action()}
+          <a href={resolve('/api/export/favorites')} download class="secondary-button text-xs py-2 px-3">
+            <Download class="h-4 w-4" />
+            Export
+          </a>
+        {/snippet}
+      </SettingsRow>
 
       <!-- Reset -->
       <form method="POST" action="?/resetPreferences" use:enhance onsubmit={handleResetPreferences} class="border-t border-border">
-        <button type="submit" class="profile-row w-full text-left">
-          <span class="profile-icon tone-0"><RotateCcw class="h-5 w-5" /></span>
-          <span class="min-w-0 flex-1">
-            <b>Reset preferences</b>
-            <small>Restore default settings for theme, role view, notifications, and accessibility</small>
-          </span>
-        </button>
+        <SettingsRow as="button" type="submit" icon={RotateCcw} title="Reset preferences" body="Restore default settings for theme, role view, notifications, and accessibility" class="w-full text-left" />
       </form>
 
       <!-- Clear activity -->
       <form method="POST" action="?/clearActivities" use:enhance onsubmit={handleClearActivities} class="border-t border-border">
-        <button type="submit" class="profile-row w-full text-left">
-          <span class="profile-icon tone-0"><Trash2 class="h-5 w-5" /></span>
-          <span class="min-w-0 flex-1">
-            <b>Clear activity history</b>
-            <small>Permanently delete all recorded account activity</small>
-          </span>
-        </button>
+        <SettingsRow as="button" type="submit" icon={Trash2} title="Clear activity history" body="Permanently delete all recorded account activity" class="w-full text-left" />
       </form>
     </div>
   </div>

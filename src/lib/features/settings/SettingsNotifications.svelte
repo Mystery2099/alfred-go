@@ -3,6 +3,8 @@
   import type { AppStore } from '$lib/app-state.svelte'
   import { getPushStatus, isPushSupported, subscribeToPush, unsubscribeFromPush } from '$lib/push-client'
   import { Radio } from 'lucide-svelte'
+  import SettingsRow from './SettingsRow.svelte'
+  import SwitchIndicator from './SwitchIndicator.svelte'
   import { notificationOptions } from './settings-options'
 
   let { app }: { app: AppStore } = $props()
@@ -84,22 +86,21 @@
   </div>
   <div class="overflow-hidden rounded-2xl bg-surface shadow-sm ring-1 ring-border">
     {#if pushSupported}
-      <div class="profile-row">
-        <span class="profile-icon tone-1"><Radio class="h-5 w-5" /></span>
-        <span class="min-w-0 flex-1">
-          <b>Browser push notifications</b>
-          <small>Get real-time alerts on your phone or computer</small>
-        </span>
-        <button
-          onclick={togglePush}
-          disabled={pushLoading}
-          class="h-6 w-10 shrink-0 rounded-full p-0.5 transition {pushSubscribed ? 'bg-campus-blue' : 'bg-border'} disabled:opacity-50"
-          aria-pressed={pushSubscribed}
-          aria-label={pushSubscribed ? 'Disable push notifications' : 'Enable push notifications'}
-        >
-          <span class="block h-5 w-5 rounded-full bg-white transition {pushSubscribed ? 'translate-x-4' : ''}"></span>
-        </button>
-      </div>
+      <SettingsRow
+        as="button"
+        icon={Radio}
+        tone="tone-1"
+        title="Browser push notifications"
+        body="Get real-time alerts on your phone or computer"
+        onclick={togglePush}
+        disabled={pushLoading}
+        ariaPressed={pushSubscribed}
+        ariaLabel={pushSubscribed ? 'Disable push notifications' : 'Enable push notifications'}
+      >
+        {#snippet action()}
+          <SwitchIndicator checked={pushSubscribed} disabled={pushLoading} />
+        {/snippet}
+      </SettingsRow>
       {#if pushError}
         <p class="px-4 pb-3 text-sm text-red-600 dark:text-red-400">{pushError}</p>
       {/if}
@@ -111,16 +112,11 @@
           ...(app.currentPreference?.notificationSettings || {}),
           [title]: !notificationEnabled(title)
         })} />
-        <button type="submit" class="profile-row">
-          <span class="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-selected text-link"><ItemIcon class="h-5 w-5" /></span>
-          <span class="min-w-0 flex-1 text-left">
-            <b>{title}</b>
-            <small>{body}</small>
-          </span>
-          <span class="h-6 w-10 shrink-0 rounded-full p-0.5 transition {notificationEnabled(title) ? 'bg-campus-blue' : 'bg-border'}">
-            <span class="block h-5 w-5 rounded-full bg-white transition {notificationEnabled(title) ? 'translate-x-4' : ''}"></span>
-          </span>
-        </button>
+        <SettingsRow as="button" type="submit" icon={ItemIcon} {title} {body}>
+          {#snippet action()}
+            <SwitchIndicator checked={notificationEnabled(title)} />
+          {/snippet}
+        </SettingsRow>
       </form>
     {/each}
   </div>
