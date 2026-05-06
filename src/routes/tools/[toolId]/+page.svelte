@@ -3,6 +3,7 @@
   import { page } from '$app/stores'
   import { getAppState, roleLabels } from '$lib/app-state.svelte'
   import ToolHero from '$lib/features/tools/ToolHero.svelte'
+  import ToolInfoRow from '$lib/features/tools/ToolInfoRow.svelte'
   import ToolLiveData from '$lib/features/tools/ToolLiveData.svelte'
   import ToolOnboardingGuide from '$lib/features/tools/ToolOnboardingGuide.svelte'
   import Icon from '$lib/components/shared/Icon.svelte'
@@ -77,35 +78,17 @@
     <div>
       <p class="mb-3 text-xs font-extrabold uppercase tracking-[0.18em] text-text-muted">Details</p>
       <div class="divide-y divide-border overflow-hidden rounded-2xl bg-surface shadow-sm ring-1 ring-border">
-        <div class="flex items-center gap-4 px-6 py-4 sm:px-8">
-          <div class="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-muted text-link">
-            <Folder class="h-5 w-5" />
-          </div>
-          <div class="min-w-0 flex-1">
-            <span class="block text-xs font-bold uppercase tracking-wider text-text-soft">Category</span>
-            <span class="block text-sm font-extrabold text-text">{app.categoryName(tool.categoryId)}</span>
-          </div>
-        </div>
+        <ToolInfoRow icon={Folder} label="Category">
+          <span class="block text-sm font-extrabold text-text">{app.categoryName(tool.categoryId)}</span>
+        </ToolInfoRow>
         {#if showAudienceDetail}
-          <div class="flex items-center gap-4 px-6 py-4 sm:px-8">
-            <div class="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-muted text-link">
-              <Users class="h-5 w-5" />
-            </div>
-            <div class="min-w-0 flex-1">
-              <span class="block text-xs font-bold uppercase tracking-wider text-text-soft">Audience</span>
-              <span class="block text-sm font-extrabold text-text">{tool.audienceRoles.map((role) => roleLabels[role]).join(', ')}</span>
-            </div>
-          </div>
+          <ToolInfoRow icon={Users} label="Audience">
+            <span class="block text-sm font-extrabold text-text">{tool.audienceRoles.map((role) => roleLabels[role]).join(', ')}</span>
+          </ToolInfoRow>
         {/if}
-        <div class="flex items-center gap-4 px-6 py-4 sm:px-8">
-          <div class="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-muted text-link">
-            <Clock class="h-5 w-5" />
-          </div>
-          <div class="min-w-0 flex-1">
-            <span class="block text-xs font-bold uppercase tracking-wider text-text-soft">Status</span>
-            <span class="block text-sm font-extrabold text-text">{tool.isActive ? 'Active' : 'Inactive'}</span>
-          </div>
-        </div>
+        <ToolInfoRow icon={Clock} label="Status">
+          <span class="block text-sm font-extrabold text-text">{tool.isActive ? 'Active' : 'Inactive'}</span>
+        </ToolInfoRow>
       </div>
     </div>
 
@@ -115,38 +98,22 @@
         <p class="mb-3 text-xs font-extrabold uppercase tracking-[0.18em] text-text-muted">Support & Requirements</p>
         <div class="divide-y divide-border overflow-hidden rounded-2xl bg-surface shadow-sm ring-1 ring-border">
           {#if tool.requirements}
-            <div class="flex items-center gap-4 px-6 py-4 sm:px-8">
-              <div class="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-muted text-link">
-                <Wrench class="h-5 w-5" />
-              </div>
-              <div class="min-w-0 flex-1">
-                <span class="block text-xs font-bold uppercase tracking-wider text-text-soft">Requirements</span>
-                <span class="block text-sm font-extrabold text-text">{tool.requirements}</span>
-              </div>
-            </div>
+            <ToolInfoRow icon={Wrench} label="Requirements">
+              <span class="block text-sm font-extrabold text-text">{tool.requirements}</span>
+            </ToolInfoRow>
           {/if}
           {#if tool.helpUrl}
-            <a href={tool.helpUrl} target="_blank" rel="noopener noreferrer" class="group flex items-center gap-4 px-6 py-4 transition duration-200 ease-out hover:bg-muted active:scale-[0.995] sm:px-8">
-              <div class="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-muted text-link transition duration-200 group-hover:scale-105">
-                <HelpCircle class="h-5 w-5" />
-              </div>
-              <div class="min-w-0 flex-1">
-                <span class="block text-xs font-bold uppercase tracking-wider text-text-soft">Help & Documentation</span>
-                <span class="block text-sm font-extrabold text-link group-hover:underline">View help documentation</span>
-              </div>
-              <ExternalLink class="h-4 w-4 shrink-0 text-text-soft transition duration-200 group-hover:translate-x-0.5" />
-            </a>
+            <ToolInfoRow icon={HelpCircle} label="Help & Documentation" href={tool.helpUrl}>
+              <span class="block text-sm font-extrabold text-link group-hover:underline">View help documentation</span>
+              {#snippet action()}
+                <ExternalLink class="h-4 w-4 shrink-0 text-text-soft transition duration-200 group-hover:translate-x-0.5" />
+              {/snippet}
+            </ToolInfoRow>
           {/if}
           {#if tool.contactInfo}
-            <div class="flex items-center gap-4 px-6 py-4 sm:px-8">
-              <div class="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-muted text-link">
-                <Mail class="h-5 w-5" />
-              </div>
-              <div class="min-w-0 flex-1">
-                <span class="block text-xs font-bold uppercase tracking-wider text-text-soft">Contact</span>
-                <span class="block text-sm font-extrabold text-text">{tool.contactInfo}</span>
-              </div>
-            </div>
+            <ToolInfoRow icon={Mail} label="Contact">
+              <span class="block text-sm font-extrabold text-text">{tool.contactInfo}</span>
+            </ToolInfoRow>
           {/if}
         </div>
       </div>
