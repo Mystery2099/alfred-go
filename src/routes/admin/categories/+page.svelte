@@ -1,7 +1,7 @@
 <script lang="ts">
   import { enhance } from '$app/forms'
   import { getAppState } from '$lib/app-state.svelte'
-  import { Trash2 } from 'lucide-svelte'
+  import DeleteActionForm from '$lib/features/admin/DeleteActionForm.svelte'
 
   const app = getAppState()
   let name = $state('')
@@ -58,18 +58,13 @@
       </div>
     </form>
     <div class="divide-y divide-border rounded-2xl bg-surface shadow-sm ring-1 ring-border overflow-hidden">
-      {#each app.categories as category}
+      {#each app.categories as category (category.id)}
         <div class="flex items-center justify-between gap-3 px-5 py-4 transition hover:bg-muted">
           <div class="min-w-0 flex-1">
             <span class="font-bold text-text">{category.name}</span>
             <p class="text-sm text-text-muted">{category.description || 'No description'}</p>
           </div>
-          <form method="POST" action="?/deleteCategory" use:enhance>
-            <input type="hidden" name="categoryId" value={category.id} />
-            <button title="Delete category" type="submit" class="grid h-8 w-8 place-items-center rounded-lg text-text-muted transition hover:bg-rose-100 hover:text-rose-600" aria-label="Delete {category.name} category">
-              <Trash2 class="h-4 w-4" />
-            </button>
-          </form>
+          <DeleteActionForm action="?/deleteCategory" fieldName="categoryId" id={category.id} label={`Delete ${category.name} category`} />
         </div>
       {/each}
     </div>

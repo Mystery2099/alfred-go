@@ -2,8 +2,10 @@
   import { enhance } from '$app/forms'
   import { getAppState, roleLabels } from '$lib/app-state.svelte'
   import type { Announcement } from '$lib/types'
-  import { Plus, X, Trash2, Pencil } from 'lucide-svelte'
+  import { Plus, X, Pencil } from 'lucide-svelte'
+  import AdminIconButton from '$lib/features/admin/AdminIconButton.svelte'
   import AudienceRolePicker from '$lib/features/admin/AudienceRolePicker.svelte'
+  import DeleteActionForm from '$lib/features/admin/DeleteActionForm.svelte'
 
   const app = getAppState()
 
@@ -149,15 +151,8 @@
             </div>
           </div>
           <div class="flex items-center gap-1 shrink-0">
-            <button title="Edit announcement" onclick={() => startEdit(announcement)} class="grid h-8 w-8 place-items-center rounded-lg text-text-muted transition hover:bg-muted hover:text-link">
-              <Pencil class="h-4 w-4" />
-            </button>
-            <form method="POST" action="?/deleteAnnouncement" use:enhance>
-              <input type="hidden" name="announcementId" value={announcement.id} />
-              <button title="Delete announcement" type="submit" class="grid h-8 w-8 place-items-center rounded-lg text-text-muted transition hover:bg-rose-100 hover:text-rose-600">
-                <Trash2 class="h-4 w-4" />
-              </button>
-            </form>
+            <AdminIconButton icon={Pencil} label="Edit announcement" onclick={() => startEdit(announcement)} />
+            <DeleteActionForm action="?/deleteAnnouncement" fieldName="announcementId" id={announcement.id} label="Delete announcement" />
           </div>
         </div>
       {/each}

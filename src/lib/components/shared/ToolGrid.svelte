@@ -1,8 +1,10 @@
 <script lang="ts">
   import { enhance } from '$app/forms'
   import { resolve } from '$app/paths'
-  import { Pencil, Trash2, ExternalLink, ChevronRight } from 'lucide-svelte'
+  import { Pencil, ExternalLink, ChevronRight } from 'lucide-svelte'
   import { getAppState } from '$lib/app-state.svelte'
+  import AdminIconButton from '$lib/features/admin/AdminIconButton.svelte'
+  import DeleteActionForm from '$lib/features/admin/DeleteActionForm.svelte'
   import FavoriteButton from '$lib/features/tools/FavoriteButton.svelte'
   import Icon from './Icon.svelte'
   import type { Tool } from '$lib/types'
@@ -62,23 +64,8 @@
         <!-- Actions -->
         {#if admin}
           <div class="flex items-center gap-1 shrink-0">
-            <button
-              aria-label="Edit {tool.name}"
-              onclick={() => onEdit?.(tool)}
-              class="grid h-9 w-9 place-items-center rounded-xl text-text-muted transition duration-150 hover:scale-110 hover:bg-muted hover:text-link active:scale-90"
-            >
-              <Pencil class="h-4 w-4" />
-            </button>
-            <form method="POST" action="?/deleteTool" use:enhance>
-              <input type="hidden" name="toolId" value={tool.id} />
-              <button
-                aria-label="Delete {tool.name}"
-                type="submit"
-                class="grid h-9 w-9 place-items-center rounded-xl text-text-muted transition duration-150 hover:scale-110 hover:bg-rose-50 hover:text-rose-600 active:scale-90"
-              >
-                <Trash2 class="h-4 w-4" />
-              </button>
-            </form>
+            <AdminIconButton size="md" icon={Pencil} label={`Edit ${tool.name}`} onclick={() => onEdit?.(tool)} />
+            <DeleteActionForm action="?/deleteTool" fieldName="toolId" id={tool.id} label={`Delete ${tool.name}`} size="md" />
           </div>
         {:else}
           <div class="flex items-center gap-1 shrink-0">
